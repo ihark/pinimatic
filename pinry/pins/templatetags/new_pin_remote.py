@@ -8,7 +8,7 @@ register = Library()
 
 
 @register.simple_tag
-def new_pin(request):
-    return render_to_string('pins/templatetags/new_pin.html',
+def new_pin_remote(request):
+    return render_to_string('pins/templatetags/new_pin_remote.html',
         {'form': PinForm()},
         context_instance=RequestContext(request))

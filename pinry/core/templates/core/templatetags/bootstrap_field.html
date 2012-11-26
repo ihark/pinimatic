@@ -1,5 +1,9 @@
-<div class="control-group{% if field.errors %} error{% endif %}">
+{% if field.is_hidden %}
+<div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}" style="display:none;">
+{% elif not field.is_hidden %}
+<div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}">
     <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+{% endif %}
     <div class="controls">
         {{ field }}
         {% if field.errors %}

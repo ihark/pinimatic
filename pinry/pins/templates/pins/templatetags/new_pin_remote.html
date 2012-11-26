@@ -1,0 +1,20 @@
+{% load bootstrap_field %}
+
+<div class="modal fade" id="new-pin">
+    <div class="modal-header">
+        <h3>New Pin</h3>
+    </div>
+    <form action="" enctype="multipart/form-data" method="get" id="ajaxform" name="pin_form" class="form-horizontal">
+        <div class="modal-body">
+            {% csrf_token %}
+            {% for field in form %}
+                {% bootstrap_field field %}
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+			<div class="messageContainer"></div>
+            <button id="btnsubmit" type="submit" class="btn btn-primary">Submit</button>
+            <a id="cancel" onclick="removeOverlay()" data-toggle="modal" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>

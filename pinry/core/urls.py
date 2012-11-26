@@ -8,4 +8,6 @@ urlpatterns = patterns('',
         {'template_name': 'core/login.html'}, name='login'),
     url(r'^register/$', 'pinry.core.views.register', name='register'),
     url(r'^logout/$', 'pinry.core.views.logout_user', name='logout'),
+    url(r'^bookmarklet/$', 'pinry.core.views.bookmarklet', name='bookmarklet'),
+    url(r'^ajax/submit/$', 'pinry.pins.views.AjaxSubmit', name='AjaxSubmit'),
 )

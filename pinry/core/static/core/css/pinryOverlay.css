@@ -1,0 +1,117 @@
+/* MODIFICATIONS TO PINRY and BOOTSTRAP CSS */
+
+body {
+/* use below rule to make room for header at a later date */
+	/* margin-top: 70px; */
+
+}
+
+#overlay *, ::after, ::before {
+-webkit-box-sizing: content-box !important;
+-moz-box-sizing: content-box !important;
+box-sizing: content-box !important;
+}
+#overlay  *{
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+#overlay div{
+    width: auto;
+}
+
+#overlay, input, textarea, select, .uneditable-input {
+	color: #555 !important;
+	background-color: white !important;
+	border: 1px solid #CCC !important;
+	-webkit-border-radius: 3px !important;
+	-moz-border-radius: 3px !important;
+	border-radius: 3px !important;
+}	
+
+#ajaxform {
+    margin: 0px;
+}
+
+    #ajaxform textarea {
+            height: 50px;
+			resize: vertical;
+    }
+		
+	#ajaxform input {
+			width: 210px;
+            height: 25px;
+			padding: 1px 1px 1px 4px !important;
+    }
+	#ajaxform input[type="file"] {
+			width: 210px;
+			height: 25px;
+			border: 0px !important;
+			padding: 1px 1px 1px 4px !important;
+	}
+	
+#overlay .form-horizontal .control-group {
+  margin-bottom: 18px;
+}
+#overlay .form-horizontal .controls {
+  margin-left: 120px;
+  width: 250px;
+}
+#overlay .form-horizontal .control-label {
+  float: left;
+  width: 100px;
+  padding-top: 5px;
+  text-align: right;
+}
+	
+#overlay .modal {
+  width: 450px;
+  margin: -180px 0 0 -250px;
+  overflow-x: auto;
+  overflow-x: hidden;
+  max-height: 400px;
+}
+
+#overlay .messageContainer div {
+  float: left;
+  text-align: left;
+  width: 270px;
+}
+
+#overlay .alertSmall {
+  padding: 4px 10px 4px 10px;
+  margin-bottom: 2px;
+  margin-top: 0px;
+}
+#overlay .modal-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #EEE;
+}
+#overlay .modal-body{
+  padding: 10px 15px;
+  overflow-x: auto;
+  overflow-x: hidden;
+}
+#overlay .modal-footer {
+  padding: 10px 15px;
+  margin-bottom: 0;
+  text-align: right;
+  background-color: whiteSmoke;
+  border-top: 1px solid #DDD;
+  -webkit-border-radius: 0 0 6px 6px;
+  -moz-border-radius: 0 0 6px 6px;
+  border-radius: 0 0 6px 6px;
+  -webkit-box-shadow: inset 0 1px 0 white;
+  -moz-box-shadow: inset 0 1px 0 #ffffff;
+  box-shadow: inset 0 1px 0 white;
+}
+
+
+
+
+
+
+
+
+
+
+

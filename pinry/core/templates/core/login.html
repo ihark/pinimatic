@@ -17,6 +17,7 @@
                     {% endfor %}
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Login</button>
+                        <input type="hidden" name="next" value="{{ next }}" />
                         <a href="{% url core:home %}" class="btn">Cancel</a>
                     </div>
                 </form>

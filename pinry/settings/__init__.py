@@ -2,6 +2,7 @@ import os
 from django.contrib.messages import constants as messages
 
 
+
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
 
@@ -39,8 +40,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.auth.middleware.RemoteUserMiddleware',
+    #'pinry.core.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'pinry.core.middleware.Public',
+    'pinry.core.middleware.AllowOriginMiddleware', 
+    'pinry.core.middleware.AjaxMessaging',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -49,13 +55,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     "django.core.context_processors.request",
+    "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "pinry.core.context_processors.template_settings",
-)
+    "pinry.core.context_processors.baseurl",
+) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']
 ROOT_URLCONF = 'pinry.urls'
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
 INTERNAL_IPS = ['127.0.0.1']
 MESSAGE_TAGS = {
     messages.WARNING: 'alert',

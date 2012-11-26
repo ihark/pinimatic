@@ -5,6 +5,7 @@ import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+HTTPS=1
 
 DATABASES = {
     'default': {

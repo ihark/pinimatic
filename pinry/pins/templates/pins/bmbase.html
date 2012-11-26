@@ -1,0 +1,19 @@
+{% load new_pin_remote %}
+{% load compress %}
+{% load bootstrap_field %}
+
+{% compress css %}
+    <link name="cssbs" rel="stylesheet" href="{{ BASE_URL }}/static/vendor/bootstrap/2.0.3/css/bootstrap.css">
+    <link name="csspo" rel="stylesheet" href="{{ BASE_URL }}/static/core/css/pinryOverlay.css">
+{% endcompress %}
+
+
+
+{% block yield %}{% endblock %}
+{% new_pin_remote request %}
+
+
+
+{% compress js %}
+    <script name="jq" src="{{ BASE_URL }}/static/core/js/pinry.js"></script>
+{% endcompress %}

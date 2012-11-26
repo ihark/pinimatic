@@ -87,6 +87,9 @@ function onLoadData(data) {
               html += '<a href="/pins/delete-pin/'+image.id+'">';
                   html += '<i class="icon-trash"></i>';
               html += '</a>';
+			  html += '<a href="/pins/edit-pin/'+image.id+'">';
+                  html += '<i class="icon-edit"></i>';
+              html += '</a>';
           html += '</div>';
           html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
               html += '<img src="'+image.thumbnail+'" width="200" >';

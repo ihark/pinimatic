@@ -3,18 +3,24 @@ from django import forms
 from taggit.forms import TagField
 
 from .models import Pin
+from pinry.core.widgets import CustomImage, CustomThumbnail
+from django.forms.widgets import HiddenInput
 
 
 class PinForm(forms.ModelForm):
-    url = forms.CharField(label='URL', required=False)
-    image = forms.ImageField(label='or Upload', required=False)
+    id = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='id', required=False)
+    imgUrl = forms.CharField(label='Image URL', required=False)
+    #thumbnail = forms.ImageField(widget=CustomThumbnail(), label='Current', required=False)
+    image = forms.ImageField(widget=CustomImage(),label='or Upload', required=False)
     tags = TagField()
 
 
     def __init__(self, *args, **kwargs):
         super(forms.ModelForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = (
-            'url',
+            'id',
+            'imgUrl',
+            #'thumbnail',
             'image',
             'description',
             'tags',
@@ -31,28 +37,32 @@ class PinForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(PinForm, self).clean()
-
-        url = cleaned_data.get('url')
+        id = cleaned_data.get('id')
+        imgUrl = cleaned_data.get('imgUrl')
         image = cleaned_data.get('image')
-
-        if url:
-            self.check_if_image(url)
+        
+        if id:
+            pass
+            print 'validate id: '+str(id)
+        elif imgUrl:
+            #print '--checking url for exiting, edit = '+edit
+            self.check_if_image(imgUrl)
             try:
-                Pin.objects.get(url=url)
+                Pin.objects.get(imgUrl=imgUrl)
                 raise forms.ValidationError("URL has already been pinned!")
             except Pin.DoesNotExist:
-                protocol = url.split(':')[0]
+                protocol = imgUrl.split(':')[0]
                 if protocol == 'http':
-                    opp_url = url.replace('http://', 'https://')
+                    opp_url = imgUrl.replace('http://', 'https://')
                 elif protocol == 'https':
-                    opp_url = url.replace('https://', 'http://')
+                    opp_url = imgUrl.replace('https://', 'http://')
                 else:
                     raise forms.ValidationError("Currently only support HTTP and "
                                                 "HTTPS protocols, please be sure "
                                                 "you include this in the URL.")
 
                 try:
-                    Pin.objects.get(url=opp_url)
+                    Pin.objects.get(imgUrl=opp_url)
                     raise forms.ValidationError("URL has already been pinned!")
                 except Pin.DoesNotExist:
                     pass

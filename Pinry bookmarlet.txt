@@ -1,0 +1,3 @@
+paste the following code into a browser bookmark:
+
+javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='http://localhost:8000/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())

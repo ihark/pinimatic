@@ -11,24 +11,32 @@ from PIL import Image
 
 class Pin(models.Model):
     submitter = models.ForeignKey(User)
-    url = models.TextField(blank=True, null=True)
+    imgUrl = models.TextField(blank=True, null=True)
+    #srcUrl will be used as link to image source page rather than the image url.
+    srcUrl = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='pins/pin/originals/')
-    thumbnail = models.ImageField(upload_to='pins/pin/thumbnails/')
+    thumbnail = models.ImageField(upload_to='pins/pin/thumbnails/', max_length=100)
     published = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
 
 
     def __unicode__(self):
-        return self.url
+        return self.imgUrl
+
+    def edit(self, *args, **kwargs):
+        print 'model - pin.edit()'
+        self.image.delete()
+        self.thumbnail.delete()
 
 
     def save(self, *args, **kwargs):
         hash_name = os.urandom(32).encode('hex')
-
+        
         if not self.image:
+            print 'if not self.image'
             temp_img = NamedTemporaryFile()
-            temp_img.write(urllib2.urlopen(self.url).read())
+            temp_img.write(urllib2.urlopen(self.imgUrl).read())
             temp_img.flush()
             image = Image.open(temp_img.name)
             if image.mode != "RGB":
@@ -51,6 +59,14 @@ class Pin(models.Model):
                 image = image.convert("RGB")
             image.save(temp_thumb.name, 'JPEG')
             self.thumbnail.save(''.join([hash_name, '.jpg']), File(temp_thumb))
+            
+        if not self.srcUrl:
+            print 'model self.srcUrl = '+str(self.srcUrl)
+            print 'model self.imgUrl = '+str(self.imgUrl)
+            self.srcUrl = self.imgUrl
+            print 'model self.srcUrl = '+str(self.srcUrl)
+        else:
+            pass
 
         super(Pin, self).save(*args, **kwargs)
 

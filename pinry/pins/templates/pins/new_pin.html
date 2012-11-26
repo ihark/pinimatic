@@ -9,9 +9,12 @@
     <div class="container">
         <div class="row">
             <div class="span6 offset3" id="form">
-                <h1>New Pin</h1>
+                <h3>Edit Pin</h3>
                 {{ form.non_field_errors }}
-                <form enctype="multipart/form-data" action="{% url pins:new-pin %}" method="post" class="form-horizontal">
+                <form enctype="multipart/form-data" action="" method="post" class="form-horizontal">
+                    {% if thumbnail %}
+                        <img id="thumb_id" src="{{thumbnail}}"/>
+                    {% endif %}
                     {% for field in form %}
                         {% bootstrap_field field %}
                     {% endfor %}

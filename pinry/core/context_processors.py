@@ -6,3 +6,8 @@ def template_settings(request):
         'site_name': settings.SITE_NAME,
     }
 
+def baseurl(request):
+    """
+    Return a BASE_URL template context for the current request.
+    """     
+    return {'BASE_URL': '//' + request.get_host(),}

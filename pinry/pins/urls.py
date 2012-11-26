@@ -6,4 +6,6 @@ urlpatterns = patterns('pinry.pins.views',
     url(r'^tag/.+/$', 'recent_pins', name='tag'),
     url(r'^new-pin/$', 'new_pin', name='new-pin'),
     url(r'^delete-pin/(?P<pin_id>\d+)/$', 'delete_pin', name='delete-pin'),
+	url(r'^edit-pin/(?P<pin_id>\d*)/$', 'new_pin', name='edit-pin'),
+
 )

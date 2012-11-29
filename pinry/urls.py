@@ -11,5 +11,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('pinry.api.urls', namespace='api')),
     url(r'^pins/', include('pinry.pins.urls', namespace='pins')),
+	#url(r'^bookmarklet/', include('pinry.bookmarklet.urls', namespace='bookmarklet')),
     url(r'', include('pinry.core.urls', namespace='core')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

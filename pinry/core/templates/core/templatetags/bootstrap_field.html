@@ -2,18 +2,18 @@
 <div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}" style="display:none;">
 {% elif not field.is_hidden %}
 <div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}">
-    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    <label id="{{ field.id_for_label }}_label" class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 {% endif %}
-    <div class="controls">
-        {{ field }}
-        {% if field.errors %}
-            <span class="help-inline">
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        {{ error|escape }}
-                    {% endfor %}
-                {% endif %}
-            </span>
-        {% endif %}
+{% if field.errors %}
+	<span class="help-inline control-label">
+		{% if field.errors %}
+			{% for error in field.errors %}
+				: {{ error|escape }}
+			{% endfor %}
+		{% endif %}
+	</span>
+{% endif %}
+	<div class="controls">
+		{{ field }}
     </div>
 </div>

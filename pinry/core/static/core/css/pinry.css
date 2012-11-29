@@ -9,6 +9,7 @@ body {
     filter: none;
     border-bottom: 1px solid #999;
     height: 48px;
+	min-width: 500px;
 }
 
     .navbar .brand {
@@ -91,13 +92,36 @@ body {
 
         .pin p {
             margin-bottom: 0;
-            padding-top: 15px
+            padding-top: 3px;
+			padding-bottom: 3px;
+			
         }
-
-            .pin strong {
-                color: #777;
-                font-weight: normal;
-            }
+		
+		.pin a {
+			color: #000;
+			text-decoration: none;
+		}
+		
+		.pin a:link {
+			color: #777;
+		}
+		
+		.pin a:visited {
+			color: #777;
+		}
+		
+		.pin a:hover {
+			color: #000;
+		}
+		
+		.pin strong {
+			color: #777;
+			font-weight: normal;
+		}
+		
+		.pin .source-url {
+			font-size: 10px;
+		}
 
 .pin-options {
     margin: 5px;
@@ -122,13 +146,7 @@ body {
         padding: 3px;
     }
 
-#form {
-    border: 1px solid #ccc;
-    background-color: white;
-    padding: 15px;
-}
-
-    #form h1 {
+    form h1 {
         font-family: 'Monoton';
         text-align: center;
         font-weight: normal;
@@ -148,7 +166,7 @@ body {
         }
 		input[type="file"] {
 			height: 25px;
-			width: 210px;
+			width: 200px;
 			line-height: 25px;
 		}
 
@@ -158,14 +176,82 @@ body {
 		
 /* MODIFICATIONS TO BOOTSTRAP */		
 .modal {
-  width: 500px;
-  margin: -185px 0 0 -280px;
+  width: 498px;
+  margin: -230px 0 0 -250px;
+}
+.modal.fade {
+  top: -50%;
 }
 .modal.fade.in {
   top: 50%;
-  margin: -185px 0 0 -280px;
+}
+.modal-footer {
+  padding: 10px 15px;
+}
+.modal-header h3{
+  display:inline-block;
+  margin-right: 25px;
+}
+
+.form-container {
+    border: 1px solid #ccc;
+    background-color: white;
+	width: 470px;
+    padding: 15px;
+	overflow: hidden;
+	margin-right: auto;
+	margin-left: auto;
+}
+.form-container .form-actions{
+  float: left;
+  text-align: right;
+  width: 100%;
+  padding: 10px 15px 10px 15px;
+  margin: 0px 0px -15px -15px;
+}
+.form-container .form-header{
+  width: 100%;
+  padding: 5px 15px 5px 15px;
+  margin: -15px 0px 15px -15px;
+  border-bottom: 1px solid #CCC;
+  
+}
+.form-header h3{
+  display:inline-block;
+  margin: 0px 25px 0px 0px ;
+  
+}
+
+.form{
+    text-align: center;
+}
+
+.form #fields_div{
+  text-align: left;
+  display: inline-block;
+  width: 220px;
+}
+.form #thumb_div{
+  vertical-align: top;
+  text-align: center;
+  display: inline-block;
+  margin-right: 30px;
+  margin-top: 5px;
+  width: 200px;
+  height: 100%;
+  border: 1px solid #CCC;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 
 
-
-
+.form .control-group.error > label {
+  color: black;
+  display: inline-block;
+}
+.form .help-inline.control-label {
+  vertical-align: inherit;
+  padding-left: 0px;
+  cursor: default;
+}

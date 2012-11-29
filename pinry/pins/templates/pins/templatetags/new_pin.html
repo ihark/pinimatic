@@ -3,12 +3,18 @@
 <div class="modal fade" id="new-pin">
     <div class="modal-header">
         <h3>New Pin</h3>
+		<span>* Required fields</span>
     </div>
-    <form enctype="multipart/form-data" action="{% url pins:new-pin %}" method="post" class="form-horizontal">
+    <form enctype="multipart/form-data" id="new-pin-form" action="{% url pins:new-pin %}" method="post" class="form">
         <div class="modal-body">
-            {% for field in form %}
-                {% bootstrap_field field %}
-            {% endfor %}
+			<div id="thumb_div">
+				<img id="thumb_id" src="/static/core/img/thumb-default.png" alt="Invlaid Image"/>
+			</div>
+			<div id="fields_div">
+				{% for field in form %}
+					{% bootstrap_field field %}
+				{% endfor %}
+			</div>
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-primary">Post</button>

@@ -5,46 +5,53 @@ body {
 	/* margin-top: 70px; */
 
 }
-
+#overlay{
+	background-color: transparent !important;
+}
 #overlay *, ::after, ::before {
--webkit-box-sizing: content-box !important;
--moz-box-sizing: content-box !important;
-box-sizing: content-box !important;
+	-webkit-box-sizing: content-box !important;
+	-moz-box-sizing: content-box !important;
+	box-sizing: content-box !important;
+
 }
 #overlay  *{
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	font-size: 13px;
+	font-weight: normal;
+	font-style: normal;
+	text-rendering: optimizelegibility;
+}
+#overlay  h1, h2, h3, h4, h5, h6 {
+margin: 0;
+font-family: inherit;
+font-weight: bold;
+font-style: normal;
+color: inherit;
+text-rendering: optimizelegibility;
+text-align: left;
+}
+#overlay  h3{
+	font-size: 18px
 }
 
 #overlay div{
     width: auto;
-}
-
-#overlay, input, textarea, select, .uneditable-input {
-	color: #555 !important;
-	background-color: white !important;
-	border: 1px solid #CCC !important;
-	-webkit-border-radius: 3px !important;
-	-moz-border-radius: 3px !important;
-	border-radius: 3px !important;
-}	
-
-#ajaxform {
-    margin: 0px;
+	margin: 0;
 }
 
     #ajaxform textarea {
-            height: 50px;
-			resize: vertical;
+            height: 50px !important;
+			resize: vertical !important;
     }
 		
 	#ajaxform input {
-			width: 210px;
-            height: 25px;
+			width: 210px !important; 
+            height: 25px !important;
 			padding: 1px 1px 1px 4px !important;
     }
 	#ajaxform input[type="file"] {
-			width: 210px;
-			height: 25px;
+			width: 210px !important;
+			height: 25px !important;
 			border: 0px !important;
 			padding: 1px 1px 1px 4px !important;
 	}
@@ -62,13 +69,41 @@ box-sizing: content-box !important;
   padding-top: 5px;
   text-align: right;
 }
-	
+
 #overlay .modal {
-  width: 450px;
-  margin: -180px 0 0 -250px;
-  overflow-x: auto;
-  overflow-x: hidden;
-  max-height: 400px;
+  width: 450px !important;
+  margin: -115px 0 0 -225px  !important;
+  overflow: auto !important;
+  max-height: 400px !important;
+  z-index: 10 !important;
+  background-color: white !important;
+  color: #555 !important;
+  border: 1px solid #CCC !important;
+  -webkit-border-radius: 3px !important;
+  -moz-border-radius: 3px !important;
+  border-radius: 3px !important;
+  padding: 0 !important;
+  bottom: auto !important;
+}
+
+#overlay .modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  background-color: #000000;
+}
+
+#overlay .modal-backdrop.fade {
+  opacity: 0;
+}
+
+#overlay .modal-backdrop,
+#overlay .modal-backdrop.fade.in {
+  opacity: 0.9;
+  filter: alpha(opacity=90);
 }
 
 #overlay .messageContainer div {
@@ -78,22 +113,27 @@ box-sizing: content-box !important;
 }
 
 #overlay .alertSmall {
-  padding: 4px 10px 4px 10px;
-  margin-bottom: 2px;
-  margin-top: 0px;
+  padding: 4px 10px 4px 10px !important;
+  margin-bottom: 2px !important;
+  margin-top: 0px !important;
+  list-style: disc !important;
 }
+
 #overlay .modal-header {
   padding: 10px 15px;
   border-bottom: 1px solid #EEE;
+  text-align: left;
 }
 #overlay .modal-body{
+  vertical-align: middle;
+  text-align: center;
   padding: 10px 15px;
   overflow-x: auto;
-  overflow-x: hidden;
+  overflow-y: hidden;
 }
 #overlay .modal-footer {
   padding: 10px 15px;
-  margin-bottom: 0;
+  margin: 10px -15px -10px;
   text-align: right;
   background-color: whiteSmoke;
   border-top: 1px solid #DDD;
@@ -103,8 +143,57 @@ box-sizing: content-box !important;
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 #ffffff;
   box-shadow: inset 0 1px 0 white;
+  overflow: hidden;
+}
+#form-container {
+    border: 1px solid #ccc;
+    background-color: white;
+	width: 500px;
+    padding: 15px;
+	overflow: hidden;
+}
+#form-container img {
+    display: block;
+	max-height: 200px;
+	max-width: 160px;
+}
+#form-container div {
+   vertical-align: middle;
+}
+#form-container form {
+   margin: 0px;
 }
 
+#form-container #fields_div{
+  text-align: left;
+  display: inline-block;
+  width: 220px;
+  margin: 0px 0px 0px 10px;
+  padding: 0px;
+}
+#form-container #thumb_div{
+  display: inline-block;
+  width: 160px;
+  margin: 0px 10px 0px 0px;
+  padding: 0px;
+}
+
+#form-container .form-header{
+  width: 100%;
+  padding: 10px 15px 10px 15px;
+  margin: -15px 0px 15px -15px;
+  border-bottom: 1px solid #CCC;
+}
+
+.control-group.error > label {
+  color: black;
+  display: inline-block;
+}
+.help-inline.control-label {
+  vertical-align: inherit;
+  padding-left: 0px;
+  cursor: default;
+}
 
 
 

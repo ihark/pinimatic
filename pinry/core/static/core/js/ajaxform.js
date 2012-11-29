@@ -82,18 +82,12 @@ $(document).ready(function () {
 // }
 function popLoc(data) {
 	//&mode=save tells view to save pin in lew of POST
-	nw = window.open("http:"+baseurl+"/pins/new-pin/?"+data+"&save=True", 'popup', 'width=800,height=400,resizeable,scrollbars');
+	nw = window.open("http:"+baseurl+"/pins/new-pin/?"+data+"&save=True", 'popup', 'width=800, height=400, resizeable=true, scrollbars');
 	if (window.focus) {
 		nw.focus()
 	}	
 }
-//remove the overlay
-function removeOverlay() {
-    $("#new-pin").attr('class', 'modal fade');
-	o=document.getElementById("overlay");
-	document.body.removeChild(o);
-    document.body.setAttribute("class", "");
-}
+
 //ajax messages
 function addMessageList(div_id) {
     var container = $( '.messageContainer' );
@@ -117,8 +111,8 @@ function addMessage(html_id, text, extra_tags) {
     // }, 10000);
 }
 function apply_form_field_error(fieldname, error, tags) {
-    var input = $( "#id_"  + fieldname),
-        container = $( "#div_id_"  + fieldname),
+    var input = $( "#id_"+fieldname+"_label"),
+        container = $( "#div_id_"+fieldname),
         error_msg = $("<span />").addClass("help-inline ajax-error").text(error);
 
     container.addClass("error");

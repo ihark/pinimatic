@@ -6,24 +6,35 @@
 {% block title %}New Pin{% endblock %}
 
 {% block yield %}
-    <div class="container">
-        <div class="row">
-            <div class="span6 offset3" id="form">
-                <h3>Edit Pin</h3>
-                {{ form.non_field_errors }}
-                <form enctype="multipart/form-data" action="" method="post" class="form-horizontal">
-                    {% if thumbnail %}
-                        <img id="thumb_id" src="{{thumbnail}}"/>
-                    {% endif %}
-                    {% for field in form %}
-                        {% bootstrap_field field %}
-                    {% endfor %}
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Post</button>
-                        <a href="{% url core:home %}" class="btn">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <div class="form-container">
+		<div class="form-header">
+			<h3 id="edit-form-title" >Edit Pin</h3>
+			<span>* Required fields</span>
+		</div>
+		{{ form.non_field_errors }}
+		<form enctype="multipart/form-data" action="" id="edit-pin-form" method="post" class="form">
+			<div id="thumb_div">
+				<img id="thumb_id" src="{{thumb}}" alt="Invlaid Image"/>
+			</div>
+			<div id="fields_div">
+				{% for field in form %}
+					{% bootstrap_field field %}
+				{% endfor %}
+			</div>
+			<div class="form-actions">
+                <button type="submit" class="btn btn-primary">Post</button>
+				<a href="{% url core:home %}" onClick="cancelNewPin();" class="btn">Cancel</a>
+			</div>
+		</form>
     </div>
+	<script>
+		var id = document.getElementById('id_id')
+		var title = document.getElementById('edit-form-title')
+		if (id.value){
+			title.innerHTML = 'Edit Pin'
+		}else{
+			title.innerHTML = 'New Pin'
+		}
+	</script>
+			
 {% endblock %}

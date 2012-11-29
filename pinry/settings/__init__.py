@@ -4,11 +4,10 @@ from django.contrib.messages import constants as messages
 
 
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
-
+SITE_URL = 'http://localhost:8000'
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinry'
-
 # Set to False to disable people from creating new accounts.
 ALLOW_NEW_REGISTRATIONS = True
 
@@ -24,8 +23,11 @@ USE_TZ = True
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
 MEDIA_URL = '/media/'
+TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
+TMP_URL = '/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
+IMAGES_PATH = 'pins/pin/originals/'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -88,4 +90,5 @@ INSTALLED_APPS = (
     'pinry.core',
     'pinry.pins',
     'pinry.api',
+    'pinry.bookmarklet',
 )

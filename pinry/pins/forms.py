@@ -4,7 +4,7 @@ from taggit.forms import TagField, TagWidget
 
 from .models import Pin
 from pinry.core.widgets import CustomImage, CustomThumbnail, AdminImageWidget
-from django.forms.widgets import FileInput, HiddenInput
+from django.forms.widgets import FileInput, HiddenInput, TextInput
 from pinry.settings import IMAGES_PATH, MEDIA_URL
 #from pinry.core.utils import MakeThumbnail, saveTempImg
 
@@ -12,7 +12,7 @@ from pinry.settings import IMAGES_PATH, MEDIA_URL
 class PinForm(forms.ModelForm):
     id = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='id', required=False)
     srcUrl = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='srcUrl', required=False)
-    imgUrl = forms.CharField(label='Image URL', required=False)
+    imgUrl = forms.CharField(widget=TextInput(attrs={'placeholder':'http://www.xxx.com/image.ext'}), label='Image URL', required=False)
     #thumbnail = forms.ImageField(widget=CustomThumbnail(), label='Current', required=False)
     image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
     tags = TagField(widget=TagWidget(attrs={'placeholder':'required'}), label='*Tags')

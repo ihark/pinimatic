@@ -45,6 +45,7 @@ def AjaxSubmit(request):
 def recent_pins(request):
     return TemplateResponse(request, 'pins/recent_pins.html', None)
 
+#create new pin or edit exitsing pin, based on presence of id.
 @login_required ()
 def new_pin(request, pin_id=None):
     save = request.REQUEST.get('save', False)
@@ -56,7 +57,8 @@ def new_pin(request, pin_id=None):
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
             if pin.submitter != request.user:
-                messages.error(request, 'This aint your pin!')            
+                messages.error(request, 'You can not edit other users pins.')  
+                return HttpResponseRedirect(reverse('pins:recent-pins'))
         except Pin.DoesNotExist:
             messages.error(request, 'This pin does not exist.')
     else:
@@ -129,8 +131,7 @@ def delete_pin(request, pin_id=None):
 
             messages.success(request, 'Pin successfully deleted.')
         else:
-            messages.error(request, 'You are not the submitter and can not '
-                                    'delete this pin.')
+            messages.error(request, 'You can not delete other users pins.')
     except Pin.DoesNotExist:
         messages.error(request, 'Pin with the given id does not exist.')
         

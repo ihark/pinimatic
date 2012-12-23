@@ -21,8 +21,7 @@ class UserResource(ModelResource):
         }
 
         # Add it here.
-        #authentication = BasicAuthentication()
-        #authorization = DjangoAuthorization()
+        authorization = DjangoAuthorization()
     
 
         

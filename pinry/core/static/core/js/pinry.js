@@ -61,8 +61,8 @@ function loadData(tag, user) {
 		var nAddress = '/pins/'+user+'/'
 		console.warn('if user update url to: /pins/'+user+'/')
         window.history.pushState(user, 'Pinry - User - '+user, nAddress);
-
-	} else if (tag && !user) {
+	}else if (tag && !user) {
+		user = cUser
 		var nAddress = '/pins/'+cUser+'/'+tag+'/'
 		console.warn('else if tag update url to: '+nAddress)
         window.history.pushState(tag, 'Pinry - Tag - '+tag, nAddress);
@@ -71,6 +71,7 @@ function loadData(tag, user) {
 		console.warn('else if tag update url to: '+nAddress)
         window.history.pushState(tag, 'Pinry - Tag - '+tag, nAddress);
 	}
+		
 	
 	if (tag !== undefined || user !== undefined && user !== cUser){
 		page = 0;
@@ -110,8 +111,6 @@ function loadData(tag, user) {
  */
 function onLoadData(data) {
     data = data.objects;
-    isLoading = false;
-    $('#loader').hide();
     
     page++;
     
@@ -147,6 +146,8 @@ function onLoadData(data) {
     $('#pins').append(html);
     
     applyLayout();
+	isLoading = false;
+    $('#loader').hide();
 };
 
 $(document).ready(new function() {

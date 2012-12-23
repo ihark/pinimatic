@@ -25,6 +25,7 @@
                 <ul class="nav pull-right">
                     {% if user.is_authenticated %}
                         <li><a href="#new-pin" data-toggle="modal">New Pin</a></li>
+						<li><p onclick="loadData(undefined, '{{ user }}');">{{ user }}</p></li>
                         <li><a href="{% url core:logout %}">Logout</a></li>
                     {% else %}
                         <li><a href="{% url core:login %}">Login</a></li>

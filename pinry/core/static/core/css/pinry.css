@@ -14,21 +14,22 @@ body {
 
     .navbar .brand {
         margin-left: 0;
-        color: #333;
+        color: #999;
         font-family: 'Monoton';
         font-size: 30px;
     }
-
-    .navbar .nav > li > a {
-        color: #333;
+	.navbar .nav > li > a,
+	.navbar .nav > li > p{
+        color: #999;
         text-shadow: none;
         border-left: 1px solid #ccc;
         padding: 14px 20px 15px;
+		margin: 0px;
+		cursor: pointer;
     }
-
-    .navbar .nav > li > a:hover {
-        color: #333;
-        text-decoration: underline;
+	.navbar .nav > li > a:hover,
+	.navbar .nav > li > p:hover{
+        color: #555;
     }
 .messages {
     list-style-type: none;

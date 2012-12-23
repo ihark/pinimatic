@@ -1,7 +1,7 @@
 /**
  * Based on Wookmark's endless scroll.
  */
-var apiURL = '/api/pin/?format=json&offset='
+var apiURL = '/api/v1/pin/?format=json&offset='
 var page = 0;
 var handler = null;
 var globalTag = null;
@@ -33,38 +33,65 @@ function applyLayout() {
 };
 
 /**
- * Loads data from the API.
+ * Loads data from the API. (tag set buy tag click)
  */
-function loadData(tag) {
+
+
+function loadData(tag, user) {
     isLoading = true;
     $('#loader').show();
-
-    if (tag !== undefined) {
-        globalTag = tag;
-        window.history.pushState(tag, 'Pinry - Tag - '+tag, '/pins/tag/'+tag+'/');
-    } else if (url(2) == 'tag') {
-        tag = url(3);
-        globalTag = tag;
-        window.history.pushState(tag, 'Pinry - Tag - '+tag, '/pins/tag/'+tag+'/');
+	console.warn('first user: '+user)
+	console.warn('first Tag: '+tag)
+	//check url for current user / tag
+	if (url(2) && url(2) != 'all') {
+		console.warn('url(2)sets user to: '+url(2))
+		user = url(2)
+    }else if (!user){ //if no current user and no new user set to 'all'
+		user = 'all'
+	}
+	if (url(3) && tag !== null) {
+		console.warn('url(3) sets tag to : '+url(3))
+		tag = url(3)
     }
+	//if new user or new tag selected
+	if (user && !tag) {
+		console.warn('if user update url to: /pins/'+user+'/')
+        window.history.pushState(user, 'Pinry - User - '+user, '/pins/'+user+'/');
+
+	} else if (tag) {
+		console.warn('else if tag update url to: '+user+'/'+tag+'/')
+        window.history.pushState(tag, 'Pinry - Tag - '+tag, '/pins/'+user+'/'+tag+'/');
+	}
+	
+    if (user !== undefined) {
+		page = 0
+	}
 
     if (tag !== undefined) {
         $('#pins').html('');
-        page = 0;
+		page = 0
         if (tag != null)
             $('.tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
         else {
             $('.tags').html('');
-            window.history.pushState(tag, 'Pinry - Recent Pins', '/pins/');
+            window.history.pushState(tag, 'Pinry - Recent Pins', '/pins/'+user+'/');
         }
     }
-
+	console.warn('page: '+page)
     var loadURL = apiURL+(page*30);
-    if (globalTag !== null) loadURL += "&tag=" + tag;
+	console.warn('final user: '+user)
+	console.warn('final tag: '+tag)
+	if (user && user != 'all') loadURL += "&user=" + user;
+    if (tag && tag !== null) loadURL += "&tag=" + tag;
     
     $.ajax({
         url: loadURL,
+		contentType: 'application/json',
+		beforeSend: function(jqXHR, settings) {
+			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+		},
         success: onLoadData
+		
     });
 };
 

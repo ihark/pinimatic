@@ -1,14 +1,13 @@
+from django.conf.urls.defaults import *
 from django.conf.urls import patterns, include, url
+from tastypie.api import Api
+from .api import UserResource, PinResource
 
-from .api import PinResource
-from .api import UserResource
 
-
-pin_resource = PinResource()
-user_resource = UserResource()
-
+v1_api = Api(api_name='v1')
+v1_api.register(PinResource())
+v1_api.register(UserResource())
 
 urlpatterns = patterns('',
-    url(r'', include(pin_resource.urls)),
-    url(r'', include(user_resource.urls)),
+    (r'', include(v1_api.urls)),
 )

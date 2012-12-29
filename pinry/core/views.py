@@ -13,6 +13,7 @@ from django.template import RequestContext
 
 
 def home(request):
+    user = 'all'
     return HttpResponseRedirect(reverse('pins:recent-pins'))
 
 

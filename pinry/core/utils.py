@@ -16,7 +16,7 @@ from django.core.files.images import ImageFile
 #ajax thumbnail uplaod
 #get uploaded image and pass to save    
 def ajax_upload( request ):
-  if request.method == "POST":    
+  if request.method == "POST":
     if request.is_ajax( ):
       # the file is stored raw in the request
       upload = request
@@ -49,7 +49,7 @@ def ajax_upload( request ):
     tmpUrl = settings.SITE_URL+settings.TMP_URL+tmpName
     savePath = tmpPath+tmpName 
     success = save_upload( upload, savePath, is_raw )
- 
+    print success
     # let Ajax Upload know whether we saved it or not
     ret_json = { 'success': success, 'tmpName':tmpName, 'tmpUrl':tmpUrl, }
     return HttpResponse( json.dumps( ret_json ) )
@@ -83,7 +83,7 @@ def save_upload( uploaded, filePath, raw_data ):
       # got through saving the upload, report success
       return True
   except IOError:
-    # could not open the file most likely
+    print 'could not open the file most likely'
     pass
   return False
   

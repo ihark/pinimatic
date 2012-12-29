@@ -4,8 +4,13 @@
 var apiURL = '/api/v1/pin/?format=json&offset='
 var page = 0;
 var handler = null;
-var globalTag = null;
+var cTag = null;//not used yet for current tag
+var cTags = null;//not used yet for list of current tag filters
+var cUser = null;
 var isLoading = false;
+var pinsUrl = "" //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
+var apiPrefix = "user"//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
+
 
 /**
  * When scrolled all the way to the bottom, add more tiles.
@@ -34,9 +39,16 @@ function applyLayout() {
 
 /**
  * Loads data from the API. 
- *(tag set by tag click user set by nav bar button)
+ * tag set by tag click user set by nav bar button)
+ * set tag / user to null to clear
  */
-//?*Need method for detecting back button or watch url(0) for changes.
+//?*reloads page on state change, needs work!!! 
+window.onpopstate = function(e) {
+	console.warn('pop state');
+	console.warn(e.state);
+	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+	if (e.state !== null) window.location.href = e.state;
+};
 function loadData(tag, user) {
     isLoading = true;
     $('#loader').show();
@@ -45,65 +57,68 @@ function loadData(tag, user) {
 	console.warn('first Tag: '+tag)
 
 	//check url for current user / tag
-	if (url(2) && url(2) != 'all') {
-		console.warn('url(2)sets user to: '+url(2))
+	if (url(2)) {
+		console.warn('url(2)sets cUser to: '+url(2))
 		cUser = url(2)
-    }else if (!user){ //if no current user and no new user set to 'all'
-		user = 'all'
-		cUser = user
 	}
-	if (url(3) && tag !== null) {
-		console.warn('url(3) sets tag to : '+url(3))
-		tag = url(3)
+	if (url(3)) {
+		console.warn('url(3) sets cTag to : '+url(3))
+		cTag = url(3)
     }
-	//if new user or new tag selected
-	if (user && !tag) {
-		var nAddress = '/pins/'+user+'/'
-		console.warn('if user update url to: /pins/'+user+'/')
-        window.history.pushState(user, 'Pinry - User - '+user, nAddress);
-	}else if (tag && !user) {
+	//determine if new user or tag selected and set url to current if not except if null.
+	var nAddress = '/'+apiPrefix+'/'
+	if (user) {
+		nAddress += user+'/'
+		console.warn('if user update url to: '+nAddress)
+	}else if (cUser) {
 		user = cUser
-		var nAddress = '/pins/'+cUser+'/'+tag+'/'
-		console.warn('else if tag update url to: '+nAddress)
-        window.history.pushState(tag, 'Pinry - Tag - '+tag, nAddress);
-	}else if (tag && user){
-		var nAddress = '/pins/'+user+'/'+tag+'/'
-		console.warn('else if tag update url to: '+nAddress)
-        window.history.pushState(tag, 'Pinry - Tag - '+tag, nAddress);
+		nAddress += user+'/'
+		console.warn('else if cUser update url to: '+nAddress)
 	}
-		
+	if (tag){//*add support for multi tags with cTags, maybe peramiter url is better??
+		nAddress += tag+'/'
+		console.warn('if tag update url to: '+nAddress)
+	}else if (cTag && tag !== null){
+		tag = cTag
+		nAddress += cTag+'/'
+		console.warn('else if cTag update url to: '+nAddress)
+	}
+	if (tag){
+		$('.tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
+	}else{
+		$('.tags').html('');
+	}
 	
+	window.history.pushState(nAddress, 'Pinry: '+nAddress, nAddress);
+	console.warn('final url = '+nAddress)
+	
+	//reset page and refresh pins display
 	if (tag !== undefined || user !== undefined && user !== cUser){
 		page = 0;
 		$('#pins').html('');
-
 	}
-    if (tag !== undefined) {
-        //$('#pins').html('');
-        if (tag != null)
-            $('.tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
-        else {
-            $('.tags').html('');
-            window.history.pushState(tag, 'Pinry - Recent Pins', '/pins/'+cUser+'/');
-        }
-    }
+   
 	console.warn('page: '+page)
     var loadURL = apiURL+(page*30);
 	console.warn('final user: '+user)
 	console.warn('final tag: '+tag)
 	if (user && user != 'all') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
-    $.ajax({
-        url: loadURL,
-		contentType: 'application/json',
-		beforeSend: function(jqXHR, settings) {
-			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-		},
-        success: onLoadData,
-		error: function(jqXHR, settings) {
-			alert(error);
-		},
-    });
+	
+	//prevent api request when not in apiPrefix domain
+	if (url(1) == apiPrefix) {
+		$.ajax({
+			url: loadURL,
+			contentType: 'application/json',
+			beforeSend: function(jqXHR, settings) {
+				jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+			},
+			success: onLoadData,
+			error: function(jqXHR, settings) {
+				alert(jqXHR);
+			},
+		});
+	}
 };
 
 /**
@@ -120,10 +135,10 @@ function onLoadData(data) {
       image = data[i];
       html += '<div class="pin">';
           html += '<div class="pin-options">';
-              html += '<a href="/pins/delete-pin/'+image.id+'">';
+              html += '<a href="'+pinsUrl+'/delete-pin/'+image.id+'">';
                   html += '<i class="icon-trash"></i>';
               html += '</a>';
-			  html += '<a href="/pins/edit-pin/'+image.id+'">';
+			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'">';
                   html += '<i class="icon-edit"></i>';
               html += '</a>';
           html += '</div>';

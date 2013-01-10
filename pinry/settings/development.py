@@ -1,3 +1,4 @@
+from pinry.settings.settings import *
 from pinry.settings import *
 
 import os
@@ -13,5 +14,6 @@ DATABASES = {
         'NAME': os.path.join(SITE_ROOT, 'development.db'),
     }
 }
+
 
 SECRET_KEY = 'fake-key'

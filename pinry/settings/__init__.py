@@ -2,12 +2,22 @@ import os
 from django.contrib.messages import constants as messages
 
 
-
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
-SITE_URL = 'http://localhost:8000'
+
+import socket
+try:
+    HOSTNAME = socket.gethostname()
+    fqdn = socket.getfqdn()
+except:
+    HOSTNAME = 'localhost'
+    fqdn = 'localhost'
+SITE_HOST = os.environ.get('HOSTNAME')
+print 'SITE_HOST = '+str(SITE_HOST)
+print 'HOSTNAME = '+str(HOSTNAME)
+print 'fqdn = '+str(fqdn)
 
 # Changes the naming on the front-end of the website.
-SITE_NAME = 'Pinry'
+SITE_NAME = 'Pinimatic'
 # Set to False to disable people from creating new accounts.
 ALLOW_NEW_REGISTRATIONS = True
 
@@ -24,7 +34,7 @@ USE_TZ = True
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
 MEDIA_URL = '/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
-TMP_URL = '/media/tmp/'
+TMP_URL = 'http://localhost:8000/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
 IMAGES_PATH = 'pins/pin/originals/'
@@ -91,4 +101,6 @@ INSTALLED_APPS = (
     'pinry.pins',
     'pinry.api',
     'pinry.bookmarklet',
+    'storages',
 )
+

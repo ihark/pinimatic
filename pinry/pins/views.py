@@ -11,7 +11,7 @@ from .forms import PinForm
 from .models import Pin
 
 from django.utils import simplejson
-from pinry.settings import SITE_URL, TMP_URL
+from pinry.settings import TMP_URL
 from django.core.files.storage import default_storage
 
 
@@ -94,16 +94,15 @@ def new_pin(request, pin_id=None):
                 messages.success(request, 'Pin successfully modified.')
             else:
                 messages.success(request, 'New pin successfully added.')
-                
-            return HttpResponseRedirect(reverse('pins:recent-pins'))
+            #return HttpResponseRedirect(reverse('pins:recent-pins'))
         else:
             messages.error(request, 'Pin did not pass validation!')
         if form.is_bound:
             if form.saved_data['uImage']:
-                #this makes thumnail for image uplaod
                 #(only comes into play on image upload with form error on resubmit)
-                print 'view - image submitted for thumb saveTempImg() called'
-                thumb = SITE_URL+TMP_URL+form.saved_data['uImage']
+                print 'view - getting thumb & data for error corection form'
+                #this makes thumnail for image uplaod
+                thumb = TMP_URL+form.saved_data['uImage']
                 #form.saved_data is = form.cleaned_data for invalid forms
                 form = PinForm(form.saved_data)
             else:
@@ -125,8 +124,8 @@ def delete_pin(request, pin_id=None):
     try:
         pin = Pin.objects.get(id=pin_id)
         if pin.submitter == request.user:
-            default_storage.delete(pin.image.path)
-            default_storage.delete(pin.thumbnail.path)
+            default_storage.delete(pin.image.name)
+            default_storage.delete(pin.thumbnail.name)
             pin.delete()
 
             messages.success(request, 'Pin successfully deleted.')
@@ -135,5 +134,5 @@ def delete_pin(request, pin_id=None):
     except Pin.DoesNotExist:
         messages.error(request, 'Pin with the given id does not exist.')
         
-
+    print request
     return HttpResponseRedirect(reverse('pins:recent-pins'))

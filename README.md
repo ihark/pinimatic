@@ -33,10 +33,10 @@ Note: On Ubuntu you can get the build deps by running
     $ git clone git://github.com/overshard/pinry.git
     $ cd pinry
     $ virtualenv .
-    $ bin/pip install -r requirements/development.txt
-    $ bin/python manage.py syncdb
-    $ bin/python manage.py migrate
-    $ bin/python manage.py runserver
+    $ pip install -r requirements.txt
+    $ python manage.py syncdb
+    $ python manage.py migrate
+    $ python manage.py runserver
 
 
 ### Production
@@ -47,11 +47,18 @@ running Django in a production environment and edit the
 hundreds of different ways to deploy a Django project and everyone has their own
 preference.
 
+### Heroku: production.py is now set up for deployment to heroku.  
+- Create a Heroku account and add postgreSQL to your account.
+- Create amazon S3 account and set up a bucket.
+- set Heroku env variables DB_USER, DB_PASSWORD, DB_NAME 
+acording to your postgreSQL database settings.
+- set Heroku env variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME
+acording to your amazon S3 bucket.
 
 ### Quick Settings
 
 There are a few settings provided specific to Pinry that allow you to get some
-of the most requested functionality easily.
+of the most requested functionality easily. (pinry/settings/__init__.py)
 
  + **SITE_NAME**: For quickly changing the name Pinry to something you prefer.
  + **ALLOW_NEW_REGISTRATIONS**: Set to False to prevent people from registering.
@@ -60,12 +67,21 @@ of the most requested functionality easily.
           both PUBLIC and the previous setting are set to False to prevent
           all public access.)
 
+## Current Features
 
+ + Pin Tagging
+ + Filter by tag & user
+ + Add images via Bookmarklet
+ + Upload Image Files
+ + Add images via url
+ + Delete & Edit Pins
+ 
 ## Roadmap
-
+ + User boards
+ + Follow users
+ + Like Pins
+ + Comment on pins
  + Non-image URL pinning
- + Bookmarklet
- + Tagging, groups, multiple and/or user boards
  + Statistics/analytics with pretty graphs
 
 
@@ -80,7 +96,8 @@ of the most requested functionality easily.
 
 ## License (Simplified BSD)
 
-Copyright (c) Isaac Bythewood  
+Copyright (c) Isaac Bythewood
+Copyright (c) Simplex Studio (arctelix) 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

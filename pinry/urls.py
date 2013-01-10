@@ -13,3 +13,10 @@ urlpatterns = patterns('',
     url(r'', include('pinry.core.urls', namespace='core')),
     url(r'', include('pinry.pins.urls', namespace='pins')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        url(r'^media/tmp/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.TMP_ROOT,
+        }),
+   )

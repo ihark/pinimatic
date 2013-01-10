@@ -1,9 +1,11 @@
 ﻿javascript : var baseurl = "{{ BASE_URL }}";(function () { 
 	console.warn('--start bookmarklet--');
 	{% load static %}
-	////test for EXISTING bookmarklet
-	pinry = /^https?:\/\/.*?\.?pinry\.com\//;
-	if (document.getElementById("overlay") == undefined || location.href.match(pinry == null)) {
+	////test for EXISTING bookmarklet or pinry domain
+	pinry = /^https?:\/\/.*?((pinry)|(localhost)).*?\//
+	inPinry = location.href.match(pinry);
+	console.warn('test for pinry host : '+inPinry)
+	if (document.getElementById("overlay") == undefined && inPinry == null) {
 		var d = document;
 		var b = d.body;
 		var jq;
@@ -101,7 +103,11 @@
 		//check for jquery
 		checkLoad("window.$", jqReady, "jquery has loaded");
 	}else {
-		alert("You have an open bookmarklet already!");		
+		if (inPinry) {
+			alert("You have already pinned everything here!");
+		}else{
+			alert("You have an open bookmarklet already!");	
+		}			
 	}
 	//exicute when jquery is ready
 	function jqReady() {

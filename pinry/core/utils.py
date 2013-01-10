@@ -8,7 +8,6 @@ import tempfile
 from django.utils import simplejson
 from django.http import HttpResponse, Http404
 from django.conf import settings
-#from pinry.settings import MEDIA_URL, IMAGES_PATH, SITE_URL
 import os
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -42,12 +41,12 @@ def ajax_upload( request ):
         raise Http404( "Bad Upload" )
       filename = upload.name
       
-    # save the file
     hash_name = os.urandom(32).encode('hex')
     tmpName = hash_name+filename
     tmpPath = settings.TMP_ROOT
-    tmpUrl = settings.SITE_URL+settings.TMP_URL+tmpName
-    savePath = tmpPath+tmpName 
+    tmpUrl = settings.TMP_URL+tmpName
+    savePath = tmpPath+tmpName
+    print 'ajax_uplaod savePath: '+savePath
     success = save_upload( upload, savePath, is_raw )
     print success
     # let Ajax Upload know whether we saved it or not
@@ -58,7 +57,18 @@ def ajax_upload( request ):
 def save_upload( uploaded, filePath, raw_data ):
   
   tmpPath = settings.TMP_ROOT
-  print 'save_uplaod filename: '+filePath
+  'save_uplaod tmpPath: '+tmpPath
+  #if not os.path.isdir(tmpPath):
+  print '------creating dir @ tempPath:'
+  print tmpPath
+  e = os.path.isdir(tmpPath)
+  print e
+  if not e:
+      os.makedirs(tmpPath)
+      e = os.path.isdir(tmpPath)
+      print e
+  
+  print 'save_uplaod filepath: '+filePath
   ''' 
   raw_data: if True, uploaded is an HttpRequest object with the file being
             the raw post data 

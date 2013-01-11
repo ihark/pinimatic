@@ -119,7 +119,7 @@ function loadData(tag, user) {
 			},
 			success: onLoadData,
 			error: function(jqXHR, settings) {
-				alert(jqXHR);
+				console.warn('ajax error: '+string(jqXHR));
 			},
 		});
 	}

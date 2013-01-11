@@ -44,10 +44,9 @@ function applyLayout() {
  */
 //?*reloads page on state change, needs work!!! 
 window.onpopstate = function(e) {
-	console.warn('pop state');
-	console.warn(e.state);
+	console.warn('pop state: '+e.state);
 	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-	if (e.state !== null) window.location.href = e.state;
+	if (e.state) window.location.href = e.state;
 };
 function loadData(tag, user) {
     isLoading = true;
@@ -57,16 +56,16 @@ function loadData(tag, user) {
 	console.warn('first Tag: '+tag)
 
 	//check url for current user / tag
-	if (url(2)) {
+	if (url(2) && url(1) == apiPrefix) {
 		console.warn('url(2)sets cUser to: '+url(2))
 		cUser = url(2)
+		var nAddress = '/'+apiPrefix+'/'
 	}
-	if (url(3)) {
+	if (url(3) && url(1) == apiPrefix) {
 		console.warn('url(3) sets cTag to : '+url(3))
 		cTag = url(3)
     }
 	//determine if new user or tag selected and set url to current if not except if null.
-	var nAddress = '/'+apiPrefix+'/'
 	if (user) {
 		nAddress += user+'/'
 		console.warn('if user update url to: '+nAddress)

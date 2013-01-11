@@ -42,7 +42,7 @@ function applyLayout() {
  * tag set by tag click user set by nav bar button)
  * set tag / user to null to clear
  */
-//?*reloads page on state change, needs work!!! 
+//reloads page on state change 
 window.onpopstate = function(e) {
 	console.warn('pop state: '+e.state);
 	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
@@ -87,9 +87,14 @@ function loadData(tag, user) {
 	}else{
 		$('.tags').html('');
 	}
-	
-	window.history.pushState(nAddress, 'Pinry: '+nAddress, nAddress);
+	//window.location.href = nAddress
 	console.warn('final url = '+nAddress)
+	console.warn('url(path) = '+url('path'))
+	if (nAddress && nAddress != url('path')){
+		console.warn('PUSH STATE ADDED')
+		window.history.pushState(nAddress, 'Pinry: '+nAddress, nAddress);
+	}
+	
 	
 	//reset page and refresh pins display
 	if (tag !== undefined || user !== undefined && user !== cUser){
@@ -134,10 +139,10 @@ function onLoadData(data) {
       image = data[i];
       html += '<div class="pin">';
           html += '<div class="pin-options">';
-              html += '<a href="'+pinsUrl+'/delete-pin/'+image.id+'">';
+              html += '<a href="'+pinsUrl+'/delete-pin/'+image.id+'/">';
                   html += '<i class="icon-trash"></i>';
               html += '</a>';
-			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'">';
+			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'/">';
                   html += '<i class="icon-edit"></i>';
               html += '</a>';
           html += '</div>';

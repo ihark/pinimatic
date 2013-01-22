@@ -95,7 +95,8 @@ def new_pin(request, pin_id=None):
                 messages.success(request, 'Pin successfully modified.')
             else:
                 messages.success(request, 'New pin successfully added.')
-            #return HttpResponseRedirect(reverse('pins:recent-pins'))
+                return HttpResponseRedirect(reverse('pins:recent-pins'))
+            
         else:
             messages.error(request, 'Pin did not pass validation!')
             if form.is_bound:

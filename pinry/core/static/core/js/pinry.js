@@ -119,7 +119,7 @@ function loadData(tag, user) {
 			},
 			success: onLoadData,
 			error: function(jqXHR, settings) {
-				alert(jqXHR);
+				console.warn('ladData - ajax error');
 			},
 		});
 	}
@@ -145,11 +145,17 @@ function onLoadData(data) {
 			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'/">';
                   html += '<i class="icon-edit"></i>';
               html += '</a>';
+			  html += '<a href="#" onclick="follow('+image.id+'); return false;">';
+                  html += '<i class="icon-star"></i>';
+              html += '</a>';
           html += '</div>';
           html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
               html += '<img src="'+image.thumbnail+'" width="200" >';
           html += '<a class="source-url" rel="pins" href="'+image.srcUrl+'">';
 		      html += '<span>Visit Origninal Website</span>';
+		  html += '</a>';
+		   html += '<span class="source-url"> : posted by </span><a href="#" class="source-url" onclick="loadData(undefined, \''+image.submitter.username+'\'); return false;">';
+		      html += '<span class="source-url">'+image.submitter.username+'</span>';
 		  html += '</a>';
           if (image.description) html += '<p>'+image.description+'</p>';
           if (image.tags) {
@@ -181,6 +187,24 @@ $('.fancybox').fancybox({
     openEffect: 'none',
     closeEffect: 'none'
 });
+
+/**
+ * Follow functions.
+ */
+function follow(id) {
+	$.ajax({
+		url: pinsUrl+'/toggle/pins/Pin/'+id+'/',
+		type: 'POST',
+		contentType: 'application/json',
+		beforeSend: function(jqXHR, settings) {
+			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+		},
+		success: onLoadData,
+		error: function(jqXHR, settings) {
+			console.warn('follow - ajax error');
+		},
+	});
+}
 
 /**
  * Edit pin functions.

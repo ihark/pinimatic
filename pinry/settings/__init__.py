@@ -4,6 +4,7 @@ from django.contrib.messages import constants as messages
 
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
+# play with detecting host
 import socket
 try:
     HOSTNAME = socket.gethostname()
@@ -15,6 +16,7 @@ SITE_HOST = os.environ.get('HOSTNAME')
 print 'SITE_HOST = '+str(SITE_HOST)
 print 'HOSTNAME = '+str(HOSTNAME)
 print 'fqdn = '+str(fqdn)
+# end play with detecting host
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
@@ -102,5 +104,6 @@ INSTALLED_APPS = (
     'pinry.api',
     'pinry.bookmarklet',
     'storages',
+    'follow',
 )
 

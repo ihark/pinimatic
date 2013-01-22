@@ -11,6 +11,8 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from pinry.core.utils import delete_upload
 
+from follow import utils
+
 
 
 class Pin(models.Model):
@@ -99,3 +101,5 @@ class Pin(models.Model):
 
     class Meta:
         ordering = ['-id']
+
+utils.register(Pin)

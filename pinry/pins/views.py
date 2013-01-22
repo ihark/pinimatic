@@ -11,7 +11,7 @@ from .forms import PinForm
 from .models import Pin
 
 from django.utils import simplejson
-from pinry.settings import TMP_URL
+from django.conf import settings
 from django.core.files.storage import default_storage
 
 
@@ -103,7 +103,7 @@ def new_pin(request, pin_id=None):
                     #(only comes into play on image upload with form error on resubmit)
                     print 'view - getting thumb & data for error corection form'
                     #this makes thumnail for image uplaod
-                    thumb = TMP_URL+form.saved_data['uImage']
+                    thumb = settings.TMP_URL+form.saved_data['uImage']
                     #form.saved_data is = form.cleaned_data for invalid forms
                     form = PinForm(form.saved_data)
                 else:

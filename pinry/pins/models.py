@@ -12,6 +12,7 @@ from django.core.files.storage import default_storage
 from pinry.core.utils import delete_upload
 
 
+
 class Pin(models.Model):
     submitter = models.ForeignKey(User)
     imgUrl = models.TextField(blank=True, null=True)
@@ -77,9 +78,8 @@ class Pin(models.Model):
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(temp_thumb.name, 'JPEG')
             self.thumbnail.save(''.join([hash_name, '.jpg']), File(temp_thumb))
-            if self.uImage:
-                delete_upload(None, self.uImage)
-                #default_storage.delete(TMP_ROOT+self.uImage)
+            print 'view - delete_uplaod called'
+            delete_upload(None, self.uImage)
             print 'model - thumbnail complete'
         
         if not self.srcUrl:

@@ -15,6 +15,7 @@ from pinry.settings import TMP_URL
 from django.core.files.storage import default_storage
 
 
+
 def AjaxSubmit(request):
     #tests
     print '--- request recieved with obove reqest data ----'
@@ -97,18 +98,18 @@ def new_pin(request, pin_id=None):
             #return HttpResponseRedirect(reverse('pins:recent-pins'))
         else:
             messages.error(request, 'Pin did not pass validation!')
-        if form.is_bound:
-            if form.saved_data['uImage']:
-                #(only comes into play on image upload with form error on resubmit)
-                print 'view - getting thumb & data for error corection form'
-                #this makes thumnail for image uplaod
-                thumb = TMP_URL+form.saved_data['uImage']
-                #form.saved_data is = form.cleaned_data for invalid forms
-                form = PinForm(form.saved_data)
-            else:
-                print 'view - url submitted for thumb'
-                thumb = request.REQUEST['imgUrl']
-                print 'view - edit invalid form'
+            if form.is_bound:
+                if form.saved_data['uImage']:
+                    #(only comes into play on image upload with form error on resubmit)
+                    print 'view - getting thumb & data for error corection form'
+                    #this makes thumnail for image uplaod
+                    thumb = TMP_URL+form.saved_data['uImage']
+                    #form.saved_data is = form.cleaned_data for invalid forms
+                    form = PinForm(form.saved_data)
+                else:
+                    print 'view - url submitted for thumb'
+                    thumb = request.REQUEST['imgUrl']
+                    print 'view - edit invalid form'
     else:
         print 'not POST or Save'
         

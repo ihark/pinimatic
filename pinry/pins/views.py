@@ -9,6 +9,7 @@ from PIL import Image
 
 from .forms import PinForm
 from .models import Pin
+from django.contrib.auth.models import User
 
 from django.utils import simplejson
 from django.conf import settings
@@ -45,6 +46,14 @@ def AjaxSubmit(request):
 
 def recent_pins(request):
     return TemplateResponse(request, 'pins/recent_pins.html', None)
+    
+def user_profile(request, profileName=None, tag=None):
+    profile = User.objects.get(username__exact=profileName)
+    context = {
+            'profile': profile,
+            'tag': tag,
+        }
+    return TemplateResponse(request, 'pins/user_profile.html', context)
 
 #create new pin or edit exitsing pin, based on presence of id.
 @login_required ()

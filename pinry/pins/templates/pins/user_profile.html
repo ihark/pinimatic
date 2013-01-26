@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% load follow_tags %}
+
+{% block title %}Recent Pins{% endblock %}
+
+{% block yield %}
+
+<div id="pins-container">
+
+	<div class="pin" id="user-info" style="position: absolute; top: 0px; left: 0px; display: hidden;"> 
+		<h1>
+			<a href="{% url core:home %}user/{{ profile.username }}" onclick="loadData(undefined, '{{ profile.username }}');">{{ profile.username }}</a>
+			{% if request.user|is_following:profile %}
+				<button id="follow-btn" class="btn btn-mini following" type="button" data-profile="{{ profile.pk }}">Un-Follow</button>
+			{% else %}
+				<button id="follow-btn" class="btn btn-mini" type="button" data-profile="{{ profile.pk }}">Follow</button>
+			{% endif %}
+		</h1>
+		<div class="statistics">
+			<p><a href="http://www.wookmark.com/profile/arctelix"><span>8</span><br>Images</a></p>
+			<p><a href="http://www.wookmark.com/profile/arctelix/groups"><span>8</span><br>Groups</a></p>
+			<p><a href="http://www.wookmark.com/profile/arctelix/notes"><span>8</span><br>Notes</a></p>
+			<p><a href="http://www.wookmark.com/profile/arctelix/following"><span class="follow-data" data-follow="8">8</span><br>Following</a></p>
+		</div>
+		<div class="groups"> 
+			<h2><a href="http://www.wookmark.com/profile/arctelix/groups">Groups</a></h2>
+			<ul class="unsorted"> 
+				<li data-id="13418" data-archived="0"> 
+					<div class="link">
+						<a href="http://www.wookmark.com/group/13418/architecture">Architecture</a>
+						<span>-0</span>
+					</div>
+				</li> 
+				<li data-id="12378" data-archived="0"> 
+					<div class="link">
+						<a href="http://www.wookmark.com/group/12378/furniture">Furniture</a>
+						<span>-2</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="sources"> 
+			<h2><a href="http://www.wookmark.com/profile/arctelix/topsites">Favorite sites</a></h2>
+			<ul> 
+				<li><a href="http://www.wookmark.com/source/2701/fabforgottennobility.tumblr.com">fabforgottennobility.tumblr.com</a> <span>-1</span></li>
+				<li><a href="http://www.wookmark.com/source/4227/vk.com">VK</a> <span>-1</span></li>
+				<li><a href="http://www.wookmark.com/source/3164/fancycrave.com">fancycrave.com</a> <span>-1</span></li>
+				<li><a href="http://www.wookmark.com/source/306/weheartit.com">We Heart It</a> <span>-1</span></li>
+				<li><a href="http://www.wookmark.com/source/37/www.google.com">Google</a> <span>-1</span></li>
+			</ul> 
+		</div>
+		<div class="secOptions">
+			<div class="linkButton">
+				<a href="http://www.wookmark.com/embed/gallery/setup/user/7563" title="Embed a gallery of arctelix's images">Embed</a>
+			</div>
+			<div class="linkButton">
+				<a href="http://www.wookmark.com/api/rss/user/7563" title="RSS feed for arctelix"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
+			</div>
+		</div>
+	</div>
+	<div id="pins"></div>
+</div>
+
+<div id="loader" class="container">
+	<div class="row">
+		<div class="span2 offset5">
+			<img src="/static/core/img/loader.gif" alt="Loader">
+		</div>
+	</div>
+</div>
+
+		
+{% endblock %}

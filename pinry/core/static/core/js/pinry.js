@@ -4,12 +4,12 @@
 var apiURL = '/api/v1/pin/?format=json&offset='
 var page = 0;
 var handler = null;
-var cTag = null;//not used yet for current tag
+var cTag = null;//used to track current tag
 var cTags = null;//not used yet for list of current tag filters
-var cUser = null;
+var cUser = null;//used to track current user
 var isLoading = false;
 var pinsUrl = "" //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
-var apiPrefix = "user"//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
+var apiPrefixA = ["user", "profile"]//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
 
 
 /**
@@ -28,12 +28,13 @@ function applyLayout() {
       if(handler) handler.wookmarkClear();
       
       // Create a new layout handler.
-      handler = $('#pins .pin');
+      handler = $('#pins-container .pin');
       handler.wookmark({
           autoResize: true,
           offset: 3,
           itemWidth: 242
       });
+	  $('#user-info').show();
   });
 };
 
@@ -48,39 +49,51 @@ window.onpopstate = function(e) {
 	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
 	if (e.state) window.location.href = e.state;
 };
+function inArray(value, array){
+	var i;
+	for (i=0; i < array.length; i++) {
+		if (array[i] === value) {
+			return value;
+		}
+	}
+	return false;
+}
 function loadData(tag, user) {
     isLoading = true;
     $('#loader').show();
+	var apiPrefix = inArray(url(1), apiPrefixA);
+	console.warn('first user: '+user);
+	console.warn('first Tag: '+tag);
 	
-	console.warn('first user: '+user)
-	console.warn('first Tag: '+tag)
-
 	//check url for current user / tag
-	if (url(2) && url(1) == apiPrefix) {
-		console.warn('url(2)sets cUser to: '+url(2))
-		cUser = url(2)
-		var nAddress = '/'+apiPrefix+'/'
+	if (url(2) && apiPrefix) {
+		console.warn('url(2)sets cUser to: '+url(2));
+		cUser = url(2);
+		var nAddress = '/'+apiPrefix+'/';
 	}
-	if (url(3) && url(1) == apiPrefix) {
-		console.warn('url(3) sets cTag to : '+url(3))
-		cTag = url(3)
-    }
+	if (url(3) && apiPrefix) {
+		console.warn('url(3) sets cTag to : '+url(3));
+		cTag = url(3);
+    }else{
+		cTag = null;
+	}
+	
 	//determine if new user or tag selected and set url to current if not except if null.
 	if (user) {
-		nAddress += user+'/'
-		console.warn('if user update url to: '+nAddress)
+		nAddress += user+'/';
+		console.warn('if user update url to: '+nAddress);
 	}else if (cUser) {
-		user = cUser
-		nAddress += user+'/'
-		console.warn('else if cUser update url to: '+nAddress)
+		user = cUser;
+		nAddress += user+'/';
+		console.warn('else if cUser update url to: '+nAddress);
 	}
 	if (tag){//*add support for multi tags with cTags, maybe peramiter url is better??
-		nAddress += tag+'/'
-		console.warn('if tag update url to: '+nAddress)
+		nAddress += tag+'/';
+		console.warn('if tag update url to: '+nAddress);
 	}else if (cTag && tag !== null){
-		tag = cTag
-		nAddress += cTag+'/'
-		console.warn('else if cTag update url to: '+nAddress)
+		tag = cTag;
+		nAddress += cTag+'/';
+		console.warn('else if cTag update url to: '+nAddress);
 	}
 	if (tag){
 		$('.tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
@@ -88,10 +101,10 @@ function loadData(tag, user) {
 		$('.tags').html('');
 	}
 	//window.location.href = nAddress
-	console.warn('final url = '+nAddress)
-	console.warn('url(path) = '+url('path'))
+	console.warn('final url = '+nAddress);
+	console.warn('url(path) = '+url('path'));
 	if (nAddress && nAddress != url('path')){
-		console.warn('PUSH STATE ADDED')
+		console.warn('PUSH STATE ADDED');
 		window.history.pushState(nAddress, 'Pinry: '+nAddress, nAddress);
 	}
 	
@@ -102,10 +115,10 @@ function loadData(tag, user) {
 		$('#pins').html('');
 	}
    
-	console.warn('page: '+page)
+	console.warn('page: '+page);
     var loadURL = apiURL+(page*30);
-	console.warn('final user: '+user)
-	console.warn('final tag: '+tag)
+	console.warn('final user: '+user);
+	console.warn('final tag: '+tag);
 	if (user && user != 'all') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
 	
@@ -145,17 +158,17 @@ function onLoadData(data) {
 			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'/">';
                   html += '<i class="icon-edit"></i>';
               html += '</a>';
-			  html += '<a href="#" onclick="follow('+image.id+'); return false;">';
+			  html += '<a href="#" onclick="fav('+image.id+'); return false;">';
                   html += '<i class="icon-star"></i>';
               html += '</a>';
           html += '</div>';
           html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
               html += '<img src="'+image.thumbnail+'" width="200" >';
-          html += '<a class="source-url" rel="pins" href="'+image.srcUrl+'">';
-		      html += '<span>Visit Origninal Website</span>';
+          html += '<a rel="pins" href="'+image.srcUrl+'">';
+		      html += '<span>Posted from</span>';
 		  html += '</a>';
-		   html += '<span class="source-url"> : posted by </span><a href="#" class="source-url" onclick="loadData(undefined, \''+image.submitter.username+'\'); return false;">';
-		      html += '<span class="source-url">'+image.submitter.username+'</span>';
+		   html += '<span class="text"> : by </span><a href="/user/'+image.submitter.username+'/">';
+		      html += '<span>'+image.submitter.username+'</span>';
 		  html += '</a>';
           if (image.description) html += '<p>'+image.description+'</p>';
           if (image.tags) {
@@ -189,9 +202,15 @@ $('.fancybox').fancybox({
 });
 
 /**
- * Follow functions.
+ * Pin Options Functions.
  */
-function follow(id) {
+ 
+// add event listeners
+$('#follow-btn').live('click', function(event){
+	follow(this)
+});
+
+function fav(id) {
 	$.ajax({
 		url: pinsUrl+'/toggle/pins/Pin/'+id+'/',
 		type: 'POST',
@@ -199,13 +218,53 @@ function follow(id) {
 		beforeSend: function(jqXHR, settings) {
 			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
 		},
-		success: onLoadData,
+		success: console.warn('fav added'),
 		error: function(jqXHR, settings) {
 			console.warn('follow - ajax error');
 		},
 	});
 }
+function follow(target) {
+	var button = $(target);
+	console.warn(target)
+	var followData = $('.follow-data');
+	var following = button.hasClass('following');
 
+	// get profile id.
+	var profileId = button.attr('data-profile');
+	// Update the number display and show it.
+	var count = parseInt(followData.attr('data-follow'));
+	if(following) count++;
+	else count--;
+	followData.attr('data-follow', count);
+
+	
+	if(following) {
+		button.addClass('following');
+		//this.showLoader('Liking');
+	} else {
+		button.removeClass('following');
+		//this.showLoader('Unliking');
+	}
+
+	this.onLikeImage = function( result ) {
+		//console.log('onLikeImage', result);
+		//this.hideLoader();
+	};
+	var url = pinsUrl+'/toggle/auth/User/'+profileId+'/';
+	$.ajax({
+		url: url,
+		type: 'POST',
+		contentType: 'application/json',
+		beforeSend: function(jqXHR, settings) {
+			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+		},
+		success: $.proxy(this.onLikeImage, this),//todo: need to detect if followed or not
+		error: function(jqXHR, settings) {
+			console.warn('follow - ajax error');
+		},
+	});
+}
 /**
  * Edit pin functions.
  */

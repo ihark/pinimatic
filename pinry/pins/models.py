@@ -102,4 +102,5 @@ class Pin(models.Model):
     class Meta:
         ordering = ['-id']
 
-utils.register(Pin)
+utils.register(Pin, 'favorite')
+utils.register(User, 'folowing')

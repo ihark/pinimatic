@@ -15,6 +15,9 @@ from django.utils import simplejson
 from django.conf import settings
 from django.core.files.storage import default_storage
 
+from follow.models import Follow
+from django.db.models import Count
+from urlparse import urlparse, urlunparse
 
 
 def AjaxSubmit(request):
@@ -36,7 +39,7 @@ def AjaxSubmit(request):
                 print '--- ajax M2M form saved----'#
                 messages.success(request, 'New pin successfully added.')
             except:
-                messages.error(request, 'There was a issue with this image file. Note: .png & .gif. images are still buggy.')
+                messages.error(request, 'Oops! Somthing went wrong while saving this pin.')
     else:
         print '--- user did not pass authentication----'#
         messages.error(request, 'You are not loged in.', extra_tags='login')
@@ -49,9 +52,58 @@ def recent_pins(request):
     
 def user_profile(request, profileName=None, tag=None):
     profile = User.objects.get(username__exact=profileName)
+    pins = Pin.objects.filter(submitter=profile)
+    pinsC = pins.count()
+    tags = pins.order_by('tags__name').filter(submitter=profile).values_list('tags__name').annotate(count=Count('tags__name'))
+    tagsC = tags.distinct().count()
+    folowers = Follow.objects.get_follows(profile).values_list('user__username', flat=True)
+    folowersC = folowers.count()
+    folowing = Follow.objects.filter(user=profile).exclude(folowing__exact=None).values_list('folowing__username', flat=True)
+    folowingC = folowing.count()
+    favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
+    favsC = favs.count()
+    #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
+    srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
+    srcDomains = {}
+    for url in srcUrls:
+        p = urlparse(url[0])
+        dom = p.netloc
+        count = url[1]
+        parts = p.scheme, p.netloc, '', '', '', ''
+        url = urlunparse(parts)
+        if dom not in srcDomains and dom != '':
+            srcDomains[dom] = count, url
+        elif dom != '':
+            srcDomains[dom] = srcDomains[dom][0]+count, url
+    print srcDomains
+    import operator
+    srcDomains = sorted(srcDomains.iteritems(), key=operator.itemgetter(1), reverse=True)
+    srcDoms =srcDomains[:5]
+    
+    print pinsC
+    print tags
+    print tagsC
+    print folowers
+    print folowersC
+    print folowing
+    print folowingC
+    print favs
+    print favsC
+    print srcDoms
+
+    
     context = {
             'profile': profile,
-            'tag': tag,
+            'pinsC': pinsC,
+            'folowers': folowers,
+            'folowersC': folowersC,
+            'folowing': folowing,
+            'folowingC': folowingC,
+            'tags': tags,
+            'tagsC': tagsC,
+            'favs': favs,
+            'favsC': favsC,
+            'srcDoms': srcDoms,
         }
     return TemplateResponse(request, 'pins/user_profile.html', context)
 

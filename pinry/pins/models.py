@@ -80,8 +80,9 @@ class Pin(models.Model):
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(temp_thumb.name, 'JPEG')
             self.thumbnail.save(''.join([hash_name, '.jpg']), File(temp_thumb))
-            print 'view - delete_uplaod called'
-            delete_upload(None, self.uImage)
+            print 'model - delete_uplaod called'
+            if self.uImage:
+                delete_upload(None, self.uImage)
             print 'model - thumbnail complete'
         
         if not self.srcUrl:
@@ -98,7 +99,7 @@ class Pin(models.Model):
             self.imgUrl = 'Uploaded'
             
         super(Pin, self).save(*args, **kwargs)
-
+    
     class Meta:
         ordering = ['-id']
 

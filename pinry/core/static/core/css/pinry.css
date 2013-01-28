@@ -1,17 +1,21 @@
-body {
-    margin-top: 70px;
-    background: url("/static/core/img/background.png");
-}
-
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+html, body, div, span, applet, object, iframe, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
 	margin: 0;
 	padding: 0;
 	border: 0;
 	outline: 0;
-	font-size: 100%;
 	vertical-align: baseline;
 	background: transparent;
 }
+
+h5, h6 {
+margin: 0px 0px;
+}
+body {
+    margin-top: 70px;
+	background-color: #E0EBCC;
+    background: url("/static/core/img/background.png");
+	background: url("http://fc05.deviantart.net/fs16/f/2007/149/e/0/Background_Texture_Dark_by_colmahouse.jpg");
+	}
 .navbar-inner {
     background-image: none;
     background: white;
@@ -101,14 +105,10 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
     z-index: 100;
 	float: left;
 }
-#user-info h1{
-	font-weight: 300;
-	font-size: 18px;
+#user-info .header{
 	margin: -20px -20px 0px -20px;
 	color: #666;
 	padding: 0px 20px 0px 20px;
-	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
 	background-color: #f4f4f4;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f4f4f4));
 	background-image: -webkit-linear-gradient(top, #ffffff, #f4f4f4);
@@ -117,79 +117,87 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 	background-image: -o-linear-gradient(top, #ffffff, #f4f4f4);
 	background-image: linear-gradient(top, #ffffff, #f4f4f4);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#f4f4f4');
-	border-bottom: 1px solid #ddd;
 }
-	#user-info h1 > a{
-		font-weight: 300;
-		font-size: 18px;
+
+#user-info .header > *{
+	display: inline-block;
+}
+	#user-info .section {
+		width: 200px;
+		height: auto;
+		border-top: 1px solid #ccc;
+		margin: 0px -20px;
+		padding: 5px 20px 0px 20px;
+		line-height: 16px;
 	}
-	
-
-    .pin {
-        background: #fff;
-        width: 200px;
-        float: left;
-        border: 1px solid #ccc;
-        padding: 20px;
-        display: none;
-    }
-
-        .pin #user-info div {
-            width: 200px;
-			height: auto;
-        }
-		.pin div  > p{
+	.inline > *{
 		position:relative;
 		display:inline-block;
-		margin-right:10px;
+		margin-right:3px;
 		text-align:center;
-		}
-			.pin div  > p > a > span{
-			font-size: 12px;
-			font-weight: bold;
+	}
+	.inline > a > span{
+		line-height: 0px;
+		font-size: 12px;
+		font-weight: bold;
+	}
+		
+	#follow-btn {
+		width: 70px;
+		margin-right: 10px;
+		position:absolute;
+		top:9px;
+		right:0;
+	}
 
-			}
+.pin {
+	background: #fff;
+	width: 200px;
+	float: left;
+	border: 1px solid #ccc;
+	padding: 20px;
+	display: none;
+}
+	.pin img {
+		padding: 0;
+		margin: 0;
+	}
 
-		.pin img {
-            padding: 0;
-            margin: 0;
-        }
-
-        .pin p {
-            margin-bottom: 0;
-            padding-top: 3px;
-			padding-bottom: 3px;
-			
-        }
+	.pin p {
+		margin-bottom: 0;
+		padding-top: 3px;
+		padding-bottom: 3px;
 		
-		.pin a {
-			color: #777;
-			text-decoration: none;
-			font-size: 10px;
-		}
-		
-		.pin a:link {
-			color: #555;
-		}
-		
-		.pin a:visited {
-			color: #555;
-		}
-		
-		.pin a:hover {
-			color: #000;
-		}
-		
-		.pin strong {
-			color: #000;
-			font-weight: normal;
-		}
-		
-		.pin .text {
-			font-size: 10px;
-			cursor: default;
-			color: #777;
-		}
+	}
+	
+	.pin a {
+		color: #777;
+		text-decoration: none;
+		font-size: 10px;
+	}
+	
+	.pin a:link {
+		color: #555;
+	}
+	
+	.pin a:visited {
+		color: #555;
+	}
+	
+	.pin a:hover {
+		color: #000;
+	}
+	
+	.pin strong {
+		color: #000;
+		font-weight: normal;
+	}
+	
+	.pin .text {
+		font-size: 10px;
+		cursor: default;
+		color: #777;
+	}
 
 .pin-options {
     margin: 5px;

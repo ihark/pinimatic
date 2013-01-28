@@ -24,7 +24,7 @@
                     {% if user.is_authenticated %}
 						<li><span style="vertical-align:middle; text-align:right; width:100px; line-height:100%; font-size:11px;">Drag this to your bookmarks bar.</span><a class="buttonbm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">Pinify It</a></li>
                         <li><a href="#new-pin" data-toggle="modal">New Pin</a></li>
-						<li><a href="{% url pins:profile %}{{ user }}/" onclick="loadData(undefined, '{{ user }}');">{{ user }}</a></li>
+						<li><a href="{% url pins:user %}{{ user }}/" onclick="loadData(undefined, '{{ user }}');">{{ user }}</a></li>
                         <li><a href="{% url core:logout %}">Logout</a></li>
                     {% else %}
                         <li><a href="{% url core:login %}">Login</a></li>

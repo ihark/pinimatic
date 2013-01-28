@@ -227,25 +227,30 @@ function fav(id) {
 function follow(target) {
 	var button = $(target);
 	console.warn(target)
-	var followData = $('.follow-data');
-	var following = button.hasClass('following');
+	var followData = $('.followers-data');
+	var state = button.attr('data-state');
 
 	// get profile id.
 	var profileId = button.attr('data-profile');
 	// Update the number display and show it.
-	var count = parseInt(followData.attr('data-follow'));
-	if(following) count++;
-	else count--;
-	followData.attr('data-follow', count);
-
-	
-	if(following) {
-		button.addClass('following');
+	var count = parseInt(followData.attr('data-followers'));
+	console.warn('count: '+count)
+	console.warn('state = '+state)
+	if(state == "true") {
+		button.attr('data-state', 'false');
+		button.html('Spy')
+		count--;
+		console.warn('count: '+count)
 		//this.showLoader('Liking');
 	} else {
-		button.removeClass('following');
+		button.attr('data-state', 'true');
+		button.html('Un-Spy')
+		count++;
+		console.warn('count: '+count)
 		//this.showLoader('Unliking');
 	}
+	followData.attr('data-followers', count);
+	followData.html(count);
 
 	this.onLikeImage = function( result ) {
 		//console.log('onLikeImage', result);

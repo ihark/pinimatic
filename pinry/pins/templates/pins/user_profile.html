@@ -7,26 +7,26 @@
 {% block yield %}
 
 <div id="pins-container">
-	<div class="pin" id="user-info" style="position: absolute; top: 0px; left: 0px; display: hidden;">
+	<div class="pin profile" id="{{ profile.pk }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}">
 		<div class="header">
 			<a href="{% url core:home %}user/{{ profile.username }}" onclick="loadData(undefined, '{{ profile.username }}');"><h4>{{ profile.username }}</h4></a>
 			{% if request.user != profile %}
-				<button id="follow-btn" class="btn btn-mini" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button" data-profile="{{ profile.pk }}">{% if request.user|is_following:profile %}Un-Spy{% else %}Spy{% endif %}</button>
+				<button id="followers" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Spy{% else %}Spy{% endif %}</button>
 			{% endif %}
 		</div>
 		<div class="section">
-			<a href="http://www.wookmark.com/profile/arctelix/groups"><h6>User Stats</h6></a>
+			<a href=""><h6>User Stats</h6></a>
 			<div class="inline">
-				<a href="http://www.wookmark.com/profile/arctelix"><span class="pin-data" data-pin="{{ pinsC }}">{{ pinsC }}</span><br>Pins</a>
-				<a href="http://www.wookmark.com/profile/arctelix/groups"><span class="tag-data" data-tag="{{ tagsC }}">{{ tagsC }}</span><br>Tags</a>
-				<a href="http://www.wookmark.com/profile/arctelix/favs"><span class="tag-data" data-tag="{{ favsC }}">{{ favsC }}</span><br>Favs</a>
-				<a href="http://www.wookmark.com/profile/arctelix/notes"><span>NA</span><br>Notes</a>
-				<a href="http://www.wookmark.com/profile/arctelix/following"><span class="following-data" data-following="{{ folowingC }}">{{ folowingC }}</span><br>Spying</a>
-				<a href="http://www.wookmark.com/profile/arctelix/followers"><span class="followers-data" data-followers="{{ folowersC }}">{{ folowersC }}</span><br>Stalked</a></p>
+				<a href=""><span>{{ pinsC }}</span><br>Pins</a>
+				<a href=""><span class="display text tags">{{ tagsC }}</span><br>Tags</a>
+				<a href=""><span class="display text favs">{{ favsC }}</span><br>Favs</a>
+				<a href=""><span class="display text notes">NA</span><br>Notes</a>
+				<a href=""><span class="display text folowing">{{ folowingC }}</span><br>Spying</a>
+				<a href=""><span class="display text followers" >{{ folowersC }}</span><br>Stalked</a></p>
 			</div>
 		</div>
 		<div class="section"> 
-			<a href="http://www.wookmark.com/profile/arctelix/groups"><h6>Tags</h6></a>
+			<a href=""><h6>Tags</h6></a>
 			<div class="inline">
 				{% for tag in tags %}
 					<a href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}:{{ tag.1 }}</a>
@@ -34,7 +34,7 @@
 			</div>
 		</div>
 		<div class="section"> 
-			<a href="http://www.wookmark.com/profile/arctelix/topsites"><h6>Favorite sites</h6></a>
+			<a href=""><h6>Favorite sites</h6></a>
 			<div class="inline">
 			{% for srcDom in srcDoms %}
 			<li><a href="{{ srcDom.1.1 }}"><span>{{ srcDom.0 }}:</span>{{ srcDom.1.0 }}</a></li>
@@ -44,8 +44,8 @@
 		<div class="section">
 			<h6>Share</h6>
 			<div class="inline">
-				<a href="http://www.wookmark.com/embed/gallery/setup/user/7563" title="Embed a gallery of arctelix's images"><h5>ESS</h5></a>
-				<a href="http://www.wookmark.com/api/rss/user/7563" title="RSS feed for arctelix"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
+				<a href="" title="Embed a gallery of arctelix's images"><h5>ESS</h5></a>
+				<a href="" title="RSS feed for {{ profile.username }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
 			</div>
 		</div>
 	</div>

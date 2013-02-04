@@ -2,6 +2,8 @@
  * Based on Wookmark's endless scroll.
  */
 var apiURL = '/api/v1/pin/?format=json&offset='
+//var favsURL = '/api/v1/favs/?format=json&'
+var userURL = '/api/v1/auth/user/?format=json&'
 var page = 0;
 var handler = null;
 var cTag = null;//used to track current tag
@@ -10,7 +12,9 @@ var cUser = null;//used to track current user
 var isLoading = false;
 var pinsUrl = "" //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
 var apiPrefixA = ["user", "profile"]//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
-
+var authUser = $('#user').attr('data-user')
+console.log('current authUser: '+authUser)
+//TODO: need to get current athenticated user as java variable
 
 /**
  * When scrolled all the way to the bottom, add more tiles.
@@ -96,9 +100,9 @@ function loadData(tag, user) {
 		console.warn('else if cTag update url to: '+nAddress);
 	}
 	if (tag){
-		$('.tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
+		$('#tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
 	}else{
-		$('.tags').html('');
+		$('#tags').html('');
 	}
 	//window.location.href = nAddress
 	console.warn('final url = '+nAddress);
@@ -142,50 +146,69 @@ function loadData(tag, user) {
  * Receives data from the API, creates HTML for images and updates the layout
  */
 function onLoadData(data) {
-    data = data.objects;
-    
-    page++;
-    
-    var html = '';
-    var i=0, length=data.length, image;
-    for(; i<length; i++) {
-      image = data[i];
-      html += '<div class="pin">';
-          html += '<div class="pin-options">';
-              html += '<a href="'+pinsUrl+'/delete-pin/'+image.id+'/">';
-                  html += '<i class="icon-trash"></i>';
-              html += '</a>';
-			  html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'/">';
-                  html += '<i class="icon-edit"></i>';
-              html += '</a>';
-			  html += '<a href="#" onclick="fav('+image.id+'); return false;">';
-                  html += '<i class="icon-star"></i>';
-              html += '</a>';
-          html += '</div>';
-          html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
-              html += '<img src="'+image.thumbnail+'" width="200" >';
-          html += '<a rel="pins" href="'+image.srcUrl+'">';
-		      html += '<span>Posted from</span>';
-		  html += '</a>';
-		   html += '<span class="text"> : by </span><a href="/user/'+image.submitter.username+'/">';
-		      html += '<span>'+image.submitter.username+'</span>';
-		  html += '</a>';
-          if (image.description) html += '<p>'+image.description+'</p>';
-          if (image.tags) {
-              html += '<p>';
-              for (tag in image.tags) {
-                  html += '<span class="label tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
-              }
-              html += '</p>';
-          }
-      html += '</div>';
-    }
-    
-    $('#pins').append(html);
-    
-    applyLayout();
+	data = data.objects;
+	//getFavData(image.id)
+	page++;
+	
+	var userFav
+	var i=0, length=data.length, image;
+	for(; i<length; i++) {
+		image = data[i];
+		userFav = false
+		var html = '';
+		for (f in image.favorites){
+			if (image.favorites[f].user == authUser){
+				userFav = true;
+				break
+			}
+		}
+		html += '<div class="pin" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
+			html += '<div class="pin-options">';
+				html += '<a href="'+pinsUrl+'/delete-pin/'+image.id+'/">';
+				html += '<i id="delete-btn" title="Delete" class="icon-trash"></i>';
+				html += '</a>';
+				html += '<a href="'+pinsUrl+'/edit-pin/'+image.id+'/">';
+					html += '<i id="edit-btn" title="Edit" class="icon-edit"></i>';
+				html += '</a>';
+				html += '<a>';
+				if (userFav) {
+					html += '<i id="favs" data-state="'+userFav+'" title="Remove Favorite" class="icon-star"></i>';
+				} else {
+					html += '<i id="favs" data-state="'+userFav+'" title="Add Favorite" class="icon-star-empty"></i>';
+				};
+				html += '</a>';
+			html += '</div>';
+			html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
+				html += '<img src="'+image.thumbnail+'" width="200" >';
+			html += '</a>';
+			html += '<div class="pin-info">';
+				html += '<a class="pin-src" rel="pins" href="'+image.srcUrl+'">Posted from</a>';
+					html += '<span class="text"> : by </span>'
+				html += '<a class="pin-submitter" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a>';
+				html +='<span class="pin-stats pull-right">'
+					html += '<i class="display icon favs"></i><span class="display text favs ">'+image.favorites.length+'</span>';
+				html +='</span>'
+			html += '</div>';
+			html += '<div class="pin-desc">';
+				if (image.description) html += '<p id="desc">'+image.description+'</p>';
+			html += '</div>';
+			html += '<div class="pin-tags">';
+				if (image.tags) {
+					html += '<p>';
+					for (tag in image.tags) {
+						html += '<span class="label tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
+					}
+					html += '</p>';
+				}
+			html += '</div>';
+		html += '</div>';
+		$('#pins').append(html);
+		//hide favs display if there are none
+		if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()
+	}
+	applyLayout();
 	isLoading = false;
-    $('#loader').hide();
+	$('#loader').hide();
 };
 
 $(document).ready(new function() {
@@ -204,59 +227,139 @@ $('.fancybox').fancybox({
 /**
  * Pin Options Functions.
  */
- 
+
 // add event listeners
-$('#follow-btn').live('click', function(event){
+$('#followers').live('click', function(event){
 	follow(this)
 });
+$('#favs').live('click', function(event){
+	togglePinStat(this, 'icon-star', 'icon-star-empty', '/toggle/pins/Pin/');
+});
+//TODO: may not need this or its not working
+$('#user').live('onchange', function(event){
+	authUser = this.attr('data-user')
+	console.log('user changed to: '+authUser+this)
+});
 
-function fav(id) {
+
+//TODO: make an ajax api function to consolodate all the ajax calls
+//TODO: make one funtion to update all fav follow counts
+/* togglePinStat: 
+xxx: is a unique name of the stat to toggle
+targetBtn: the HTML element acting as the toggle button
+  must have: id="xxx" set staticly by onLoadData
+  must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
+.pin class:  id=#-Pin, data-xxx=Current qty of stat
+.display .*** .text: dispay's the current count
+.display .*** .icon-iconname: display's the icon (must be 11px X 11p)
+*/
+
+function togglePinStat(targetBtn, tIcon, fIcon, url){
+	console.log(targetBtn);
+	var button = $(targetBtn);
+	var name = button.attr('id');
+	console.log('name: '+name);
+	var state = button.attr('data-state');
+	var pin = $($(targetBtn).closest(".pin"));
+	console.log(pin);
+	var id = parseInt(pin.attr('id'));
+	console.log(id);
+	var count = pin.attr('data-'+name);
+	console.log(count);
+	var disp = pin.find('.display.'+name);
+	var dispText = pin.find('.display.text.'+name);
+	console.log(disp);
+	var aProfile = $('.pin.profile');
+	console.log(aProfile);
+	var countP = aProfile.attr('data-'+name);
+	console.log(count);
+	var dispTextP = aProfile.find('.display.text.'+name);
+	var aProfileId = aProfile.attr('data-profile')
+	console.log(aProfileId);
+	if (authUser == aProfileId) {
+		console.log('authUser = aProfile');
+		var updateProfile = true;
+	}
+
+	this.onFav = function( result ) {
+		if (state == "true"){
+			count--;
+			countP--;
+			button.attr('data-state', "false");
+			button.addClass(fIcon);
+			button.removeClass(tIcon);
+			pin.attr('data-'+name, count);
+			dispText.html(count);
+			if (count == 0) {
+				disp.hide();
+			}
+			if (updateProfile){
+				aProfile.attr('data-'+name, countP);
+				dispTextP.html(countP);
+			}
+		}else{
+			count++;
+			countP++;
+			button.attr('data-state', "true");
+			button.addClass(tIcon);
+			button.removeClass(fIcon);
+			pin.attr('data-'+name, count);
+			dispText.html(count);
+			disp.show();
+			if (updateProfile){
+				aProfile.attr('data-'+name, countP);
+				dispTextP.html(countP);
+			}
+		}
+	}
+	
 	$.ajax({
-		url: pinsUrl+'/toggle/pins/Pin/'+id+'/',
+		url: pinsUrl+url+id+'/',
 		type: 'POST',
 		contentType: 'application/json',
 		beforeSend: function(jqXHR, settings) {
 			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
 		},
-		success: console.warn('fav added'),
+		success: $.proxy(this.onFav, this),//TODO: swap fav image
 		error: function(jqXHR, settings) {
-			console.warn('follow - ajax error');
+			console.warn('addfav - ajax error');
 		},
 	});
 }
-function follow(target) {
-	var button = $(target);
-	console.warn(target)
-	var followData = $('.followers-data');
+
+function follow(targetBtn) {
+	var button = $(targetBtn);
+	var name = button.attr('id')
 	var state = button.attr('data-state');
+	var pin = $($(targetBtn).closest(".pin"));
+	var id = parseInt(pin.attr('id'));
+	var count = pin.attr('data-'+name);
+	var disp = pin.find('.display.'+name)
+	var dispText = pin.find('.display.text.'+name)
 
-	// get profile id.
-	var profileId = button.attr('data-profile');
-	// Update the number display and show it.
-	var count = parseInt(followData.attr('data-followers'));
-	console.warn('count: '+count)
-	console.warn('state = '+state)
-	if(state == "true") {
-		button.attr('data-state', 'false');
-		button.html('Spy')
-		count--;
+	this.onFollow = function( result ) {
+		console.log('onFollow', result);
+		// Update the number of followers displayed.
 		console.warn('count: '+count)
-		//this.showLoader('Liking');
-	} else {
-		button.attr('data-state', 'true');
-		button.html('Un-Spy')
-		count++;
-		console.warn('count: '+count)
-		//this.showLoader('Unliking');
-	}
-	followData.attr('data-followers', count);
-	followData.html(count);
-
-	this.onLikeImage = function( result ) {
-		//console.log('onLikeImage', result);
-		//this.hideLoader();
+		console.warn('state = '+state)
+		if(state == "true") {
+			button.attr('data-state', 'false');
+			button.html('Spy')
+			count--;
+			console.warn('count: '+count)
+			//this.showLoader('Liking');
+		} else {
+			button.attr('data-state', 'true');
+			button.html('Un-Spy')
+			count++;
+			console.warn('count: '+count)
+			//this.showLoader('Unliking');
+		}
+		pin.attr('data-'+name, count);
+		dispText.html(count);
 	};
-	var url = pinsUrl+'/toggle/auth/User/'+profileId+'/';
+	
+	var url = pinsUrl+'/toggle/auth/User/'+id+'/';
 	$.ajax({
 		url: url,
 		type: 'POST',
@@ -264,7 +367,7 @@ function follow(target) {
 		beforeSend: function(jqXHR, settings) {
 			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
 		},
-		success: $.proxy(this.onLikeImage, this),//todo: need to detect if followed or not
+		success: $.proxy(this.onFollow, this),//todo: need to detect if followed or not
 		error: function(jqXHR, settings) {
 			console.warn('follow - ajax error');
 		},

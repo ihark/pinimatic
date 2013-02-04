@@ -90,7 +90,7 @@ body {
 }
 
 
-.tags {
+#tags {
     padding: 0px 0px 0px 20px;
 }
 
@@ -105,7 +105,8 @@ body {
     z-index: 100;
 	float: left;
 }
-#user-info .header{
+
+.pin.profile .header{
 	margin: -20px -20px 0px -20px;
 	color: #666;
 	padding: 0px 20px 0px 20px;
@@ -118,11 +119,10 @@ body {
 	background-image: linear-gradient(top, #ffffff, #f4f4f4);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#f4f4f4');
 }
-
-#user-info .header > *{
-	display: inline-block;
-}
-	#user-info .section {
+	.pin.profile .header > *{
+		display: inline-block;
+	}
+	.pin.profile .section {
 		width: 200px;
 		height: auto;
 		border-top: 1px solid #ccc;
@@ -133,16 +133,19 @@ body {
 	.inline > *{
 		position:relative;
 		display:inline-block;
-		margin-right:3px;
+		margin-right:2px;
 		text-align:center;
 	}
-	.inline > a > span{
+	.pin.profile .inline > a > span{
 		line-height: 0px;
 		font-size: 12px;
 		font-weight: bold;
 	}
+	.pin.profile .inline > a {
+		font-size: 11px;
+	}
 		
-	#follow-btn {
+	.pin.profile .btn.follow {
 		width: 70px;
 		margin-right: 10px;
 		position:absolute;
@@ -157,6 +160,7 @@ body {
 	border: 1px solid #ccc;
 	padding: 20px;
 	display: none;
+	font-size: 11px;
 }
 	.pin img {
 		padding: 0;
@@ -167,13 +171,12 @@ body {
 		margin-bottom: 0;
 		padding-top: 3px;
 		padding-bottom: 3px;
-		
 	}
 	
 	.pin a {
 		color: #777;
 		text-decoration: none;
-		font-size: 10px;
+		font-size: 11px;
 	}
 	
 	.pin a:link {
@@ -192,19 +195,34 @@ body {
 		color: #000;
 		font-weight: normal;
 	}
-	
-	.pin .text {
-		font-size: 10px;
+	.pin i {
+		vertical-align: text-bottom;
+	}
+	.pin .display {
 		cursor: default;
 		color: #777;
 	}
+	.pin .icon {
+		background-position: 0px 0px;
+		display: inline-block;
+		width: 11px;
+		height: 11px;
+		margin-bottom: 2px;
+		margin-top: 0px;
+		line-height: 14px;
+		vertical-align: text-bottom;
+	}
+	.pin .icon.favs {
+		background-image: url("../img/icons-star.png");
+	}
+	
 
 .pin-options {
     margin: 5px;
     display: none;
     right: 20px;
     position: absolute;
-    padding: 0px 2px 3px 2px;
+    padding: 1px 2px 1px 2px;
     background-color: #eee;
     border: 1px solid #ccc;
     -webkit-box-shadow: 0 1px 3px #ccc;

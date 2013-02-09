@@ -156,7 +156,7 @@
 			console.warn('--image skiped: in pinry domain--');
 			return t
 		} else {
-			if (e.width < 150 && e.height < 150 || e.width < 80 || e.height < 80) {
+			if (e.width < 150 && e.height < 150 || e.width < 100 && e.height < 20) {
 				console.warn('--image skiped: too small--');
 				return t
 			}

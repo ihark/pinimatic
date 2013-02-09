@@ -68,18 +68,19 @@ of the most requested functionality easily. (pinry/settings/__init__.py)
           all public access.)
 
 ## Current Features
-
  + Pin Tagging
+ + User Boards / groups
  + Filter by tag & user
+ + User profiles
  + Add images via Bookmarklet
  + Upload Image Files
  + Add images via url
  + Delete & Edit Pins
+ + Favorite / Follow pins
+ + Follow users
+ + Re-Pin Pins
  
 ## Roadmap
- + User boards
- + Follow users
- + Like Pins
  + Comment on pins
  + Non-image URL pinning
  + Statistics/analytics with pretty graphs

@@ -16,6 +16,7 @@
 						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">
 						{{ field.as_hidden }}
 						</div>
+					{% elif field.name == "repin"%}
 					{% else %}
 						{% bootstrap_field field %}
 					{% endif %}

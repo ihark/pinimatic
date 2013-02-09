@@ -5,7 +5,10 @@
 {% block title %}Recent Pins{% endblock %}
 
 {% block yield %}
-
+<!-- 
+<script>
+var au = {{ authUserJ|safe }}
+</script> -->
 <div id="pins-container">
 	<div class="pin profile" id="{{ profile.pk }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}">
 		<div class="header">
@@ -14,40 +17,43 @@
 				<button id="followers" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Spy{% else %}Spy{% endif %}</button>
 			{% endif %}
 		</div>
-		<div class="section">
-			<a href=""><h6>User Stats</h6></a>
-			<div class="inline">
-				<a href=""><span>{{ pinsC }}</span><br>Pins</a>
-				<a href=""><span class="display text tags">{{ tagsC }}</span><br>Tags</a>
-				<a href=""><span class="display text favs">{{ favsC }}</span><br>Favs</a>
-				<a href=""><span class="display text notes">NA</span><br>Notes</a>
-				<a href=""><span class="display text folowing">{{ folowingC }}</span><br>Spying</a>
-				<a href=""><span class="display text followers" >{{ folowersC }}</span><br>Stalked</a></p>
+		<div class="section center">
+			<div class="inline center vert-left">
+				<a id="user-pins"><div class="btn-hover"><span class="large display">{{ pinsC }}</span><br>Pins</div></a>
+				<a id="user-tags"><div class="btn-hover"><span class="large display">{{ tagsC }}</span><br>Groups</div></a>
+			</div>
+			<div class="inline center vert-auto">
+				<a id="user-favs"><div class="btn-hover"><span class="large display">{{ favsC }}</span><br>Favorites</div></a>
+				<a id="user-notes"><div class="btn-hover"><span class="large display">NA</span><br>Comments</div></a>
+			</div>
+			<div class="inline center vert-right">
+				<a id="user-following"><div class="btn-hover"><span class="large display">{{ folowingC }}</span><br>Following</div></a>
+				<a id="user-followers"><div class="btn-hover"><span class="large display">{{ folowersC }}</span><br>Followers</div></a>
 			</div>
 		</div>
 		<div class="section"> 
-			<a href=""><h6>Tags</h6></a>
-			<div class="inline">
+			<h6>Tags</h6>
+			<div class="inline tags">
 				{% for tag in tags %}
-					<a href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}:{{ tag.1 }}</a>
+					<a class="hover btn-hover" href="{% url core:home %}user/{{ user }}/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
 				{% endfor %}
 			</div>
 		</div>
 		<div class="section"> 
-			<a href=""><h6>Favorite sites</h6></a>
+			<h6>Favorite sites</h6>
 			<div class="inline">
 			{% for srcDom in srcDoms %}
-			<li><a href="{{ srcDom.1.1 }}"><span>{{ srcDom.0 }}:</span>{{ srcDom.1.0 }}</a></li>
+			<li class="hover btn-hover"><a href="{{ srcDom.1.1 }}">{{ srcDom.0 }}<span class="white">: {{ srcDom.1.0 }}</span></a></li>
 			{% endfor %}
 			</div>
 		</div>
-		<div class="section">
+		<!-- <div class="section">
 			<h6>Share</h6>
 			<div class="inline">
-				<a href="" title="Embed a gallery of arctelix's images"><h5>ESS</h5></a>
+				<a href="" title="Embed a gallery of arctelix's images">ESS</a>
 				<a href="" title="RSS feed for {{ profile.username }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
 			</div>
-		</div>
+		</div> -->
 	</div>
 	<div id="pins"></div>
 </div>

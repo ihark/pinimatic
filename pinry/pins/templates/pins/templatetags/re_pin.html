@@ -1,0 +1,30 @@
+{% load bootstrap_field %}
+
+<div class="modal fade" id="re-pin">
+    <div class="modal-header">
+        <h3>Re-Pin</h3>
+		<span>* Required fields</span>
+    </div>
+    <form enctype="multipart/form-data" id="re-pin-form" action="" method="post" class="form">
+        <div class="modal-body">
+			<div id="thumb_div">
+				<img id="thumb_id" src="/static/core/img/thumb-default.png" alt="Invlaid Image"/>
+			</div>
+			<div id="fields_div">
+				{% for field in form %}
+					{% if field.name == "imgUrl" or field.name == "image" %}
+						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">
+						{{ field.as_hidden }}
+						</div>
+					{% else %}
+						{% bootstrap_field field %}
+					{% endif %}
+				{% endfor %}
+			</div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Post</button>
+            <a href="#re-pin" data-toggle="modal" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>

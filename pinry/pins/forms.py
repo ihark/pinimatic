@@ -17,6 +17,7 @@ class PinForm(forms.ModelForm):
     image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
     tags = TagField(widget=TagWidget(attrs={'placeholder':'required'}), label='*Tags')
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
+    repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False, initial=None)
 
 
     def __init__(self, *args, **kwargs):
@@ -30,18 +31,33 @@ class PinForm(forms.ModelForm):
             'description',
             'tags',
             'uImage',
+            'repin',
         )
 
 
     def check_if_image(self, data):
         print '--form check_if_img()'
-        # Test file type
-        image_file_types = ['png', 'gif', 'jpeg', 'jpg']
-        file_type = data.split('.')[-1]
-        file_type = file_type.split('?')[0]
+        image_file_types = ['png', 'gif', 'jpeg', 'jpg', 'none']
+        file_url = data.split('?')[0]
+        print 'file type: '+file_url
+        p = file_url.rfind('.')
+        s = file_url.rfind('/')
+        print 'p: '+str(p)
+        print 's: '+str(s)
+        if p != -1 and p > s:
+            file_type = file_url.split('.')[-1]
+        else:
+            file_type = 'none'
+        print 'file type: '+file_type
         if file_type.lower() not in image_file_types:
             raise forms.ValidationError("Requested URL is not an image file. "
                                         "Only images are currently supported.")
+    def clean_repin(self):
+        data = self.cleaned_data['repin']
+        if data == '':
+            data = None
+        return data
+
 
     def clean(self):
         cleaned_data = super(PinForm, self).clean()

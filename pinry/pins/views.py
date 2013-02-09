@@ -49,8 +49,13 @@ def AjaxSubmit(request):
 
 def recent_pins(request):
     return TemplateResponse(request, 'pins/recent_pins.html', None)
+  
+from django.core.serializers.json import DjangoJSONEncoder
     
 def user_profile(request, profileName=None, tag=None):
+    authUser = User.objects.values('id','username','first_name','last_name','date_joined','last_login').filter(username__exact=request.user)
+    authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)
+
     profile = User.objects.get(username__exact=profileName)
     pins = Pin.objects.filter(submitter=profile)
     pinsC = pins.count()
@@ -62,6 +67,7 @@ def user_profile(request, profileName=None, tag=None):
     folowingC = folowing.count()
     favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
     favsC = favs.count()
+    
     #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
     srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
     srcDomains = {}
@@ -104,6 +110,8 @@ def user_profile(request, profileName=None, tag=None):
             'favs': favs,
             'favsC': favsC,
             'srcDoms': srcDoms,
+            'authUser': authUser,
+            'authUserJ': authUserJ
         }
     return TemplateResponse(request, 'pins/user_profile.html', context)
 

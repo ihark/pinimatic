@@ -14,21 +14,21 @@ var au = {{ authUserJ|safe }}
 		<div class="header">
 			<a href="{% url core:home %}user/{{ profile.username }}" onclick="loadData(undefined, '{{ profile.username }}');"><h4>{{ profile.username }}</h4></a>
 			{% if request.user != profile %}
-				<button id="followers" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Spy{% else %}Spy{% endif %}</button>
+				<button id="followers" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
 			{% endif %}
 		</div>
 		<div class="section center">
 			<div class="inline center vert-left">
-				<a id="user-pins"><div class="btn-hover"><span class="large display">{{ pinsC }}</span><br>Pins</div></a>
-				<a id="user-tags"><div class="btn-hover"><span class="large display">{{ tagsC }}</span><br>Groups</div></a>
+				<a id="user-pins"><div class="btn-hover"><span class="pins large display text">{{ pinsC }}</span><br>Pins</div></a>
+				<a id="user-tags"><div class="btn-hover"><span class="tags large display text">{{ tagsC }}</span><br>Groups</div></a>
 			</div>
 			<div class="inline center vert-auto">
-				<a id="user-favs"><div class="btn-hover"><span class="large display">{{ favsC }}</span><br>Favorites</div></a>
-				<a id="user-notes"><div class="btn-hover"><span class="large display">NA</span><br>Comments</div></a>
+				<a id="user-favs"><div class="btn-hover"><span class="favs large display text">{{ favsC }}</span><br>Favorites</div></a>
+				<a id="user-notes"><div class="btn-hover"><span class="notes large display text">NA</span><br>Comments</div></a>
 			</div>
 			<div class="inline center vert-right">
-				<a id="user-following"><div class="btn-hover"><span class="large display">{{ folowingC }}</span><br>Following</div></a>
-				<a id="user-followers"><div class="btn-hover"><span class="large display">{{ folowersC }}</span><br>Followers</div></a>
+				<a id="user-fing"><div class="btn-hover"><span class="following large display text">{{ folowingC }}</span><br>Following</div></a>
+				<a id="user-fers"><div class="btn-hover"><span class="followers large display text">{{ folowersC }}</span><br>Followers</div></a>
 			</div>
 		</div>
 		<div class="section"> 
@@ -50,7 +50,7 @@ var au = {{ authUserJ|safe }}
 		<!-- <div class="section">
 			<h6>Share</h6>
 			<div class="inline">
-				<a href="" title="Embed a gallery of arctelix's images">ESS</a>
+				<a href="" title="Embed a gallery of images">ESS</a>
 				<a href="" title="RSS feed for {{ profile.username }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
 			</div>
 		</div> -->

@@ -660,13 +660,13 @@ function follow(targetBtn) {
 		console.log('state = '+state)
 		if(state == "true") {
 			button.attr('data-state', 'false');
-			button.html('Spy')
+			button.html('Follow')
 			count--;
 			console.log('count: '+count)
 			//this.showLoader('Liking');
 		} else {
 			button.attr('data-state', 'true');
-			button.html('Un-Spy')
+			button.html('Un-Follow')
 			count++;
 			console.log('count: '+count)
 			//this.showLoader('Unliking');

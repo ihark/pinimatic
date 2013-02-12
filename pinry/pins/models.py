@@ -24,7 +24,7 @@ class Pin(models.Model):
     thumbnail = models.ImageField(upload_to='pins/pin/thumbnails/', max_length=100)
     published = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
-    repin = models.ForeignKey('self', blank=True, null=True)
+    repin = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
 
 
     def __unicode__(self):

@@ -11,9 +11,7 @@ margin: 0px 0px;
 }
 body {
     margin-top: 70px;
-	background-color: #E0EBCC;
-    background: url("/static/core/img/background.png");
-	background: url("http://fc05.deviantart.net/fs16/f/2007/149/e/0/Background_Texture_Dark_by_colmahouse.jpg");
+
 	}
 .navbar-inner {
     background-image: none;
@@ -90,7 +88,7 @@ body {
 
 
 #tags {
-    padding: 0px 0px 0px 20px;
+    padding: 0px 0px 5px 20px;
 }
 
     .tag {
@@ -104,10 +102,12 @@ body {
     z-index: 100;
 	float: left;
 }
+.pin.welcome,
 .pin.profile {
 	padding-bottom: 15px;
 }
-	.pin.profile .header{
+	.pin .header{
+		height: 100%;
 		margin: -20px -20px 0px -20px;
 		color: #666;
 		padding: 0px 20px 0px 20px;
@@ -120,11 +120,12 @@ body {
 		background-image: linear-gradient(top, #ffffff, #f4f4f4);
 		filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#f4f4f4');
 	}
-	.pin.profile .header > *{
-		display: inline-block;
+	.pin.welcome .header a:hover{
+		font-weight: bolder;
+		text-decoration: underline;
 	}
-	.pin.profile .section {
-		width: 200px;
+
+	.section {
 		height: auto;
 		border-top: 1px solid #ccc;
 		margin: 0px -20px;
@@ -147,6 +148,9 @@ body {
 	}
 	.white{
 		color: White;
+	}
+	.dark{
+		color: Black;
 	}
 	.hover{
 		width:100%;
@@ -183,15 +187,15 @@ body {
 
 	}
 	
-	.pin.profile .btn-hover:hover {
+	.pin .btn-hover:hover {
 		font-weight: normal;
 		background: #F0F0F0;
 	}
-	.pin.profile .btn-hover{
+	.pin .btn-hover{
 		margin: 2px 0px 2px 0px;
 	}
 		
-	.pin.profile .btn.follow {
+	.pin .btn.follow {
 		width: 70px;
 		margin-right: 10px;
 		position:absolute;
@@ -222,11 +226,15 @@ body {
 		text-decoration: none;
 		cursor: pointer;
 	}
+	.pin .a-format {
+		color: #777;
+		cursor:default;
+	}
 	.pin a:link {
 		color: #555;
 	}
 	.pin a:visited {
-		color: #555;
+		
 	}
 	.pin a:hover {
 		color: #000;
@@ -235,7 +243,7 @@ body {
 	}
 	.pin-info a:hover {
 		text-decoration: underline;
-		
+
 	}
 	
 	
@@ -249,10 +257,7 @@ body {
 	.pin .display {
 		
 	}
-	.pin .text {
-		color: #777;
-		cursor:default;
-	}
+	
 	.pin .icon {
 		background-position: 0px 0px;
 		display: inline-block;
@@ -287,20 +292,13 @@ body {
     position: relative;
     background: #eee;
 }
-.user-group .whitebox {
+.user-group .info {
 	position: absolute;
 	background: White;
 	z-index: 110;
 	width: 200px;
 	bottom: 0px;
 	height: 60px;
-}
-.user-group .header {
-	position: absolute;
-	background: White;
-	z-index: 120;
-	width: 200px;
-	bottom: 30px;
 }
 
 .pin-options {

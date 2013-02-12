@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.contrib.auth.models import Group
 
 
 
@@ -29,7 +30,8 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            user.groups.add(Group.objects.get(name=settings.DEFAULT_USER_GROUP))
             messages.success(request, 'Thank you for registering, you can now '
                                       'login.')
             return HttpResponseRedirect(reverse('core:login'))

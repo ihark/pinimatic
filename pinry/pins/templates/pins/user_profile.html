@@ -13,9 +13,13 @@ var au = {{ authUserJ|safe }}
 	<div class="pin profile" id="{{ profile.pk }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}">
 		<div class="header">
 			<a href="{% url core:home %}user/{{ profile.username }}" onclick="loadData(undefined, '{{ profile.username }}');"><h4>{{ profile.username }}</h4></a>
-			{% if request.user != profile %}
-				<button id="followers" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
+			{% if request.user != profile and user.is_authenticated%}
+				<button id="follow" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
 			{% endif %}
+		</div>
+		<div id="tags" class="section tags">
+			<h6>Filters:</h6>
+			<div class="tags"></div>
 		</div>
 		<div class="section center">
 			<div class="inline center vert-left">

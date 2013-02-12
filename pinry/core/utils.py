@@ -114,4 +114,4 @@ def delete_upload(request, fileName = None):
         ret_json = { 'success': success, }
         return HttpResponse( json.dumps( ret_json ) )
     print success
-  
+

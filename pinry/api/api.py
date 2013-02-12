@@ -10,6 +10,9 @@ from follow.models import Follow
 from django.http import HttpResponse
 from django.utils import simplejson as json
 
+from django.db.models import Count, Sum, F
+from operator import attrgetter
+
 #resource path = pinry.api.api.SomeResource
 
 class UserResource(ModelResource):
@@ -93,19 +96,74 @@ class PinResource(ModelResource):
     repin = fields.ForeignKey('pinry.api.api.PinResource', 'repin', null=True)
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
+    popularity = fields.DecimalField(attribute='popularity', null=True)
     
     class Meta:
         always_return_data = True
         queryset = Pin.objects.all()
         resource_name = 'pin'
         include_resource_uri = True
-        authorization = DjangoAuthorization()
         allowed_methods = ['get', 'post']
         filtering = {
             'published': ['gt'],
             'submitter': ALL_WITH_RELATIONS,
-            'fav': ALL_WITH_RELATIONS,
+            'favorites': ALL_WITH_RELATIONS,
+            'popularity': ALL,
         }
+        #ordering = ['popularity']
+        authorization = DjangoAuthorization()
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        An ORM-specific implementation of ``apply_filters``.
+
+        The default simply applies the ``applicable_filters`` as ``**kwargs``,
+        but should make it possible to do more advanced things.
+
+        Here we override to check for a 'distinct' query string variable,
+        if it's equal to True we apply distinct() to the queryset after filtering.
+        """
+        distinct = request.GET.get('distinct', False) == ''
+        pop = request.GET.get('pop', False) == ''
+        if pop:
+            print '---------apply_filters'
+            qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
+            return qs
+        if distinct:
+            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
+        else:
+            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True))
+
+
+    
+    def apply_sorting(self, objects, options=None):
+        print '---apply_sorting----'
+        if options and "sort" in options:
+            if options['sort'] == "popularity":
+                #this is wrong, need to get how many times a pin is repinned. This is counting the fact that it was repinned from another pin.
+                for p in objects:
+                    p.popularity = p.fav_count+(p.repin_count*1.25)
+
+            return sorted(objects, key=attrgetter(options['sort']), reverse=True)
+ 
+        return super(PinResource, self).apply_sorting(objects, options)
+
+    '''
+    def dehydrate_popularity(self, bundle):
+        try:
+            fCount = bundle.obj.fav_count
+        except:
+            fCount = 0
+        try:
+            rCount = bundle.obj.repin_count
+        except:
+            rCount = 0
+        print rCount+fCount
+        bundle.data['popularity'] = rCount+fCount
+
+
+        return bundle.data['popularity']
+    '''
 
     def build_filters(self, filters=None):
         if filters is None:
@@ -115,10 +173,20 @@ class PinResource(ModelResource):
 
         if 'user' in filters:
             orm_filters['submitter__username__exact'] = filters['user']
+            
         
         if 'favs' in filters:
-            orm_filters['f_pin__user__username__exact'] = filters['favs']
-        
+            if filters['favs'] == 'all':
+                orm_filters['f_pin__folowing__isnull'] = 'true'
+            else:
+                orm_filters['f_pin__user__username__exact'] = filters['favs']
+
+        if 'pop' in filters:
+                #print self.obj_get(None, pk=1)
+                orm_filters['f_pin__folowing__isnull'] = 'true'
+                #orm_filters['order_by__fav_count']
+                
+
         if 'tag' in filters:
             orm_filters['tags__name__in'] = filters['tag'].split(',')
 
@@ -135,13 +203,21 @@ class PinResource(ModelResource):
     def determine_format(self, request): 
         return "application/json" 
         
-    '''' no longer needed due to 0.9.11 grade
+    ''' no longer needed due to 0.9.11 grade
     def post_list(self, request, **kwargs):
         resp = super(PinResource, self).get_list(request, **kwargs)
         print resp
         return resp
     '''
-        
-    
-    def obj_create(self, bundle, request=None, **kwargs):
-        return super(PinResource, self).obj_create(bundle, request, submitter=request.user, uImage=None)   
+    '''
+    def hydrate(self, bundle, request=None):
+        bundle.obj.submitter = User.objects.get(pk = bundle.request.user.id)
+        return bundle 
+
+    '''
+    def obj_create(self, bundle, **kwargs):
+        print '----obj_create------'
+        bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='')
+        print bundle
+        return bundle
+

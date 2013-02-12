@@ -76,10 +76,15 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']
+
 ROOT_URLCONF = 'pinry.urls'
+
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
+DEFAULT_USER_GROUP = 'Basic'
+
 INTERNAL_IPS = ['127.0.0.1']
+
 MESSAGE_TAGS = {
     messages.WARNING: 'alert',
     messages.ERROR: 'alert alert-error',

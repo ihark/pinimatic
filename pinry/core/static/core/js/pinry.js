@@ -25,7 +25,8 @@ var vn = { //holds display names for views
 	pins:"Pins",
 	fing:"Spying",
 	fers:"Stalked",
-	cmnts:"Notes"
+	cmnts:"Notes",
+	pop:"Popular"
 }
 av=url(3)//active view
 var authUserO = ajax(userURL, false);//authenticated user object//used to determine current authenticated user
@@ -159,9 +160,10 @@ function loadData(tag, user) {
 	
 	//add active tag to tag area
 	if (tag){
-		$('#tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
+		$('#tags').show();
+		$('#tags .tags').html('<span class="label tag" onclick="loadData(null)">' + tag + ' x</span>');
 	}else{
-		$('#tags').html('');
+		$('#tags').hide();
 	}
 	
 	//updated push state for back nav and current view name
@@ -194,17 +196,22 @@ function loadData(tag, user) {
 	}
 	//make api url
 	console.log('page: '+page);
-    var loadURL = pinsURL+(page*30);
+    var loadURL = pinsURL;
 	
 	//if current tag has a view setup ajax for view
 	console.log('active view set to:'+av);
-	if (av == 'favs') {
-		loadURL += "&favs=" + user;
-		user = 'all'
+	if (av == 'pop') {
+		loadURL += (page*30)+"&pop&sort=popularity"
+		//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
 		tag = null
-	}
-	if (av == 'tags') {
+	}else if (av == 'favs') {
+		loadURL += (page*30)+"&favs=" + user;
 		tag = null
+	}else if (av == 'tags') {
+		loadURL += (page*500)
+		tag = null
+	}else{
+		loadURL += (page*30)
 	}
 	console.log('final user: '+user);
 	console.log('final tag: '+tag);
@@ -296,7 +303,7 @@ function onLoadData(data) {
 				html += '</a>';
 				html += '<div class="pin-info">';
 					html += '<a class="pin-src" rel="pins" href="'+image.srcUrl+'">Posted from</a>';
-						html += '<span class="text"> : by </span>'
+						html += '<span class="a-format"> : by </span>'
 					html += '<a class="pin-submitter" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a>';
 					html +='<span class="pin-stats pull-right">'
 						html += '<i class="display icon favs"></i><span class="display text favs ">'+image.favorites.length+'</span>';
@@ -335,8 +342,7 @@ function onLoadData(data) {
 			if (tags[image.tags] == 1){
 			html += '<div class="pin user-group" id="'+image.tags+'">'
 				html += '<a class="thumbs"></a>'
-				html += '<div class="whitebox"></div>'
-				html += '<div class="header">'
+				html += '<div class="info">'
 					html += '<h5><a class="title">'+image.tags+'</a></h5>'
 					html += '<div class="details"></div>'
 				html += '</div>'
@@ -638,14 +644,30 @@ $('#user-tags').live('click', function(event){
 $('#user-favs').live('click', function(event){
 	loadData(vn.favs, aProfileO.username);
 });
-$('#followers').live('click', function(event){
-	follow(this);
+$('#follow').live('click', function(event){
+	follow(this, 'followers');
+});
+
+//welcome profile
+$('#Recent-all').live('click', function(event){
+	loadData(null, 'all');
+	return false
+});
+$('#Popular-all').live('click', function(event){
+	loadData(vn.pop, 'all');
+	return false
+});
+$('#Category-all').live('click', function(event){
+	loadData(vn.tags, 'all');
+	return false
 });
 
 //toggle follow / unfollow
-function follow(targetBtn) {
+function follow(targetBtn, display) {
 	var button = $(targetBtn);
-	var name = button.attr('id')
+	if (display){var name = display}else{
+		var name = button.attr('id')
+	}
 	var state = button.attr('data-state');
 	var pin = $($(targetBtn).closest(".pin"));
 	var id = parseInt(pin.attr('id'));

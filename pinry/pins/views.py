@@ -9,6 +9,7 @@ from PIL import Image
 
 from .forms import PinForm
 from .models import Pin
+from .utils import get_top_domains
 from django.contrib.auth.models import User
 
 from django.utils import simplejson
@@ -17,7 +18,8 @@ from django.core.files.storage import default_storage
 
 from follow.models import Follow
 from django.db.models import Count
-from urlparse import urlparse, urlunparse
+
+
 
 
 def AjaxSubmit(request):
@@ -48,13 +50,22 @@ def AjaxSubmit(request):
     
 
 def recent_pins(request):
-    return TemplateResponse(request, 'pins/recent_pins.html', None)
+    pins = Pin.objects.all()
+    #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
+    srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
+    srcDoms = get_top_domains(srcUrls, 5)
+    
+    context = {
+            'srcDoms': srcDoms,
+        }
+
+    return TemplateResponse(request, 'pins/recent_pins.html', context)
   
 from django.core.serializers.json import DjangoJSONEncoder
     
 def user_profile(request, profileName=None, tag=None):
     authUser = User.objects.values('id','username','first_name','last_name','date_joined','last_login').filter(username__exact=request.user)
-    authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)
+    authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)#not used keeping for tests
 
     profile = User.objects.get(username__exact=profileName)
     pins = Pin.objects.filter(submitter=profile)
@@ -63,28 +74,16 @@ def user_profile(request, profileName=None, tag=None):
     tagsC = tags.distinct().count()
     folowers = Follow.objects.get_follows(profile).values_list('user__username', flat=True)
     folowersC = folowers.count()
-    folowing = Follow.objects.filter(user=profile).exclude(folowing__exact=None).values_list('folowing__username', flat=True)
-    folowingC = folowing.count()
+    folowing = Follow.objects.filter(user=profile).exclude(folowing__exact=None)
+    folowingL = folowing.values_list('folowing__username', flat=True)
+    folowingC = folowingL.count()
+    #TODO: get folowing pins
     favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
     favsC = favs.count()
     
     #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
     srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
-    srcDomains = {}
-    for url in srcUrls:
-        p = urlparse(url[0])
-        dom = p.netloc
-        count = url[1]
-        parts = p.scheme, p.netloc, '', '', '', ''
-        url = urlunparse(parts)
-        if dom not in srcDomains and dom != '':
-            srcDomains[dom] = count, url
-        elif dom != '':
-            srcDomains[dom] = srcDomains[dom][0]+count, url
-    print srcDomains
-    import operator
-    srcDomains = sorted(srcDomains.iteritems(), key=operator.itemgetter(1), reverse=True)
-    srcDoms =srcDomains[:5]
+    srcDoms = get_top_domains(srcUrls, 5)
     
     print pinsC
     print tags

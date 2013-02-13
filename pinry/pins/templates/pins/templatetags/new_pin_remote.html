@@ -10,7 +10,7 @@
 				<img id="thumb_id">
 			</div>
 			<div id="fields_div">
-				{% csrf_token %}
+				<!-- {% csrf_token %} TODO: issue with ' used instead of " in rendering-->
 				{% for field in form %}
 					{% if field.name == "imgUrl" or field.name == "image" %}
 						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">

@@ -1,7 +1,7 @@
 import os
 from django.contrib.messages import constants as messages
 
-
+SITE_ID = 2
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
 # play with detecting host
@@ -55,7 +55,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'django.contrib.auth.middleware.RemoteUserMiddleware',
-    #'pinry.core.middleware.CustomHeaderMiddleware',
+    'pinry.core.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'pinry.core.middleware.Public',
@@ -100,6 +100,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'django.contrib.sites',
+    'django.contrib.comments',
     'south',
     'compressor',
     'taggit',

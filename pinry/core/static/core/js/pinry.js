@@ -73,6 +73,7 @@ function ajax(url, async, gp, cbS, cbE, data){
 		dataType: 'json',
 		processData: false,
 		beforeSend: function(jqXHR, settings) {
+				//TODO: xcrf solution needed
 		},
 		success: $.proxy(onApiData, this.getApiData),
 		//TODO: swap fav image
@@ -296,6 +297,7 @@ function onLoadData(data) {
 						html += '<i id="favs" data-state="'+userFav+'" title="Add Favorite" class="icon-star-empty"></i>';
 					};
 					html += '<i id="add" data-state="'+userPin+'" title="Re-Pin" class="icon-plus"></i>';
+					html += '<i id="comnt" data-state="'+userPin+'" title="Comment" class="icons-chat-14"></i>';
 				html += '</div>';
 				}
 				html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
@@ -320,6 +322,15 @@ function onLoadData(data) {
 					}
 					html += '</p>';
 				}
+				html += '</div>';
+				html += '<div class="pin-cmnts">';
+					if (image.comments){ 
+						html += '<p>';
+						for (cmnt in image.comments) {
+							html += '<span class="cmnt" onclick="editCmnt(\'' + image.comments[cmnt].id + '\')">' + image.comments[cmnt].comment + '</span> ';
+						}
+						html += '</p>';
+					}
 				html += '</div>';
 			html += '</div>';
 			$('#pins').append(html);
@@ -505,7 +516,29 @@ $(document).ready(new function() {
 				return allHeaders;
 			};
 			return xhr;
-		}
+		},
+		//TODO: temp added for xcsrf...not working yet
+		beforeSend: function(xhr, settings) {
+			function getCookie(name) {
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) == (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+			}
+			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+				// Only send the token to relative URLs i.e. locally.
+				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+			}
+		} 
 	});
 	
 	$('#re-pin-form').submit(function () { //// catch the form's submit event
@@ -556,8 +589,8 @@ $('#add').live('click', function(event){
 	console.warn(data)
 });
 
-//TODO: make an ajax api function to consolodate all the ajax calls
-//TODO: make one funtion to update all fav follow counts
+//TODO: integrate ajax funtion
+//TODO: add follow function into this
 
 /*Toggles Pin Status for options bar icos and for pin sats area, icons & counts: 
 - xxx: is a unique name of the stat to toggle

@@ -340,9 +340,6 @@ body {
             height: 70px;
         }
 		
-		input {
-            height: 25px;
-        }
 		input[type="file"] {
 			height: 25px;
 			width: 200px;
@@ -429,4 +426,8 @@ body {
   vertical-align: inherit;
   padding-left: 0px;
   cursor: default;
+}
+.icon-chat-14{
+	background-image: url("../img/icons-chat-14.png");
+	background-position: 14px 14px;
 }

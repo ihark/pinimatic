@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.comments.models import Comment
 from tastypie import fields
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
@@ -40,6 +41,8 @@ class UserResource(ModelResource):
         return "application/json" 
 
     def apply_authorization_limits(self, request, object_list):
+        print '--apply_authorization_limits--'
+        print request.user.id
         result = object_list.filter(id=request.user.id)
         return result
 
@@ -87,7 +90,28 @@ class FavsResource(ModelResource):
         return object_list.exclude(favorite__exact=None)
         #.filter(user=request.user)
     '''
+class ComntResource(ModelResource):
+    #content_type = fields.ForeignKey('pinry.api.api.PinResource', 'content_type', full = True)
 
+    class Meta:
+        always_return_data = True
+        queryset = Comment.objects.all()
+        resource_name = 'comnt'
+        include_resource_uri = True
+        allowed_methods = ['get']
+
+        #authentication = BasicAuthentication()
+        authorization = DjangoAuthorization()
+    '''
+    def dehydrate(self, bundle):
+        #dehydrate follows for only favorites
+        for f in bundle.data['follows'][:]:
+            if f.data['id'] == None:
+                bundle.data['follows'].remove(f)
+        return bundle
+    '''
+    def determine_format(self, request): 
+        return "application/json" 
         
 class PinResource(ModelResource):
     tags = fields.ListField()
@@ -97,6 +121,7 @@ class PinResource(ModelResource):
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)
+    comments = fields.ForeignKey(ComntResource, 'comment_set', full = True, null=True)
     
     class Meta:
         always_return_data = True
@@ -147,23 +172,6 @@ class PinResource(ModelResource):
             return sorted(objects, key=attrgetter(options['sort']), reverse=True)
  
         return super(PinResource, self).apply_sorting(objects, options)
-
-    '''
-    def dehydrate_popularity(self, bundle):
-        try:
-            fCount = bundle.obj.fav_count
-        except:
-            fCount = 0
-        try:
-            rCount = bundle.obj.repin_count
-        except:
-            rCount = 0
-        print rCount+fCount
-        bundle.data['popularity'] = rCount+fCount
-
-
-        return bundle.data['popularity']
-    '''
 
     def build_filters(self, filters=None):
         if filters is None:

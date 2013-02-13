@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'', include('pinry.core.urls', namespace='core')),
     url(r'', include('pinry.pins.urls', namespace='pins')),
     url('^', include('follow.urls')),
+    url(r'^comments/', include('django.contrib.comments.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

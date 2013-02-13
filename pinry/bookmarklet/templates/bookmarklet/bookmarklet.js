@@ -54,7 +54,7 @@
 		o.appendChild(hc);
 		var h = d.createElement("div")
 		h.setAttribute("id", "header");
-		var hs = "z-index: 10; width: 100%; height: "+hh+"px; position: fixed; left: 0; top: 0; background-color: white;";
+		var hs = "z-index: 10; min-width: 500px; width: 100%; height: "+hh+"px; position: fixed; left: 0; top: 0; background-color: white;";
 		setStyles(h, hs);
 		hc.appendChild(h);// append header to header container
 		var mh = d.createElement("p");

@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 
 from follow.models import Follow
 from django.db.models import Count
-
+from django.contrib.sites.models import get_current_site
 
 
 
@@ -206,3 +206,13 @@ def delete_pin(request, pin_id=None):
         
     print request
     return HttpResponseRedirect(reverse('pins:recent-pins'))
+  
+def comment(request, pk=1):
+    pin = Pin.objects.get(pk__exact=pk)
+    
+    #if current_site.domain == 'foo.com':
+    context = {
+            'pin': pin
+        }
+    return TemplateResponse(request, 'comments/comment.html', context)
+  

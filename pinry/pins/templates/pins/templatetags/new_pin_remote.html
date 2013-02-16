@@ -5,12 +5,13 @@
         <h3>New Pin</h3>
     </div>
 	<div class="modal-body">
+		<!-- change to post once ssl is enabled with csrf -->
         <form action="" enctype="multipart/form-data" method="get" id="ajaxform" name="pin_form" class="form">
 			<div id="thumb_div">
 				<img id="thumb_id">
 			</div>
 			<div id="fields_div">
-				<!-- {% csrf_token %} TODO: issue with ' used instead of " in rendering-->
+				<!-- need xcsrf token needed but issue with single quote used instead of double -->
 				{% for field in form %}
 					{% if field.name == "imgUrl" or field.name == "image" %}
 						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">

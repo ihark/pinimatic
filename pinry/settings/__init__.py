@@ -57,7 +57,7 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.auth.middleware.RemoteUserMiddleware',
     'pinry.core.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'pinry.core.middleware.Public',
     'pinry.core.middleware.AllowOriginMiddleware', 
     'pinry.core.middleware.AjaxMessaging',

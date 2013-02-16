@@ -149,10 +149,16 @@ body {
 	.white{
 		color: White;
 	}
+	.light{
+		color: #777;
+	}
 	.dark{
 		color: Black;
 	}
-	.hover{
+	.black{
+		color: Black;
+	}
+	.expand{
 		width:100%;
 	}
 	.hover:hover *{
@@ -179,7 +185,6 @@ body {
 	
 	.pin.profile .large {
 		line-height: 10px;
-		font-size: 12px;
 		font-size: 12px;
 		font-weight: bold;
 	}
@@ -208,10 +213,13 @@ body {
 	width: 200px;
 	float: left;
 	border: 1px solid #ccc;
-	padding: 20px;
+	padding: 20px 20px 10px 20px;
 	display: none;
 	font-size: 11px;
 }
+	.pin .pin-tags{
+		padding: 0px 0px 5px 0px;
+	}
 	.pin img {
 		padding: 0;
 		margin: 0;
@@ -222,27 +230,24 @@ body {
 		padding-bottom: 3px;
 	}
 	.pin a {
-		color: #777;
+		color: #000;
 		text-decoration: none;
 		cursor: pointer;
 	}
-	.pin .a-format {
-		color: #777;
+	.pin .style-a {
+		color: #000;
 		cursor:default;
 	}
-	.pin a:link {
-		color: #555;
-	}
+
 	.pin a:visited {
 		
 	}
 	.pin a:hover {
-		color: #000;
+		color: #398F00;
 
 		
 	}
-	.pin-info a:hover {
-		text-decoration: underline;
+	.pin.image a:hover {
 
 	}
 	
@@ -254,23 +259,43 @@ body {
 	.pin i {
 		vertical-align: text-bottom;
 	}
-	.pin .display {
-		
-	}
 	
 	.pin .icon {
 		background-position: 0px 0px;
 		display: inline-block;
 		width: 11px;
 		height: 11px;
-		margin-bottom: 2px;
-		margin-top: 0px;
+		margin: 1px 1px 2px 5px;
 		line-height: 14px;
 		vertical-align: text-bottom;
 	}
-	.pin .icon.favs {
-		background-image: url("../img/icons-star.png");
+	.pin-cmnts .icon {
+		margin-left: 0px;
+		margin-right: 5px;
 	}
+	.pin form{
+		text-align: left;
+		
+	}
+	.pin form * {
+		font-size: 11px;
+	}
+	.pin form span{
+		float: left;
+	}
+	.pin form input, textarea{
+		width: 100%;
+		padding: 0px;
+		margin: 0px 0px 5px 0px;
+		text-align: left;
+		float: left;
+		resize: vertical;
+	}
+	.pin form button{
+		float: right;
+		line-height: 18px;
+	}
+	
 
 .pin.user-group {
 	min-height: 150px;
@@ -303,6 +328,7 @@ body {
 
 .pin-options {
     margin: 5px;
+	line-height: 0px;
     display: none;
     right: 20px;
     position: absolute;
@@ -317,12 +343,20 @@ body {
             border-radius: 3px;
 	cursor: pointer;
 }
-    
-    .pin:hover .pin-options {
+.pin-options-btn{
+	display: hidden;
+	right: 4px;
+	top: 4px;
+	position: absolute;
+}
+
+    .pin:hover .pin-options,
+	.pin-options.hover {
         display: block;
     }
-	.pin-options a{
-        padding: 3px;
+	
+	.pin-options i{
+        margin: 3px;
     }
 
     
@@ -337,7 +371,9 @@ body {
 		margin-bottom: 0px;
 	}
         textarea {
-            height: 70px;
+            height: 50px;
+			max-height: 100px;
+			resize: vertical;
         }
 		
 		input[type="file"] {
@@ -427,7 +463,22 @@ body {
   padding-left: 0px;
   cursor: default;
 }
-.icon-chat-14{
-	background-image: url("../img/icons-chat-14.png");
-	background-position: 14px 14px;
+.icon-chat{
+	background-image: url("../img/icons-chat-12.png");
+	background-position: -0px 2px;
+}
+.icon-chat-empty{
+	background-image: url("../img/icons-chat-o-12.png");
+	background-position: -0px 2px;
+}
+.icon.favs {
+	background-image: url("../img/icons-star.png");
+}
+.icon.cmnts {
+	background-image: url("../img/icons-chat-11.png");
+	background-position: -0px 1px;
+}
+/* add this class to all buttons to display only for touch devices */
+.touch-only{
+	display:block
 }

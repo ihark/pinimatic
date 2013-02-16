@@ -11,6 +11,7 @@
 				<img id="thumb_id" src="/static/core/img/thumb-default.png" alt="Invlaid Image"/>
 			</div>
 			<div id="fields_div">
+				{% csrf_token %}
 				{% for field in form %}
 					{% if field.name == "imgUrl" or field.name == "image" %}
 						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">

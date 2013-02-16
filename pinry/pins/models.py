@@ -13,8 +13,6 @@ from pinry.core.utils import delete_upload
 
 from follow import utils
 
-
-
 class Pin(models.Model):
     submitter = models.ForeignKey(User)
     imgUrl = models.TextField(blank=True, null=True)
@@ -95,9 +93,9 @@ class Pin(models.Model):
                 self.srcUrl = self.imgUrl
             else:
                 self.srcUrl = settings.MEDIA_URL+self.image.name
-
+        #TODO: imgUrl should always be set to stored image incase the src is gone
         if not self.imgUrl:
-            self.imgUrl = 'Uploaded'
+            self.imgUrl = settings.MEDIA_URL+self.image.name
             
         super(Pin, self).save(*args, **kwargs)
     

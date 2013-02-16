@@ -2,6 +2,7 @@
 var apiURL = '/api/v1/'
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
+var cmntURL = apiURL+'cmnt/'
 //var favsURL = apiURL+'favs/?format=json&'
 var userURL = apiURL+'auth/user/?format=json'
 var page = 0;
@@ -14,12 +15,15 @@ var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
 var apiPrefixA = ["user", "profile"];//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
 var aProfile = $('.pin.profile');
-var aProfileO = {username:aProfile.attr('data-profile')}
-var aProfileU = aProfile.attr('data-profile')
-var pinA = []
-var origin = window.location.origin
+var aProfileO = {username:aProfile.attr('data-profile')};
+//var aProfileU = aProfile.attr('data-profile');
+var pinA = [];
+var origin = window.location.origin;
+console.warn(origin);
+var av=url(3);//active view
+var authUserO = ajax(userURL, false);//authenticated user object//used to determine current authenticated user
 
-var vn = { //holds display names for views
+var vn = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
 	pins:"Pins",
@@ -28,53 +32,62 @@ var vn = { //holds display names for views
 	cmnts:"Notes",
 	pop:"Popular"
 }
-av=url(3)//active view
-var authUserO = ajax(userURL, false);//authenticated user object//used to determine current authenticated user
-console.warn(origin)
-
 
 /** generic function for ajax calls:
  *url: url to make ajax call
  *async: Boolien false makes non async call, Defaults to true
  *cbS: name of function to call on ajax success
  *cbE: name of function to call on ajax error
- *gp: default='GET' or 'POST'
+ *reqType: default='GET'
  */
 
-function ajax(url, async, gp, cbS, cbE, data){
-	console.log('ajax() called')
+function ajax(url, async, reqType, cbS, cbE, data){
 	if (async == undefined) async = true;
-	if (gp == undefined) gp = 'GET';
+	if (reqType == undefined) reqType = 'GET';
 	var rData
 
 	onApiData = function( data, textStatus, XMLHttpRequest) {
 		console.warn(textStatus)
 		var loc = XMLHttpRequest.getAllResponseHeaders();
 		console.warn(loc)
-		
+		//if callback exicute call back
 		if (cbS){
 			cbS()
+		//if data.objects are returned return just the bojects
 		}else if(data.objects){
+				console.warn('data.objects[0] returned below:')
 				console.warn(data.objects[0])
 				rData = data.objects[0]
+		//return all data
 		}else{
 			rData = data
-			console.warn(rData)
+			console.log('data w/o objects returned below:')
+			console.log(rData)
 			if (authUserO && authUserO.username == aProfileO.username || !aProfileO.username){
-				loadData(cTag, cUser)//reloads data
+				console.log('----reloading data after ajax')
+				loadData(undefined, undefined, true)//reloads data
+				
 			}
 		}
 	}
-	$.ajax({
+	console.warn('-ajax - 1 custom ajax()');
+	$.ajax({//1 custom ajax function
 		url: url,
-		type: gp,
+		type: reqType,
 		contentType: 'application/json',
 		data: data,
 		dataType: 'json',
 		processData: false,
-		beforeSend: function(jqXHR, settings) {
-				//TODO: xcrf solution needed
+		headers:  {
+			//'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
 		},
+		xhrFields: {
+			//withCredentials: true //// add credentials to the request
+		},
+		/* beforeSend: function(jqXHR, settings) {
+			//jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+				//TODO: xcrf solution needed
+		}, */
 		success: $.proxy(onApiData, this.getApiData),
 		//TODO: swap fav image
 		error: function(jqXHR, settings) {
@@ -89,7 +102,9 @@ function ajax(url, async, gp, cbS, cbE, data){
  * Endless Scroll: Based on Wookmark's endless scroll.
  */
 
-//TODO: fix error with manual scroll jitter (possibly need to stop ajax calls when no data left via pages??
+//TEST: fix error with manual scroll jitter, better with below (possibly need to stop ajax calls when no data left via pages??
+//TEST: fix ios scroll to bottom not detected, may have fixed with $(window).bind
+
 //When scrolled all the way to the bottom, add more tiles.
 function onScroll(event) { 
   if(!isLoading) {
@@ -97,6 +112,7 @@ function onScroll(event) {
       if(closeToBottom) loadData();
   }
 };
+
 
 
 //format pin grid and apply layout
@@ -116,13 +132,13 @@ function applyLayout() {
   });
 };
 
-/**
- * Loads data from the API. 
+/**Loads data from the API. 
  * 
  * set tag / user to null to clear
- * set tag / user to undefined to keep current filter
+ * set tag / user to undefined to keep current filters.
  */
-function loadData(tag, user) {
+function loadData(tag, user, reload) {
+	if (reload == undefined){reload = false};
     isLoading = true;
     $('#loader').show();
 	console.log('----loadData()------tag:'+tag+' user: '+user)
@@ -141,7 +157,7 @@ function loadData(tag, user) {
 		cTag = null;
 	}
 	
-	//determine if new user or tag selected and set url to current if not except if null.
+	//check if new user or tag specifiled, if true set url to current except if null specified.
 	if (user) {
 		nAddress += user+'/';
 		console.log('if user update url to: '+nAddress);
@@ -182,7 +198,7 @@ function loadData(tag, user) {
 	console.log('cTag = '+cTag)
 	console.log(tag !== undefined && tag !== cTag )
 	console.log('user = '+user)
-	console.log('cUag = '+cUser)
+	console.log('cUser = '+cUser)
 	console.log(user !== undefined && user !== cUser)
 	console.log('av = '+av)
 	console.log('av name = '+vn[av])
@@ -190,7 +206,7 @@ function loadData(tag, user) {
 	
 	
 	//reset page and refresh pins display
-	if (tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
+	if (reload || tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
 		console.warn('page reset')
 		page = 0;
 		$('#pins').html('');
@@ -221,12 +237,16 @@ function loadData(tag, user) {
 	
 	//prevent api request when not in apiPrefix domain
 	if (url(1) == apiPrefix) {
-		$.ajax({
+		console.warn('-ajax - 2 loaddata()');
+		$.ajax({//2 load data
 			url: loadURL,
 			contentType: 'application/json',
+			/* headers:  {
+				'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
+			},
 			beforeSend: function(jqXHR, settings) {
 				jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-			},
+			}, */
 			success: onLoadData,
 			error: function(jqXHR, settings) {
 				console.warn('ladData - ajax error');
@@ -249,41 +269,47 @@ window.onpopstate = function(e) {
 
 function onLoadData(data) {
 	data = data.objects;
+	console.log(data[0])
 	page++;
 	var maxImages = 10 //max images to include on tag/group pin flow cover
 	var minImages = 7 //min images to include on tag/group pin flow cover
-	var userPin
-	var userFav
 	var tags = {}
 	var i=0, length=data.length, image;
 	for(; i<length; i++) {
 		image = data[i];
 		var html = '';
-		
+		var userFav = false
+		var userPin = false
 		//layout for all views except for those listed below
 		if (av != 'tags'){
-			userFav = false
+			console.log('-loadData-av != tags')
+			
 			//package pin data for js access(req for repin)
 			pinA[image.id] = {
 				srcUrl:image.srcUrl,
-				imgUrl:origin+image.image,
-				thumbnail:origin+image.image,
-				repin:'/api/v1/pin/'+image.id+'/',
+				imgUrl:image.imgUrl,//CHECK: this was changed from origin+image.image, if it works we dont need origin
+				//the origin did not work with heroku due to amazon
+				//thumbnail:origin+image.image,
+				repin:'/api/v1/pin/'+image.id+'/',//:TODO: this may need to be just id or pin object???
 			};
 			
 			if (authUserO){
 				for (f in image.favorites){
-					if (image.favorites[f].user == authUserO.id){
+					if (image.favorites[f].user.id == authUserO.id){
 						userFav = true;
 						break
 					}
 				}
-				if (image.submitter == authUserO.id){
+				console
+				if (image.submitter.id == authUserO.id){
 					userPin = true
 				}
 			}
-			html += '<div class="pin" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
+			//SETUP HTML FOR LARGE PINS DISPLAY
+			html += '<div class="pin image" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
+				//OPTIONS
 				if (authUserO){
+				html += '<i id="options-btn" style="display: block" data-state="false" title="Show Options" class="pin-options-btn icon-cog touch-only"></i>';
 				html += '<div class="pin-options">';
 					html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 					html += '<i id="delete-btn" title="Delete" class="icon-trash"></i>';
@@ -297,23 +323,29 @@ function onLoadData(data) {
 						html += '<i id="favs" data-state="'+userFav+'" title="Add Favorite" class="icon-star-empty"></i>';
 					};
 					html += '<i id="add" data-state="'+userPin+'" title="Re-Pin" class="icon-plus"></i>';
-					html += '<i id="comnt" data-state="'+userPin+'" title="Comment" class="icons-chat-14"></i>';
+					html += '<i id="cmnt" data-state="'+userPin+'" title="Comment" class="icon-chat"></i>';
 				html += '</div>';
 				}
+				//IMAGE
 				html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
 					html += '<img src="'+image.thumbnail+'" width="200" >';
 				html += '</a>';
+				//INFO / STATS
 				html += '<div class="pin-info">';
-					html += '<a class="pin-src" rel="pins" href="'+image.srcUrl+'">Posted from</a>';
-						html += '<span class="a-format"> : by </span>'
+					html += '<a class="pin-src" rel="pins" href="'+image.srcUrl+'">Posted by:</a>';
+						html += '<span class="light"> : by </span>'
 					html += '<a class="pin-submitter" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a>';
 					html +='<span class="pin-stats pull-right">'
-						html += '<i class="display icon favs"></i><span class="display text favs ">'+image.favorites.length+'</span>';
+						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
+						console.warn(image.favorites)
+						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
 					html +='</span>'
 				html += '</div>';
+				//DESCRIPTION
 				html += '<div class="pin-desc">';
 					if (image.description) html += '<p id="desc">'+image.description+'</p>';
 				html += '</div>';
+				//TAGS
 				html += '<div class="pin-tags">';
 				if (image.tags) {
 					html += '<p>';
@@ -323,25 +355,47 @@ function onLoadData(data) {
 					html += '</p>';
 				}
 				html += '</div>';
-				html += '<div class="pin-cmnts">';
+				//COMMENTS            TODO:Change api name to CmntsResource not Comnts
+				html += '<div class="section pin-cmnts">';
+					//FORM
+					html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">';
+						html += '<div id="div_comment" class="control-group">'
+							html += '<label id="comment_label" class="control-label" for="comment"></label>'
+							html += '<span class="help-inline control-label"></span>'
+							html += '<div class="controls">'
+								html += '<textarea id="id_comment" placeholder="Enter your comment here." name="comment"></textarea>'
+								html += '<input type="hidden" name="object_pk" value='+image.id+' id="id_content_type">'
+								html += '<input type="hidden" name="content_type_id" value=10 id="id_object_pk">'
+							html += '</div>'
+							html += '<button type="submit" class="btn-mini btn-primary">Post</button>'
+						html += '</div>'
+					html += '</form>';
+					//CMNTS
 					if (image.comments){ 
-						html += '<p>';
+						console.warn(image.comments)
+						
 						for (cmnt in image.comments) {
-							html += '<span class="cmnt" onclick="editCmnt(\'' + image.comments[cmnt].id + '\')">' + image.comments[cmnt].comment + '</span> ';
+							html += '<p class="pin-cmnt" onclick="editCmnt(\'' + image.comments[cmnt].id + '\')"><i class="icon cmnts"></i><a href="user/'+image.comments[cmnt].username+'">' +image.comments[cmnt].username+'</a><span class="light" >: '+ image.comments[cmnt].comment + '</span></p> ';
 						}
-						html += '</p>';
+						
 					}
 				html += '</div>';
 			html += '</div>';
 			$('#pins').append(html);
-			//hide favs stats display if there are none
-			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()
+			
+			//hide elements as required
+			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()//hide fav stat display
+			if (!image.comments[0]) $('#'+image.id+'-pin .display.cmnts').hide()//hide cmmt stat display
+			if (!image.comments[0]) $('#'+image.id+'-pin .pin-cmnts').hide()//hide cmmt section
+			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()
+			
+			
 			applyLayout();
 		}
 		
 		//lay out tags view
 		if (av == 'tags'){
-			//console.log('-av == tags')
+			console.log('-loadData-av == tags')
 			//console.log('----setting up group: '+image.tags)
 			
 			//*TODO: seperate muti tags into individual tags
@@ -429,7 +483,6 @@ function layoutThumbs(target) {
 //jquery function to format form data as assoc.array
 (function($){
     $.fn.serializeObject = function(){
-
         var self = this,
             json = {},
             push_counters = {},
@@ -440,8 +493,6 @@ function layoutThumbs(target) {
                 "fixed":    /^\d+$/,
                 "named":    /^[a-zA-Z0-9_]+$/
             };
-
-
         this.build = function(base, key, value){
             base[key] = value;
             return base;
@@ -494,12 +545,24 @@ function layoutThumbs(target) {
     };
 })(jQuery);
 
+//test for touch device
+function is_touch_device() {
+	return !!('ontouchstart' in window) // works on most browsers 
+	|| !!('onmsgesturechange' in window); // works on ie10)
+};
+if (is_touch_device()){alert('touch detected')};
+
+//FORM SUBMIT FUNCTIONS
 $(document).ready(new function() {
-    $(document).bind('scroll', onScroll);
-	// Required for reading Location header of POST responses in firefox.
+
+	//TEST: chanded $(document) to $(window) for ios compat
+    //TRY: does this need to be in doc ready? 
+	$(window).bind('scroll', onScroll);
 	var _super = $.ajaxSettings.xhr;
 	$.ajaxSetup({
+		// Required for reading Location header of ajax POST responses in firefox.
 		xhr: function () {
+			console.log('-------------xhr setup xhr--');
 			var xhr = _super();
 			var getAllResponseHeaders = xhr.getAllResponseHeaders;
 			xhr.getAllResponseHeaders = function () {
@@ -517,8 +580,9 @@ $(document).ready(new function() {
 			};
 			return xhr;
 		},
-		//TODO: temp added for xcsrf...not working yet
+		//TODO: temp added for X-CSRFToken header
 		beforeSend: function(xhr, settings) {
+			console.log('-------------before send--');
 			function getCookie(name) {
 				var cookieValue = null;
 				if (document.cookie && document.cookie != '') {
@@ -539,24 +603,27 @@ $(document).ready(new function() {
 				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 			}
 		} 
-	});
+	}); 
 	
+	//capture form submit funtions
 	$('#re-pin-form').submit(function () { //// catch the form's submit event
 		//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
 		data = $(this).serializeObject()
 		delete data.id
-		data.tags = [data.tags]
+		data.tags = [data.tags]//TODO: try {} for tags to solve comma parse issue
 		//TODO: validate tags exist here
 		sData = JSON.stringify(data)
 		ajax(pinURL, true, 'POST', undefined, undefined, sData);
 		$('#re-pin').modal('toggle')
 		return false
 	});
-    loadData();//loads initial pin data
+
+	//load initial pin data
+    loadData();
 });
 
-/**
- * On clicking an image show fancybox original.
+/**On clicking an image show fancybox original.
+ * 
  */
 $('.fancybox').fancybox({
     openEffect: 'none',
@@ -564,8 +631,8 @@ $('.fancybox').fancybox({
 });
 
 
-/**
- * Pin Options Functions.
+/**Pin Options Functions.
+ * 
  */
  
 // add event listeners for pin option buttons
@@ -577,17 +644,43 @@ $('#add').live('click', function(event){
 	var name = button.attr('id');
 	var state = button.attr('data-state');
 	var pin = $($(this).closest(".pin"));
-	var id = parseInt(pin.attr('id'));
-	var data = pinA[id]
+	var pinId = parseInt(pin.attr('id'));
+	var data = pinA[pinId]
 	$("#re-pin #id_srcUrl").attr("value", data.srcUrl);
 	$("#re-pin #id_imgUrl").attr("value", data.imgUrl);
 	$("#re-pin #id_repin").attr("value", data.repin);
 	$("#re-pin #thumb_id").attr("src", data.imgUrl);
 	//ts = "-moz-box-shadow: 0 2px 12px rgba(0,0,0,.75); -webkit-box-shadow: 0 2px 12px rgba(0,0,0,.75); box-shadow: 0 2px 12px rgba(0,0,0,.75); display: inline-block;";
 	//setStyles(t, ts);
-	$('#re-pin').modal('toggle')
+	$('#re-pin.modal').modal('toggle')
 	console.warn(data)
 });
+//TODO: add a modal form option to togglePinStat()
+// add event listeners for pin option buttons
+$('#cmnt').live('click', function(event){
+	var button = $(this);
+	var name = button.attr('id');
+	var state = button.attr('data-state');
+	var pin = $($(this).closest(".pin"));
+	var pinId = parseInt(pin.attr('id'));
+	$('#'+pinId+'-pin .pin-cmnts').show()
+	$('#'+pinId+'-pin form[name="pin-cmnt-form"]').show()
+	applyLayout()
+	//move to submit function
+	togglePinStat(this, 'icon-chat', 'icon-chat-empty')
+});
+
+$(document).on( 'submit', '.pin form', function(e){
+	e.preventDefault();
+	console.warn(e.target)
+	console.warn(this)
+	//target = $(event.target).closest('.pin.user-group')
+	data = $(this).serializeObject()
+	//TODO: validate comment exist here
+	sData = JSON.stringify(data)
+	ajax(cmntURL, true, 'POST', undefined, undefined, sData);
+}); 
+
 
 //TODO: integrate ajax funtion
 //TODO: add follow function into this
@@ -597,27 +690,38 @@ $('#add').live('click', function(event){
 - targetBtn: the HTML element acting as the toggle button
   must have: id="xxx" set staticly by onLoadData
   must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
-- .pin class:  id=#-Pin, data-xxx=Current qty of stat
-- .display .*** .text: dispay's the current count
-- .display .*** .icon-iconname: display's the icon (must be 11px X 11p)
+- .pin #id-Pin: must have: data-xxx="qty of stat"
+  must have: class="display text xxx" to dispay the current count
+  must have: class="display icon-iconname xxx" to display's the icon (must be 11px X 11p)
+- pin.profile: must have:data-xxx="qty of stat" 
+  must have: class="display text xxx" to dispay the current count
 */
 
-function togglePinStat(targetBtn, tIcon, fIcon, url){
+function togglePinStat(targetBtn, tIcon, fIcon, url, id){
 	var button = $(targetBtn);
 	var name = button.attr('id');
 	var state = button.attr('data-state');
 	var pin = $($(targetBtn).closest(".pin"));
-	var id = parseInt(pin.attr('id'));
+	if (url === undefined){
+		url = ""
+		id = ""
+	}else if (id === undefined){
+		id = parseInt(pin.attr('id'));
+		url = url+id+'/';
+	}else if (id){
+		url = url+id+'/'
+	}
 	var count = pin.attr('data-'+name);
 	var disp = pin.find('.display.'+name);
 	var dispText = pin.find('.display.text.'+name);
 	var countP = aProfile.attr('data-'+name);
 	var dispTextP = aProfile.find('.display.text.'+name);
-	if (authUserO && authUserO.username == aProfileU) {
+	
+	if (authUserO && authUserO.username == aProfileO.username) {
 		var updateProfile = true;
 	}
 
-	this.onFav = function( result ) {
+	this.onSuccess = function( result ) {
 		if (state == "true"){
 			count--;
 			countP--;
@@ -649,18 +753,18 @@ function togglePinStat(targetBtn, tIcon, fIcon, url){
 		}
 	}
 	
-	$.ajax({
-		url: pinsPrefix+url+id+'/',
-		type: 'POST',
-		contentType: 'application/json',
-		beforeSend: function(jqXHR, settings) {
-			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-		},
-		success: $.proxy(this.onFav, this),//TODO: swap fav image
-		error: function(jqXHR, settings) {
-			console.warn('addfav - ajax error');
-		},
-	});
+	if (typeof url == "string" && url != ""){
+		console.warn('-ajax - 3 togglepin()');
+		$.ajax({//3
+			url: pinsPrefix+url,
+			type: 'POST',
+			contentType: 'application/json',
+			success: $.proxy(this.onSuccess, this),//TODO: swap fav image
+			error: function(jqXHR, settings) {
+				console.warn('addfav - ajax error');
+			},
+		});
+	}
 }
 
 /**
@@ -731,13 +835,17 @@ function follow(targetBtn, display) {
 	};
 	
 	var url = pinsPrefix+'/toggle/auth/User/'+id+'/';
-	$.ajax({
+	console.warn('-ajax - 4 follow()');
+	$.ajax({//4
 		url: url,
 		type: 'POST',
 		contentType: 'application/json',
+		/* headers:  {
+			'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
+		},
 		beforeSend: function(jqXHR, settings) {
 			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-		},
+		}, */
 		success: $.proxy(this.onFollow, this),//todo: need to detect if followed or not
 		error: function(jqXHR, settings) {
 			console.warn('follow - ajax error');
@@ -753,6 +861,12 @@ $(document).on( 'click', '.pin.user-group .thumbs', function(event){
 	target = $(event.target).closest('.pin.user-group')
 	id = target[0].id
 	loadData(id, aProfileO.username);
+});
+$(document).on( 'click', '.pin-options-btn', function(event){
+	target = $(event.target).closest('.pin')
+	id = target[0].id
+	console.warn(id)
+	$('#'+id+' .pin-options').toggleClass('hover')
 });
 
 /**
@@ -841,7 +955,7 @@ function replaceFileUpload(target){
 				//re attach onFileChange due to html reset in file uplaoder
 			},
 			params: {
-			  'csrf_token': '{{ csrf_token }}',
+			  'csrf_token': $('input[name=csrfmiddlewaretoken]').val(),
 			  'csrf_name': 'csrfmiddlewaretoken',
 			  'csrf_xname': 'X-CSRFToken',
 			},

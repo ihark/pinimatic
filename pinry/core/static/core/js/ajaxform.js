@@ -10,16 +10,17 @@ $(document).ready(function () {
 			dataType : "json",
 			type : $(this).attr('method'), //// GET or POST from method attribute
 			url : $(this).attr('action'), //// url from method attribute
-			headers:  {
-			'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
+ 			headers:  {
+			'x-requested-with' : 'XMLHttpRequest' //// Required for cors with django, form validation and ajax messages , seems to be excluded from file fields
 			},
 			xhrFields: {
-			withCredentials: true //// add credentials to the request
+			withCredentials: true //// enables xcrf validation with all but IE
 			},
 			beforeSend : function(xhr, settings) {
-				////shold only be used with SSL get CSRF Token & add to headder or use basic auth
-				////xhr.setRequestHeader("X-CSRFToken", $('#csrfmiddlewaretoken').val());
-				////xhr.setRequestHeader("Authorization", "user:pass");
+				////Only use with SSL! get CSRF Token & add to headder
+				//xhr.setRequestHeader("X-CSRFToken", $('#csrfmiddlewaretoken').val()); //work arround for IE: gets cookie from from but problem with '' instad of "" used. TOTRY: put the cookie in the js instead.
+				////Only use with SSL! manual authentication, last resort
+				//xhr.setRequestHeader("Authorization", "user:pass");
 				clearMessages(messageListName);
 				clear_form_field_errors('#ajaxform');
 			},

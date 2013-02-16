@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.comments.models import Comment
+from django.contrib.comments.models import ContentType
 from tastypie import fields
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from tastypie.authentication import BasicAuthentication
@@ -39,15 +41,21 @@ class UserResource(ModelResource):
     '''
     def determine_format(self, request): 
         return "application/json" 
-
+    
+    #0.9.12-alpha restrict users to only thier user object
+    def authorized_read_list(self, object_list, bundle):
+        result =  object_list.filter(id=bundle.request.user.id)
+        return result
+    
+    ''' depreciated in 0.9.12-alpha
     def apply_authorization_limits(self, request, object_list):
         print '--apply_authorization_limits--'
         print request.user.id
         result = object_list.filter(id=request.user.id)
         return result
-
+    '''
 class FavsResource(ModelResource):
-    user = fields.CharField(attribute='user__username', null=True)
+    user = fields.ForeignKey(UserResource, 'user', full=True, null=True)
     favid = fields.CharField(attribute='favorite_id', null=True)
     folid = fields.CharField(attribute='folowing_id', null=True)
     
@@ -82,7 +90,6 @@ class FavsResource(ModelResource):
             orm_filters['folowing__id__exact'] = filters['folid']
         if 'user' in filters:
             orm_filters['user__username__exact'] = filters['user']
-        
 
         return orm_filters
     '''
@@ -90,55 +97,66 @@ class FavsResource(ModelResource):
         return object_list.exclude(favorite__exact=None)
         #.filter(user=request.user)
     '''
-class ComntResource(ModelResource):
-    #content_type = fields.ForeignKey('pinry.api.api.PinResource', 'content_type', full = True)
 
-    class Meta:
-        always_return_data = True
-        queryset = Comment.objects.all()
-        resource_name = 'comnt'
-        include_resource_uri = True
-        allowed_methods = ['get']
-
-        #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
-    '''
-    def dehydrate(self, bundle):
-        #dehydrate follows for only favorites
-        for f in bundle.data['follows'][:]:
-            if f.data['id'] == None:
-                bundle.data['follows'].remove(f)
-        return bundle
-    '''
-    def determine_format(self, request): 
-        return "application/json" 
         
+class ContentTypeResource(ModelResource):
+    #model = fields.CharField(attribute = 'model', null=True)
+    
+    class Meta:
+        queryset = ContentType.objects.all()
+        resource_name = "contrib/contenttype"
+        fields = ['model']
+        allowed_methods = ['get']
+        include_resource_uri = False
+        def determine_format(self, request): 
+            return "application/json" 
+
+
 class PinResource(ModelResource):
     tags = fields.ListField()
     imgUrl = fields.CharField(attribute='imgUrl')
-    srcUrl = fields.CharField(attribute='srcUrl')
+    srcUrl = fields.CharField(attribute='srcUrl', null=True)
     repin = fields.ForeignKey('pinry.api.api.PinResource', 'repin', null=True)
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)
-    comments = fields.ForeignKey(ComntResource, 'comment_set', full = True, null=True)
-    
+    #comments = fields.ToManyField('pinry.api.api.CmntResource', 'tagged_items', full = True, null=True)
+    comments = fields.ListField(attribute='comments')
+    #NOTE: tagged_items = content_type, id, object_id, pin, tag
+    #NOTE: content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+
     class Meta:
         always_return_data = True
         queryset = Pin.objects.all()
         resource_name = 'pin'
-        include_resource_uri = True
+        include_resource_uri = False
         allowed_methods = ['get', 'post']
         filtering = {
             'published': ['gt'],
             'submitter': ALL_WITH_RELATIONS,
             'favorites': ALL_WITH_RELATIONS,
             'popularity': ALL,
+            'tags': ALL,
         }
         #ordering = ['popularity']
         authorization = DjangoAuthorization()
 
+    def obj_get_list(self, bundle, **kwargs):
+        print '--obj_get_list--'
+        objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
+        for p in objects:
+            #add comments to pin
+            cqs = Comment.objects.filter(object_pk__exact=p.id).values('id', 'user_id', 'comment', 'submit_date', 'is_public').reverse()
+            p.comments = cqs
+            #add username to comments
+            for c in cqs:
+                uqs = User.objects.filter(id__exact=c['user_id']).values()
+                c['username'] = uqs[0]['username']
+        return objects
+
+    
     def apply_filters(self, request, applicable_filters):
+        print '---apply_filters----'
         """
         An ORM-specific implementation of ``apply_filters``.
 
@@ -150,16 +168,15 @@ class PinResource(ModelResource):
         """
         distinct = request.GET.get('distinct', False) == ''
         pop = request.GET.get('pop', False) == ''
+        
         if pop:
-            print '---------apply_filters'
             qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
             return qs
         if distinct:
             return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
         else:
             return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True))
-
-
+    
     
     def apply_sorting(self, objects, options=None):
         print '---apply_sorting----'
@@ -174,11 +191,13 @@ class PinResource(ModelResource):
         return super(PinResource, self).apply_sorting(objects, options)
 
     def build_filters(self, filters=None):
+        print '---build filters---'
         if filters is None:
             filters = {}
 
         orm_filters = super(PinResource, self).build_filters(filters)
-
+        #test for fields# orm_filters['tagged_items'] = 'true'
+            
         if 'user' in filters:
             orm_filters['submitter__username__exact'] = filters['user']
             
@@ -196,13 +215,15 @@ class PinResource(ModelResource):
                 
 
         if 'tag' in filters:
+            print '-----tag fileter found for: '+filters['tag']
             orm_filters['tags__name__in'] = filters['tag'].split(',')
+        
 
         return orm_filters
-
+    
     def dehydrate_tags(self, bundle):
         return map(str, bundle.obj.tags.all())
-    
+        
     def save_m2m(self, bundle):
         tags = bundle.data.get('tags', [])
         bundle.obj.tags.set(*tags)
@@ -217,15 +238,46 @@ class PinResource(ModelResource):
         print resp
         return resp
     '''
-    '''
-    def hydrate(self, bundle, request=None):
-        bundle.obj.submitter = User.objects.get(pk = bundle.request.user.id)
-        return bundle 
-
-    '''
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
         bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='')
         print bundle
         return bundle
+        
+class CmntResource(ModelResource):
+    #content_object = GenericForeignKeyField({
+    #  Pin: PinResource,
+    #}, 'content_object', null=True, related_name='comments')
+    #content_type = fields.ToOneField('pinry.api.api.ContentTypeResource', 'content_type', full = True, null = True)
+    #content_type = fields.CharField(attribute = 'content_type', null=True)
+    #content_object = fields.ToOneField('pinry.api.api.PinResource', 'content_object', null = True)
+    
+    class Meta:
+        always_return_data = True
+        queryset = Comment.objects.all()
+        resource_name = 'cmnt'
+        include_resource_uri = False
+        allowed_methods = ['get', 'post']
+        fields = ['comment', 'object_pk', 'id']
+        filtering = {
+            'object_pk': ALL_WITH_RELATIONS,
+            'content_type': ALL_WITH_RELATIONS,
+        }
+        #authentication = BasicAuthentication()
+        authorization = DjangoAuthorization()
+    '''
+    def dehydrate(self, bundle):
+        #dehydrate follows for only favorites
+        for f in bundle.data['follows'][:]:
+            if f.data['id'] == None:
+                bundle.data['follows'].remove(f)
+        return bundle
+    '''
+    def determine_format(self, request): 
+        return "application/json" 
 
+    def obj_create(self, bundle, **kwargs):
+        print '----obj_create------'
+        print bundle.data
+        bundle = super(CmntResource, self).obj_create(bundle, content_type_id=10, site_id=2, user=bundle.request.user)
+        return bundle

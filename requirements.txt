@@ -1,7 +1,7 @@
 Django==1.4.1
 South==0.7.6
 Pillow==1.7.7
-django-tastypie==0.9.11
+-e git://github.com/toastdriven/django-tastypie.git@58e47af6d5f90916a5dd431791f742d5cf431196#egg=django-tastypie
 django_compressor==1.2
 cssmin==0.1.4
 jsmin==2.0.2

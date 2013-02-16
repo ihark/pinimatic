@@ -131,6 +131,22 @@ function applyLayout() {
 	  $('#user-info').show();
   });
 };
+//apply layout to pin grid for tag/group covers
+function layoutThumbs(target) {
+  $(target+' .thumbs').imagesLoaded(function() {
+      // Clear our previous layout handler.
+      if(handlerT) handlerT.wookmarkClear();
+      
+      // Create a new layout handler.
+      handlerT = $(target+' .thumb.board');
+      handlerT.wookmark({
+		  container: $(target),
+          autoResize: true,
+          offset: 2,
+          itemWidth: 68
+      });
+  });
+};
 
 /**Loads data from the API. 
  * 
@@ -306,10 +322,10 @@ function onLoadData(data) {
 				}
 			}
 			//SETUP HTML FOR LARGE PINS DISPLAY
-			html += '<div class="pin image" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
+			html += '<div class="pin image touch-off" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
 				//OPTIONS
 				if (authUserO){
-				html += '<i id="options-btn" style="display: block" data-state="false" title="Show Options" class="pin-options-btn icon-cog touch-only"></i>';
+				html += '<i id="options-btn" data-state="false" title="Show Options" class="pin-options-btn icon-cog touch-off"></i>';
 				html += '<div class="pin-options">';
 					html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 					html += '<i id="delete-btn" title="Delete" class="icon-trash"></i>';
@@ -332,27 +348,28 @@ function onLoadData(data) {
 				html += '</a>';
 				//INFO / STATS
 				html += '<div class="pin-info">';
-					html += '<a class="pin-src" rel="pins" href="'+image.srcUrl+'">Posted by:</a>';
-						html += '<span class="light"> : by </span>'
-					html += '<a class="pin-submitter" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a>';
-					html +='<span class="pin-stats pull-right">'
-						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
-						console.warn(image.favorites)
-						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
-					html +='</span>'
+					html += '<l><span class="">From: </span>'
+					html += '<a class="pin-src" rel="pins" title="Source" href="'+image.srcUrl+'">'+getHost(image.srcUrl)+'</a></l>';
+					html += '<l><span class="">By: </span>'
+					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
+				html +='<div class="pin-stats pull-right">'
+						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
+						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
+				html +='</div>'
 				//DESCRIPTION
 				html += '<div class="pin-desc">';
 					if (image.description) html += '<p id="desc">'+image.description+'</p>';
 				html += '</div>';
 				//TAGS
-				html += '<div class="pin-tags">';
+				html += '<div class="pin-tags section">';
 				if (image.tags) {
-					html += '<p>';
+					html += '<l>';
+					html += '<span>Groups: </span>'
 					for (tag in image.tags) {
-						html += '<span class="label tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
+						html += '<span class="tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
 					}
-					html += '</p>';
+					html += '</l>';
 				}
 				html += '</div>';
 				//COMMENTS            TODO:Change api name to CmntsResource not Comnts
@@ -372,8 +389,6 @@ function onLoadData(data) {
 					html += '</form>';
 					//CMNTS
 					if (image.comments){ 
-						console.warn(image.comments)
-						
 						for (cmnt in image.comments) {
 							html += '<p class="pin-cmnt" onclick="editCmnt(\'' + image.comments[cmnt].id + '\')"><i class="icon cmnts"></i><a href="user/'+image.comments[cmnt].username+'">' +image.comments[cmnt].username+'</a><span class="light" >: '+ image.comments[cmnt].comment + '</span></p> ';
 						}
@@ -389,11 +404,10 @@ function onLoadData(data) {
 			if (!image.comments[0]) $('#'+image.id+'-pin .pin-cmnts').hide()//hide cmmt section
 			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()
 			
-			
 			applyLayout();
-		}
+		}//end typical view
 		
-		//lay out tags view
+		//lay out tags/group view
 		if (av == 'tags'){
 			console.log('-loadData-av == tags')
 			//console.log('----setting up group: '+image.tags)
@@ -405,7 +419,7 @@ function onLoadData(data) {
 			if (!tags[image.tags]) {tags[image.tags]=1}else{tags[image.tags]=tags[image.tags]+1};
 			//console.log(tags)
 			if (tags[image.tags] == 1){
-			html += '<div class="pin user-group" id="'+image.tags+'">'
+			html += '<div class="pin group" id="'+image.tags+'">'
 				html += '<a class="thumbs"></a>'
 				html += '<div class="info">'
 					html += '<h5><a class="title">'+image.tags+'</a></h5>'
@@ -414,7 +428,7 @@ function onLoadData(data) {
 			html += '</div>'
 			}
 			$('#pins').append(html);
-			
+
 			
 			//add images to tag group
 			if (tags[image.tags] <= maxImages){
@@ -426,138 +440,68 @@ function onLoadData(data) {
 			if(tags[image.tags] > 1){
 			}
 			applyLayout();
-
-			
-		}
-		
+		}//end tag/group view
 	}//end image for loop
 	
-	//evaluate number of items in each tag for tag/goup covers
-	console.log(tags)
-	for (key in tags){
-		//makeClick(key)
-		//for tags with one image
-		if (tags[key]==1) {
-			//console.log('--=1 key: '+key)
-			$('#'+key+' .thumbs .thumb').addClass('p1');
-
-		//add extra blank images for pin layout if there are not enough existing then apply the layout
-		}else if (tags[key] <=10){
-			//console.log('--<10 key: '+key)
-			$('#'+key+' .thumbs .thumb').addClass('board');
-			var i=tags[key]
-			while (i < 10){
-				//console.log('--while adding images key: '+key)
-				$('#'+key+' .thumbs').append('<div class="thumb board space"><img width="64px" height="2px" src="http://www.webdesign.org/img_articles/12337/1_002.jpg" alt=""></div>');
-				i++;
-			}
-			//apply layout to pins in tag group
-			layoutThumbs('#'+key);
-		}
-		//fix up layout
-		applyLayout();
+	//setup touch features
+	if (is_touch_device()){
+		$('.touch-off').toggleClass('touch-off touch-on');
 	}
+	
+	//tag/goup add place holder images as required by min/max
+	if (av == 'tags'){
+		for (key in tags){
+			//makeClick(key)
+			//for tags with one image
+			if (tags[key]==1) {
+				//console.log('--=1 key: '+key)
+				$('#'+key+' .thumbs .thumb').addClass('p1');
 
+			//add extra blank images for pin layout if there are not enough existing then apply the layout
+			}else if (tags[key] <=10){
+				//console.log('--<10 key: '+key)
+				$('#'+key+' .thumbs .thumb').addClass('board');
+				var i=tags[key]
+				while (i < 10){
+					//console.log('--while adding images key: '+key)
+					$('#'+key+' .thumbs').append('<div class="thumb board space"><img width="64px" height="2px" src="http://www.webdesign.org/img_articles/12337/1_002.jpg" alt=""></div>');
+					i++;
+				}
+				//apply layout to pins in tag group
+				layoutThumbs('#'+key);
+			}
+			//fix up layout
+			applyLayout();
+		}
+	}
 	isLoading = false;
 	$('#loader').hide();
 };
 
-//apply layout to pin grid for tag/group covers
-function layoutThumbs(target) {
-  $(target+' .thumbs').imagesLoaded(function() {
-      // Clear our previous layout handler.
-      if(handlerT) handlerT.wookmarkClear();
-      
-      // Create a new layout handler.
-      handlerT = $(target+' .thumb.board');
-      handlerT.wookmark({
-		  container: $(target),
-          autoResize: true,
-          offset: 2,
-          itemWidth: 64
-      });
-  });
-};
 
 
-//jquery function to format form data as assoc.array
-(function($){
-    $.fn.serializeObject = function(){
-        var self = this,
-            json = {},
-            push_counters = {},
-            patterns = {
-                "validate": /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
-                "key":      /[a-zA-Z0-9_]+|(?=\[\])/g,
-                "push":     /^$/,
-                "fixed":    /^\d+$/,
-                "named":    /^[a-zA-Z0-9_]+$/
-            };
-        this.build = function(base, key, value){
-            base[key] = value;
-            return base;
-        };
-
-        this.push_counter = function(key){
-            if(push_counters[key] === undefined){
-                push_counters[key] = 0;
-            }
-            return push_counters[key]++;
-        };
-
-        $.each($(this).serializeArray(), function(){
-
-            // skip invalid keys
-            if(!patterns.validate.test(this.name)){
-                return;
-            }
-
-            var k,
-                keys = this.name.match(patterns.key),
-                merge = this.value,
-                reverse_key = this.name;
-
-            while((k = keys.pop()) !== undefined){
-
-                // adjust reverse_key
-                reverse_key = reverse_key.replace(new RegExp("\\[" + k + "\\]$"), '');
-
-                // push
-                if(k.match(patterns.push)){
-                    merge = self.build([], self.push_counter(reverse_key), merge);
-                }
-
-                // fixed
-                else if(k.match(patterns.fixed)){
-                    merge = self.build([], k, merge);
-                }
-
-                // named
-                else if(k.match(patterns.named)){
-                    merge = self.build({}, k, merge);
-                }
-            }
-
-            json = $.extend(true, json, merge);
-        });
-
-        return json;
-    };
-})(jQuery);
-
+/** TOUCH NOTES:
+ * touchstart
+ * touchmove
+ * touchend
+ * touchcancel 
+**/
 //test for touch device
 function is_touch_device() {
 	return !!('ontouchstart' in window) // works on most browsers 
 	|| !!('onmsgesturechange' in window); // works on ie10)
 };
-if (is_touch_device()){alert('touch detected')};
+
 
 //FORM SUBMIT FUNCTIONS
 $(document).ready(new function() {
-
 	//TEST: chanded $(document) to $(window) for ios compat
     //TRY: does this need to be in doc ready? 
 	$(window).bind('scroll', onScroll);
+	$(window).bind('touchstart', onScroll);
+	$(window).bind('touchend', onScroll);
+	$(window).bind('touchcancel', onScroll);
+	$(window).bind('touchcancel', onScroll);
 	var _super = $.ajaxSettings.xhr;
 	$.ajaxSetup({
 		// Required for reading Location header of ajax POST responses in firefox.
@@ -604,7 +548,6 @@ $(document).ready(new function() {
 			}
 		} 
 	}); 
-	
 	//capture form submit funtions
 	$('#re-pin-form').submit(function () { //// catch the form's submit event
 		//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
@@ -617,7 +560,6 @@ $(document).ready(new function() {
 		$('#re-pin').modal('toggle')
 		return false
 	});
-
 	//load initial pin data
     loadData();
 });
@@ -856,13 +798,15 @@ function follow(targetBtn, display) {
 /**
  * tag/group view functions
  */
-//add click handler for tag/groups
+//add click handler for pin functions
+//tag/groups
 $(document).on( 'click', '.pin.user-group .thumbs', function(event){
 	target = $(event.target).closest('.pin.user-group')
 	id = target[0].id
 	loadData(id, aProfileO.username);
 });
-$(document).on( 'click', '.pin-options-btn', function(event){
+//options
+$(document).on('click touchend', '.pin-options-btn', function(event){
 	target = $(event.target).closest('.pin')
 	id = target[0].id
 	console.warn(id)
@@ -973,7 +917,7 @@ function replaceFileUpload(target){
 	return fileUploaders
 }
 
-//(currently not used) wraps fileUpload field with clear button
+//(not used) wraps fileUpload field with clear button
 var wrapTarget = false;
 function addDeleteBtnToFileUpload(target){
 	var file_input_index = 0;
@@ -1062,6 +1006,7 @@ function inArray(value, array){
 	}
 	return false;
 };
+//check for if key exists for given value in array, return false or key
 function getKey(value, array){
 	for (key in array) {
 		if (array[key] === value) {
@@ -1070,6 +1015,7 @@ function getKey(value, array){
 	}
 	return false;
 };
+//check for if value exists for given key in array, return false or value
 function getValue(key, array){
 	for (i in array) {
 		if (array[key]) {
@@ -1078,3 +1024,75 @@ function getValue(key, array){
 	}
 	return false;
 };
+//get host name from url
+function getHost(url){
+	var a = document.createElement('a');
+	a.href = url;
+	p = a.hostname.split("www.")
+	if (p[1]===undefined){h=p[0]}else{h=p[1]};
+	return h
+}
+//jquery function to format form data as assoc.array
+(function($){
+    $.fn.serializeObject = function(){
+        var self = this,
+            json = {},
+            push_counters = {},
+            patterns = {
+                "validate": /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
+                "key":      /[a-zA-Z0-9_]+|(?=\[\])/g,
+                "push":     /^$/,
+                "fixed":    /^\d+$/,
+                "named":    /^[a-zA-Z0-9_]+$/
+            };
+        this.build = function(base, key, value){
+            base[key] = value;
+            return base;
+        };
+
+        this.push_counter = function(key){
+            if(push_counters[key] === undefined){
+                push_counters[key] = 0;
+            }
+            return push_counters[key]++;
+        };
+
+        $.each($(this).serializeArray(), function(){
+
+            // skip invalid keys
+            if(!patterns.validate.test(this.name)){
+                return;
+            }
+
+            var k,
+                keys = this.name.match(patterns.key),
+                merge = this.value,
+                reverse_key = this.name;
+
+            while((k = keys.pop()) !== undefined){
+
+                // adjust reverse_key
+                reverse_key = reverse_key.replace(new RegExp("\\[" + k + "\\]$"), '');
+
+                // push
+                if(k.match(patterns.push)){
+                    merge = self.build([], self.push_counter(reverse_key), merge);
+                }
+
+                // fixed
+                else if(k.match(patterns.fixed)){
+                    merge = self.build([], k, merge);
+                }
+
+                // named
+                else if(k.match(patterns.named)){
+                    merge = self.build({}, k, merge);
+                }
+            }
+
+            json = $.extend(true, json, merge);
+        });
+
+        return json;
+    };
+})(jQuery);

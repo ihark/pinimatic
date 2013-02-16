@@ -91,8 +91,23 @@ body {
     padding: 0px 0px 5px 20px;
 }
 
-    .tag {
-        cursor: pointer;
+	.tag {
+		cursor: pointer;
+		display: inline-block;
+		padding: 2px 4px;
+		font-size: 11px;
+		font-weight: Bold;
+		line-height: 13px;
+		color: #777;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+		white-space: nowrap;
+		vertical-align: baseline;
+		border: 1px solid #ccc;
+		background-color: #f4f4f4;
+    }
+	.tag:hover {
+		color: #398F00;
+		background-color: #FFF;
     }
 
 #pins-container {
@@ -102,127 +117,21 @@ body {
     z-index: 100;
 	float: left;
 }
-.pin.welcome,
-.pin.profile {
-	padding-bottom: 15px;
-}
-	.pin .header{
-		height: 100%;
-		margin: -20px -20px 0px -20px;
-		color: #666;
-		padding: 0px 20px 0px 20px;
-		background-color: #f4f4f4;
-		background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f4f4f4));
-		background-image: -webkit-linear-gradient(top, #ffffff, #f4f4f4);
-		background-image: -moz-linear-gradient(top, #ffffff, #f4f4f4);
-		background-image: -ms-linear-gradient(top, #ffffff, #f4f4f4);
-		background-image: -o-linear-gradient(top, #ffffff, #f4f4f4);
-		background-image: linear-gradient(top, #ffffff, #f4f4f4);
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#f4f4f4');
-	}
-	.pin.welcome .header a:hover{
-		font-weight: bolder;
-		text-decoration: underline;
-	}
-
-	.section {
-		height: auto;
-		border-top: 1px solid #ccc;
-		margin: 0px -20px;
-		padding: 5px 20px 5px 20px;
-		line-height: 16px;
-	}
-	.inline {
-		position:relative;
-		display:inline-block;
-		text-align:left;
-		width:100%
-	}
-	.inline.tags > a{
-		float: left;
-		width: 50%;
-		overflow: hidden;
-	}
-	.center {
-		text-align:center;
-	}
-	.white{
-		color: White;
-	}
-	.light{
-		color: #777;
-	}
-	.dark{
-		color: Black;
-	}
-	.black{
-		color: Black;
-	}
-	.expand{
-		width:100%;
-	}
-	.hover:hover *{
-		color: Black;
-	}
-
-	.vert50 {
-		width: 49%;
-	}
-	.vert33 {
-		width: 32%;
-	}
-	.vert-left{
-		width: auto;
-		float:left;
-	}
-	.vert-right{
-		width: auto;
-		float:right;
-	}
-	.vert-auto{
-		width: auto;
-	}
-	
-	.pin.profile .large {
-		line-height: 10px;
-		font-size: 12px;
-		font-weight: bold;
-	}
-	.pin.profile a:hover {
-
-	}
-	
-	.pin .btn-hover:hover {
-		font-weight: normal;
-		background: #F0F0F0;
-	}
-	.pin .btn-hover{
-		margin: 2px 0px 2px 0px;
-	}
-		
-	.pin .btn.follow {
-		width: 70px;
-		margin-right: 10px;
-		position:absolute;
-		top:9px;
-		right:0;
-	}
 
 .pin {
 	background: #fff;
-	width: 200px;
+	width: 210px;
 	float: left;
 	border: 1px solid #ccc;
-	padding: 20px 20px 10px 20px;
+	padding: 15px 15px 0px 15px;
 	display: none;
 	font-size: 11px;
+	color: #777
 }
-	.pin .pin-tags{
-		padding: 0px 0px 5px 0px;
-	}
 	.pin img {
 		padding: 0;
 		margin: 0;
+		width: 210px;
 	}
 	.pin p {
 		margin-bottom: 0;
@@ -259,7 +168,116 @@ body {
 	.pin i {
 		vertical-align: text-bottom;
 	}
+	.pin-desc {
+		font-size: 12px;
+		min-height: 25px;
+	}
+	.pin-info {
+		font-size: 11px;
+		width: 158px;
+		margin-top: 2px;
+		display: inline-block;
+		line-height: 14px;
+	}
+	.pin-info l{
+		display: block;
+	}
+	.pin-stats {
+		float: right;
+		width: auto;
+		text-align: right;
+		line-height: 14px;
+		margin-top: 2px;
+	}
+	.pin-options {
+			margin: 5px;
+			line-height: 0px;
+			display: none;
+			right: 20px;
+			position: absolute;
+			padding: 1px 2px 1px 2px;
+			background-color: #eee;
+			border: 1px solid #ccc;
+			-webkit-box-shadow: 0 1px 3px #ccc;
+			   -moz-box-shadow: 0 1px 3px #ccc;
+					box-shadow: 0 1px 3px #ccc;
+			-webkit-border-radius: 3px;
+			   -moz-border-radius: 3px;
+					border-radius: 3px;
+			cursor: pointer;
+		}
+			.pin-options i{
+			margin: 3px;
+			}
+		.pin-options-btn{
+			display: hidden;
+			right: 4px;
+			top: 4px;
+			position: absolute;
+		}
 	
+	.pin .header{
+		height: 100%;
+		margin: -15px -15px 0px -15px;
+		color: #666;
+		padding: 0px 15px 0px 15px;
+		background-color: #f4f4f4;
+		background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f4f4f4));
+		background-image: -webkit-linear-gradient(top, #ffffff, #f4f4f4);
+		background-image: -moz-linear-gradient(top, #ffffff, #f4f4f4);
+		background-image: -ms-linear-gradient(top, #ffffff, #f4f4f4);
+		background-image: -o-linear-gradient(top, #ffffff, #f4f4f4);
+		background-image: linear-gradient(top, #ffffff, #f4f4f4);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#f4f4f4');
+	}
+	.pin.welcome .header a:hover{
+		font-weight: bolder;
+		text-decoration: underline;
+	}
+	.section {
+		height: auto;
+		border-top: 1px solid #ccc;
+		margin: 0px -15px;
+		padding: 5px 15px 5px 15px;
+		line-height: 16px;
+	}
+	.pin.image .section {
+		background-color: #f4f4f4
+	}
+	.pin.welcome,
+	.pin.profile {
+		padding-bottom: 0px;
+	}
+	.pin.profile .large {
+		line-height: 10px;
+		font-size: 12px;
+		font-weight: bold;
+	}
+	.pin.profile a:hover {
+
+	}
+	
+	.pin .btn-hover:hover {
+		font-weight: normal;
+		background: #F0F0F0;
+	}
+	.pin .btn-hover{
+		margin: 2px 0px 2px 0px;
+	}
+		
+	.pin .btn.follow {
+		width: 70px;
+		margin-right: 10px;
+		position:absolute;
+		top:9px;
+		right:0;
+	}
+	.pin-cmnts {
+		font-size: 11px;
+	}
+	.pin .pin-tags{
+		
+	}
 	.pin .icon {
 		background-position: 0px 0px;
 		display: inline-block;
@@ -297,67 +315,42 @@ body {
 	}
 	
 
-.pin.user-group {
-	min-height: 150px;
-}
-.user-group .thumb.p1 {
-	background: #fff;
-	width: 200px;
-	float: left;
-	line-height: 0px;
-}
-.user-group .thumb.board {
-	background: #fff;
-	width: 64px;
-	float: left;
-	display: none;
-	line-height: 0px;
-}
-.user-group .thumbs {
-    position: relative;
-    background: #eee;
-}
-.user-group .info {
-	position: absolute;
-	background: White;
-	z-index: 110;
-	width: 200px;
-	bottom: 0px;
-	height: 60px;
-}
+	.pin.group {
+		min-height: 150px;
+	}
+		.pin.group .thumb.p1 {
+			background: #fff;
+			width: 210px;
+			float: left;
+			line-height: 0px;
+		}
+		.pin.group .thumb.board {
+			background: #fff;
+			width: 68px;
+			float: left;
+			display: none;
+			line-height: 0px;
+		}
+		.pin.group .thumbs {
+			position: relative;
+			background: #eee;
+		}
+		.pin.group .info {
+			position: absolute;
+			background: White;
+			z-index: 110;
+			width: 210px;
+			bottom: 0px;
+			height: 60px;
+		}
 
-.pin-options {
-    margin: 5px;
-	line-height: 0px;
-    display: none;
-    right: 20px;
-    position: absolute;
-    padding: 1px 2px 1px 2px;
-    background-color: #eee;
-    border: 1px solid #ccc;
-    -webkit-box-shadow: 0 1px 3px #ccc;
-       -moz-box-shadow: 0 1px 3px #ccc;
-            box-shadow: 0 1px 3px #ccc;
-    -webkit-border-radius: 3px;
-       -moz-border-radius: 3px;
-            border-radius: 3px;
-	cursor: pointer;
-}
-.pin-options-btn{
-	display: hidden;
-	right: 4px;
-	top: 4px;
-	position: absolute;
-}
+		
 
-    .pin:hover .pin-options,
-	.pin-options.hover {
+    .pin:hover.touch-off .pin-options{
         display: block;
     }
 	
-	.pin-options i{
-        margin: 3px;
-    }
+	
 
     
 
@@ -382,11 +375,84 @@ body {
 			line-height: 25px;
 		}
 
-        .form-actions {
-            margin-bottom: 0;
-        }
-		
-/* MODIFICATIONS TO BOOTSTRAP */		
+
+/* GENERAL FORMATTING */
+.inline {
+	position:relative;
+	display:inline-block;
+	text-align:left;
+	width:100%
+}
+.inline.tags > a{
+	float: left;
+	width: 50%;
+	overflow: hidden;
+}
+.center {
+	text-align:center;
+}
+.white{
+	color: White;
+}
+.light{
+	color: #777;
+}
+.dark{
+	color: Black;
+}
+.black{
+	color: Black;
+}
+.expand{
+	width:100%;
+}
+.hover:hover *{
+	color: Black;
+}
+.vert50 {
+	width: 49%;
+}
+.vert33 {
+	width: 32%;
+}
+.vert-left{
+	width: auto;
+	float:left;
+}
+.vert-right{
+	width: auto;
+	float:right;
+}
+.vert-auto{
+	width: auto;
+}
+
+/* ICONS */
+.icon-chat{
+	background-image: url("../img/icons-chat-12.png");
+	background-position: -0px 2px;
+}
+.icon-chat-empty{
+	background-image: url("../img/icons-chat-o-12.png");
+	background-position: -0px 2px;
+}
+.icon.favs {
+	background-image: url("../img/icons-star.png");
+}
+.icon.cmnts {
+	background-image: url("../img/icons-chat-11.png");
+	background-position: -0px 1px;
+}
+
+/* TOIUCH */
+.touch-on{
+	display: block;
+}
+.touch-off{
+	display: none;
+}
+
+/* MODIFICATIONS TO BOOTSTRAP */
 .modal {
   width: 498px;
   margin: -230px 0 0 -250px;
@@ -433,6 +499,9 @@ body {
   margin: 0px 25px 0px 0px ;
   
 }
+.form-actions {
+	margin-bottom: 0;
+}
 
 .form{
     text-align: center;
@@ -462,23 +531,4 @@ body {
   vertical-align: inherit;
   padding-left: 0px;
   cursor: default;
-}
-.icon-chat{
-	background-image: url("../img/icons-chat-12.png");
-	background-position: -0px 2px;
-}
-.icon-chat-empty{
-	background-image: url("../img/icons-chat-o-12.png");
-	background-position: -0px 2px;
-}
-.icon.favs {
-	background-image: url("../img/icons-star.png");
-}
-.icon.cmnts {
-	background-image: url("../img/icons-chat-11.png");
-	background-position: -0px 1px;
-}
-/* add this class to all buttons to display only for touch devices */
-.touch-only{
-	display:block
 }

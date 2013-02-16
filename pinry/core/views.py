@@ -32,6 +32,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             user.groups.add(Group.objects.get(name=settings.DEFAULT_USER_GROUP))
+            user.save()
             messages.success(request, 'Thank you for registering, you can now '
                                       'login.')
             return HttpResponseRedirect(reverse('core:login'))

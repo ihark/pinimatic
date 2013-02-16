@@ -84,7 +84,7 @@ def user_profile(request, profileName=None, tag=None):
     #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
     srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
     srcDoms = get_top_domains(srcUrls, 5)
-    
+    ''' DEBUG
     print pinsC
     print tags
     print tagsC
@@ -95,8 +95,7 @@ def user_profile(request, profileName=None, tag=None):
     print favs
     print favsC
     print srcDoms
-
-    
+    '''
     context = {
             'profile': profile,
             'pinsC': pinsC,

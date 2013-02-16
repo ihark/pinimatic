@@ -64,6 +64,8 @@ class AjaxMessaging(object):
                         })
                             
                 except ValueError:
+                    print '-----AjaxMessaging-----ValueError:'
+                    print ValueError
                     
                     return response
 

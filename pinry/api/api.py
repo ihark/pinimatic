@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.comments.models import Comment
 from django.contrib.comments.models import ContentType
@@ -121,7 +122,7 @@ class PinResource(ModelResource):
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)
     #comments = fields.ToManyField('pinry.api.api.CmntResource', 'tagged_items', full = True, null=True)
-    comments = fields.ListField(attribute='comments')
+    comments = fields.ListField(attribute='comments', null=True)
     #NOTE: tagged_items = content_type, id, object_id, pin, tag
     #NOTE: content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
@@ -146,7 +147,7 @@ class PinResource(ModelResource):
         objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
         for p in objects:
             #add comments to pin
-            cqs = Comment.objects.filter(object_pk__exact=p.id).values('id', 'user_id', 'comment', 'submit_date', 'is_public').reverse()
+            cqs = Comment.objects.filter(object_pk__exact=p.id).values('id', 'user_id', 'comment', 'submit_date', 'is_public')
             p.comments = cqs
             #add username to comments
             for c in cqs:
@@ -215,7 +216,6 @@ class PinResource(ModelResource):
                 
 
         if 'tag' in filters:
-            print '-----tag fileter found for: '+filters['tag']
             orm_filters['tags__name__in'] = filters['tag'].split(',')
         
 
@@ -241,10 +241,11 @@ class PinResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
         bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='')
-        print bundle
         return bundle
         
 class CmntResource(ModelResource):
+    user = fields.ToOneField('pinry.api.api.UserResource', 'user')
+    content_type_id = fields.CharField(attribute = 'content_type_id')
     #content_object = GenericForeignKeyField({
     #  Pin: PinResource,
     #}, 'content_object', null=True, related_name='comments')
@@ -278,6 +279,5 @@ class CmntResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
-        print bundle.data
-        bundle = super(CmntResource, self).obj_create(bundle, content_type_id=10, site_id=2, user=bundle.request.user)
+        bundle = super(CmntResource, self).obj_create(bundle, site_id=settings.SITE_ID, user=bundle.request.user)
         return bundle

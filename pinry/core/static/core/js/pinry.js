@@ -22,7 +22,7 @@ var origin = window.location.origin;
 console.warn(origin);
 var av=url(3);//active view
 var authUserO = ajax(userURL, false);//authenticated user object//used to determine current authenticated user
-
+var aOptions //tracks active pin options floater for touch devices
 var vn = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
@@ -32,6 +32,12 @@ var vn = { //viewname:"displayname"
 	cmnts:"Notes",
 	pop:"Popular"
 }
+
+//TEST FOR TOUCH DEVICE
+function is_touch_device() {
+	return !!('ontouchstart' in window) // works on most browsers 
+	|| !!('onmsgesturechange' in window); // works on ie10)
+};
 
 /** generic function for ajax calls:
  *url: url to make ajax call
@@ -209,7 +215,7 @@ function loadData(tag, user, reload) {
 	}
 	//if current tag has a view convert tag name to defined view
 	av = getKey(tag, vn)
-	
+	/*debug
 	console.log('tag = '+tag)
 	console.log('cTag = '+cTag)
 	console.log(tag !== undefined && tag !== cTag )
@@ -219,7 +225,7 @@ function loadData(tag, user, reload) {
 	console.log('av = '+av)
 	console.log('av name = '+vn[av])
 	console.log(vn[av] !== cTag)
-	
+	 */
 	
 	//reset page and refresh pins display
 	if (reload || tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
@@ -270,8 +276,9 @@ function loadData(tag, user, reload) {
 		});
 	}
 };
-/** 
- * Reloads page on state change 
+
+/** Reloads page on state change 
+ * 
  */
 window.onpopstate = function(e) {
 	console.log('pop state: '+e.state);
@@ -279,8 +286,8 @@ window.onpopstate = function(e) {
 	if (e.state) window.location.href = e.state;
 };
 
-/**
- * Receives data from the API, creates HTML for images and updates the layout
+/**Receives data from the API, creates HTML for images and updates the layout
+ * 
  */
 
 function onLoadData(data) {
@@ -325,7 +332,7 @@ function onLoadData(data) {
 			html += '<div class="pin image touch-off" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'">';
 				//OPTIONS
 				if (authUserO){
-				html += '<i id="options-btn" data-state="false" title="Show Options" class="pin-options-btn icon-cog touch-off"></i>';
+				html += '<i id="options-btn" data-state="false" title="Show Options" class="pin-options-btn icon-cog touch-off hide"></i>';
 				html += '<div class="pin-options">';
 					html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 					html += '<i id="delete-btn" title="Delete" class="icon-trash"></i>';
@@ -442,12 +449,7 @@ function onLoadData(data) {
 			applyLayout();
 		}//end tag/group view
 	}//end image for loop
-	
-	//setup touch features
-	if (is_touch_device()){
-		$('.touch-off').toggleClass('touch-off touch-on');
-	}
-	
+
 	//tag/goup add place holder images as required by min/max
 	if (av == 'tags'){
 		for (key in tags){
@@ -470,26 +472,19 @@ function onLoadData(data) {
 				//apply layout to pins in tag group
 				layoutThumbs('#'+key);
 			}
-			//fix up layout
+			//fix up layout after extra images added
 			applyLayout();
 		}
 	}
+	
+	//TOUCH DEVICE SETUP features
+	if (is_touch_device()){
+		$('.touch-off').toggleClass('touch-off touch-on');
+		$('.touch-on').toggleClass('hide show');
+	}
+	
 	isLoading = false;
 	$('#loader').hide();
-};
-
-
-
-/** TOUCH NOTES:
- * touchstart
- * touchmove
- * touchend
- * touchcancel 
-**/
-//test for touch device
-function is_touch_device() {
-	return !!('ontouchstart' in window) // works on most browsers 
-	|| !!('onmsgesturechange' in window); // works on ie10)
 };
 
 
@@ -796,7 +791,7 @@ function follow(targetBtn, display) {
 }
 
 /**
- * tag/group view functions
+ * tag/group view click handlers
  */
 //add click handler for pin functions
 //tag/groups
@@ -805,14 +800,32 @@ $(document).on( 'click', '.pin.user-group .thumbs', function(event){
 	id = target[0].id
 	loadData(id, aProfileO.username);
 });
-//options
-$(document).on('click touchend', '.pin-options-btn', function(event){
-	target = $(event.target).closest('.pin')
-	id = target[0].id
-	console.warn(id)
-	$('#'+id+' .pin-options').toggleClass('hover')
+/**
+ * pin button click handlers
+ */
+//pin options button for touch devices
+$(document).on('click', '.pin-options-btn', function(event){
+	target = $(event.target).closest('.pin');
+	id = target[0].id;
+	console.warn(id);
+	target = $('#'+id+' .pin-options');
+	console.warn(aOptions)
+	console.warn(target)
+	if(!aOptions){
+		console.warn('1')
+		target.toggleClass('touch-hover');
+		aOptions = target;
+	}else if(aOptions && aOptions[0] == target[0]){
+		console.warn('2')
+		aOptions.toggleClass('touch-hover')
+		aOptions = undefined;
+	}else if(aOptions != undefined && aOptions[0] != target[0]){
+		console.warn('3')
+		aOptions.toggleClass('touch-hover')
+		target.toggleClass('touch-hover');
+		aOptions = target;
+	}
 });
-
 /**
  * Edit pin functions.
  */

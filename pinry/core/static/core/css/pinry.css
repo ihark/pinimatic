@@ -210,9 +210,8 @@ body {
 			margin: 3px;
 			}
 		.pin-options-btn{
-			display: hidden;
-			right: 4px;
-			top: 4px;
+			right: 1px;
+			top: 1px;
 			position: absolute;
 		}
 	
@@ -346,7 +345,8 @@ body {
 
 		
 
-    .pin:hover.touch-off .pin-options{
+    .pin:hover.touch-off .pin-options,
+	.pin.touch-on .pin-options.touch-hover {
         display: block;
     }
 	
@@ -446,11 +446,12 @@ body {
 
 /* TOIUCH */
 .touch-on{
-	display: block;
+
 }
 .touch-off{
-	display: none;
+
 }
+
 
 /* MODIFICATIONS TO BOOTSTRAP */
 .modal {

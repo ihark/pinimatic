@@ -496,7 +496,7 @@ $(document).ready(new function() {
 	$(window).bind('touchstart', onScroll);
 	$(window).bind('touchend', onScroll);
 	$(window).bind('touchcancel', onScroll);
-	$(window).bind('touchcancel', onScroll);
+	
 	var _super = $.ajaxSettings.xhr;
 	$.ajaxSetup({
 		// Required for reading Location header of ajax POST responses in firefox.
@@ -571,7 +571,30 @@ $('.fancybox').fancybox({
 /**Pin Options Functions.
  * 
  */
- 
+
+//pin options button for touch devices
+$(document).on('click touchstart', '.pin-options-btn', function(event){
+	target = $(event.target).closest('.pin');
+	id = target[0].id;
+	console.warn(id);
+	target = $('#'+id+' .pin-options');
+	console.warn(aOptions)
+	console.warn(target)
+	if(!aOptions){
+		console.warn('1')
+		target.toggleClass('touch-hover');
+		aOptions = target;
+	}else if(aOptions && aOptions[0] == target[0]){
+		console.warn('2')
+		aOptions.toggleClass('touch-hover')
+		aOptions = undefined;
+	}else if(aOptions != undefined && aOptions[0] != target[0]){
+		console.warn('3')
+		aOptions.toggleClass('touch-hover')
+		target.toggleClass('touch-hover');
+		aOptions = target;
+	}
+}); 
 // add event listeners for pin option buttons
 $('#favs').live('click', function(event){
 	togglePinStat(this, 'icon-star', 'icon-star-empty', '/toggle/pins/Pin/');
@@ -800,32 +823,7 @@ $(document).on( 'click', '.pin.user-group .thumbs', function(event){
 	id = target[0].id
 	loadData(id, aProfileO.username);
 });
-/**
- * pin button click handlers
- */
-//pin options button for touch devices
-$(document).on('click', '.pin-options-btn', function(event){
-	target = $(event.target).closest('.pin');
-	id = target[0].id;
-	console.warn(id);
-	target = $('#'+id+' .pin-options');
-	console.warn(aOptions)
-	console.warn(target)
-	if(!aOptions){
-		console.warn('1')
-		target.toggleClass('touch-hover');
-		aOptions = target;
-	}else if(aOptions && aOptions[0] == target[0]){
-		console.warn('2')
-		aOptions.toggleClass('touch-hover')
-		aOptions = undefined;
-	}else if(aOptions != undefined && aOptions[0] != target[0]){
-		console.warn('3')
-		aOptions.toggleClass('touch-hover')
-		target.toggleClass('touch-hover');
-		aOptions = target;
-	}
-});
+
 /**
  * Edit pin functions.
  */

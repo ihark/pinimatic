@@ -169,7 +169,6 @@ body {
 		vertical-align: text-bottom;
 	}
 	.pin-desc {
-		color: #333;
 		font-size: 12px;
 		min-height: 25px;
 	}

@@ -26,8 +26,9 @@ if settings.DEBUG:
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-
-if settings.SITE_HOST.split('.')[0] == '192':
+print '-----------split--------------'
+print settings.SITE_HOST.split('.')[0]
+if settings.SITE_HOST == '192.168.1.100':
     urlpatterns += patterns('',
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
                 'document_root': settings.MEDIA_ROOT,

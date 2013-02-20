@@ -19,6 +19,7 @@ from django.core.files.storage import default_storage
 from follow.models import Follow
 from django.db.models import Count
 from django.contrib.sites.models import get_current_site
+from django.contrib.comments.models import Comment
 
 
 
@@ -80,6 +81,9 @@ def user_profile(request, profileName=None, tag=None):
     #TODO: get folowing pins
     favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
     favsC = favs.count()
+    cmnts = Comment.objects.filter(user=profile, content_type_id = 10, site_id=settings.SITE_ID ).values_list('pk', flat=True)
+    cmntsC = cmnts.count()
+
     
     #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
     srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
@@ -95,7 +99,10 @@ def user_profile(request, profileName=None, tag=None):
     print favs
     print favsC
     print srcDoms
+    print cmnts
+    print cmntsC
     '''
+
     context = {
             'profile': profile,
             'pinsC': pinsC,
@@ -107,6 +114,8 @@ def user_profile(request, profileName=None, tag=None):
             'tagsC': tagsC,
             'favs': favs,
             'favsC': favsC,
+            'cmnts': cmnts,
+            'cmntsC': cmntsC,
             'srcDoms': srcDoms,
             'authUser': authUser,
             'authUserJ': authUserJ

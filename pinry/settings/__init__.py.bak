@@ -15,6 +15,7 @@ except:
     SITE_HOST = 'notfound'
     FQDN = 'notfound'
 
+print os.environ
 print 'SITE_HOST = '+str(SITE_HOST)
 print 'HOSTNAME = '+str(HOSTNAME)
 print 'FQDN = '+str(FQDN)

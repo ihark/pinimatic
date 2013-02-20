@@ -10,7 +10,7 @@
 var au = {{ authUserJ|safe }}
 </script> -->
 <div id="pins-container">
-	<div class="pin profile" id="{{ profile.pk }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}">
+	<div class="pin profile" id="{{ profile.pk }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}" data-cmnts="{{ cmntsC }}">
 		<div class="header">
 			<a href="{% url core:home %}user/{{ profile.username }}" onclick="loadData(undefined, '{{ profile.username }}');"><h4>{{ profile.username }}</h4></a>
 			{% if request.user != profile and user.is_authenticated%}
@@ -28,7 +28,7 @@ var au = {{ authUserJ|safe }}
 			</div>
 			<div class="inline center vert-auto">
 				<a id="user-favs"><div class="btn-hover"><span class="favs large display text">{{ favsC }}</span><br>Favorites</div></a>
-				<a id="user-cmnts"><div class="btn-hover"><span class="cmnts large display text">0</span><br>Comments</div></a>
+				<a id="user-cmnts"><div class="btn-hover"><span class="cmnts large display text">{{ cmntsC }}</span><br>Comments</div></a>
 			</div>
 			<div class="inline center vert-right">
 				<a id="user-fing"><div class="btn-hover"><span class="following large display text">{{ folowingC }}</span><br>Following</div></a>

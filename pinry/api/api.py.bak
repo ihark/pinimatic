@@ -147,7 +147,7 @@ class PinResource(ModelResource):
         objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
         for p in objects:
             #add comments to pin
-            cqs = Comment.objects.filter(object_pk__exact=p.id).order_by('id').values('id', 'user_id', 'comment', 'submit_date', 'is_public')
+            cqs = Comment.objects.filter(object_pk__exact=p.id).order_by('id').values('id', 'pk', 'user_id', 'comment', 'submit_date', 'is_public')
             p.comments = cqs
             #add username to comments
             for c in cqs:

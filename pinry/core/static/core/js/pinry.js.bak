@@ -1166,7 +1166,7 @@ function getWindowSize() {
 }
 function idSafe(s){
 	s = s.replace(/\s/g, '-')
-	s = s.replace(/&/g, 'ands')
+	s = s.replace(/&/g, 'and')
 	return s
 }
 function displaySafe(s){

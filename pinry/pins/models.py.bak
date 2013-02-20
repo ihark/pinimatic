@@ -90,7 +90,7 @@ class Pin(models.Model):
             print self.image.url
             print self.srcUrl
             self.srcUrl = settings.MEDIA_URL+self.image.name
-        #TODO: srcUrl gets http://domain but imgUrl does not?
+        #TODO: imgUrl should always be set to stored image incase the src is gone
         self.imgUrl = settings.MEDIA_URL+self.image.name
             
         super(Pin, self).save(*args, **kwargs)

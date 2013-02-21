@@ -4,21 +4,21 @@ from django.contrib.messages import constants as messages
 SITE_ID = 1
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
-# play with detecting host
+
 import socket
 try:
-    HOSTNAME = socket.gethostname()
-    SITE_HOST = socket.gethostbyname(socket.gethostname())
-    FQDN = socket.getfqdn()
+    HOSTNAME = socket.gethostname()#not used
+    SITE_IP = socket.gethostbyname(socket.gethostname())
+    FQDN = socket.getfqdn()#not used
 except:
-    HOSTNAME = 'notfound'
-    SITE_HOST = 'notfound'
-    FQDN = 'notfound'
+    HOSTNAME = 'localhost'
+    SITE_IP = 'localhost'
+    FQDN = 'localhost'
 
-print 'SITE_HOST = '+str(SITE_HOST)
+print 'SITE_IP = '+str(SITE_IP)
 print 'HOSTNAME = '+str(HOSTNAME)
 print 'FQDN = '+str(FQDN)
-# end play with detecting host
+
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
@@ -36,9 +36,9 @@ USE_L10N = True
 USE_TZ = True
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = 'http://'+SITE_IP+':8000/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
-TMP_URL = 'http://localhost:8000/media/tmp/'
+TMP_URL = 'http://'+SITE_IP+':8000/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
 IMAGES_PATH = 'pins/pin/originals/'

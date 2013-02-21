@@ -9,54 +9,60 @@ html, body, div, span, applet, object, iframe, blockquote, pre, a, abbr, acronym
 h5, h6 {
 margin: 0px 0px;
 }
+
 body {
     margin-top: 70px;
-
+}
+.button-bm {
+	padding:0px 5px 0px 5px !important;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	line-height: 20px;
+	font-size: 14px;
+	color: #999;
+	text-shadow: none;
+	margin: 0px 5px 0px 5px;
+	cursor: pointer;
+	-moz-border-radius:2px; 
+	border-radius: 2px;
+	box-shadow: 1px 1px 2px #888888;
+	border:1px solid #ccc;
+	background: white;
+	display: inline-block;
+}
+.navbar .button-bm{
+		margin: 8px 10px 8px 10px !important;;
 	}
 .navbar-inner {
     background-image: none;
     background: white;
     filter: none;
+	height: 40px;
     border-bottom: 1px solid #999;
-    height: 48px;
 	/*set to prevent nave bar overlap*/
-	min-width: 750px;
+	min-width: 600px;
 }
-
-    .navbar .brand {
-        margin-left: 0;
-        color: #999;
-        font-family: 'Monoton';
-        font-size: 30px;
-		padding: 14px 20px 10px;
+	
+	.navbar .brand {
+		color: #999;
+		font-family: 'Monoton';
+		font-size: 26px;
+		height: 100%;
+		padding-left:0px;
+		margin-left:10px;
     }
-	.navbar .nav > li > a,
-	.navbar .nav > li > p{
+	.navbar .nav > li > a{
         color: #999;
         text-shadow: none;
         border-left: 1px solid #ccc;
-        padding: 14px 20px 15px;
 		margin: 0px;
 		cursor: pointer;
-		display: inline-block;
+		
     }
-	.navbar .nav > li > span{
-		color: #999;
-        text-shadow: none;
-		display: inline-block;
-	}
-	.navbar .nav > li > a:hover,
-	.navbar .nav > li > p:hover{
+
+	.navbar .nav > li > a:hover{
         color: #555;
     }
-.buttonbm {
-	-moz-border-radius:2px !important; 
-	border-radius: 2px !important;
-	box-shadow: 1px 1px 2px #888888 !important;
-	border:1px solid #ccc !important;
-	margin:12px 10px 0px 10px !important;
-	padding:0px 5px 0px 5px !important;
-}
+
 .messages {
     list-style-type: none;
     top: 50px;
@@ -116,6 +122,33 @@ body {
     background: #eee;
     z-index: 100;
 	float: left;
+}
+.container{
+	width:600px;
+	margin:auto;
+}
+.indent p,
+.indent li,
+.indent textarea{
+	margin-left:20px;
+}
+.indent textarea{
+	width:90%;
+	margin:10px 20px;
+}
+.code{
+	cursor: text !important;
+	resize: none;
+	height: 65px;
+	padding:5px;
+}
+
+.help-page{
+	width:500px;
+	margin:auto;
+	padding:10px 20px 10px 20px;
+	background: White;
+	border-radius: 6px;
 }
 
 .pin {
@@ -315,7 +348,8 @@ body {
 	.pin form span{
 		float: left;
 	}
-	.pin form input, textarea{
+	.pin form input, 
+	.pin textarea{
 		width: 100%;
 		padding: 0px;
 		margin: 0px 0px 5px 0px;
@@ -357,8 +391,10 @@ body {
 			background: White;
 			z-index: 110;
 			width: 210px;
+			padding: 5px 15px 15px 15px;
 			bottom: 0px;
-			height: 60px;
+			left: 0px;
+			height: 30px;
 		}
 
     .pin:hover.touch-off .pin-options,
@@ -541,7 +577,9 @@ body {
   display: inline-block;
 }
 .form .help-inline.control-label {
+  display: inline;
   vertical-align: inherit;
   padding-left: 0px;
   cursor: default;
+  font-size: 12px;
 }

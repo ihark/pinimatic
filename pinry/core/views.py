@@ -16,6 +16,9 @@ from django.contrib.auth.models import Group
 def home(request):
     user = 'all'
     return HttpResponseRedirect(reverse('pins:recent-pins'))
+    
+def help(request):
+    return TemplateResponse(request, 'core/help-bm.html')
 
 
 def private(request):

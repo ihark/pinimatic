@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% load bootstrap_field %}
+
+
+{% block title %}PinifyIt{% endblock %}
+
+{% block yield %}
+<div class="container">
+	<div class="help-page">
+		<div id="all" class="indent">
+			<h3>Installing the bookmarklet:</h3>
+			<h4>All browsers except iOS: (iPhone, iTouch & iPad)</h4>
+			<p class="indent">Drag this Button<a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">Pinify It</a>to your bookmarks or favorites bar</p>
+		</div>
+		<div id="ios" class="indent">
+			<h4>iOS (iPhone & iPad)-More steps but not hard :)</h4>
+				<h5>1) Setup Bookmark:</h5>
+				<p>
+					<li>Tap the Share Icon (box with curved arrow) next to the address bar.</li>
+					<li>Tap Bookmark.</li>
+					<li>Tap the last box and select "Bookmarks Bar".</li>
+					<li>Tap Save.</li>
+				</p>
+				<h5>2) Copy The Text:</h5>
+				<p>
+					<li>Highlight all the text in the box below by holding you finger down on it.</li>
+					<textarea onclick="javascript:this.focus();this.select()" readonly="true" class="code">javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='//pinry.herokuapp.com/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())</textarea>
+					<li>Tap Copy.</li>
+				</p>
+				<h5>3) Edit Bookmarklet:</h5>
+				<p>
+					<li>Open your Bookmarks by taping the book icon then navigate to the Bookmarks Bar folder. (If your bookmarks are not shown, tap the book icon at the bottom of the window.)</li>
+					<li>Tap Edit</li>
+					<li>Tap Pinimatic - PinifyIt</li>
+					<li>Tap in the Address field, and clear it by tapping the X</li>
+					<li>Tap double tap the empty Address field, and tap Paste.</li>
+					<li>Tap Done on the keyboard or anyplace out side the Bookmarks window.</li>
+				</p>
+		</div>
+	</div>
+</div>
+{% endblock %}

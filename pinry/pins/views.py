@@ -22,7 +22,6 @@ from django.contrib.sites.models import get_current_site
 from django.contrib.comments.models import Comment
 
 
-
 def AjaxSubmit(request):
     #tests
     print '--- request recieved with obove reqest data ----'
@@ -130,7 +129,7 @@ def new_pin(request, pin_id=None):
         try:
             print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
-            form = PinForm(instance=pin)
+            form = PinForm(instance=pin, user=request.user)
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
             if pin.submitter != request.user:
@@ -147,8 +146,11 @@ def new_pin(request, pin_id=None):
     if request.method == 'POST' or save:
         print 'view - enterd save mode'
         form = PinForm(request.REQUEST, request.FILES, instance=pin)
-        print request.FILES
+        # request.FILES is for file uploader 
+        #TODO: do i need request.REQUEST?
+        '''
         #print all form fields for debugging
+        print 'request.FILES:',request.FILES
         print 'form.instance = '+str(form.instance.id)
         print form.data
         for f in form:
@@ -157,6 +159,7 @@ def new_pin(request, pin_id=None):
             except:
                 print f.name+' = does not exist'
         #end debug
+        '''
         if form.is_valid():
             print 'form is valid'
             pin = form.save(commit=False)
@@ -169,6 +172,7 @@ def new_pin(request, pin_id=None):
             form.save_m2m()
             if pin_id:
                 messages.success(request, 'Pin successfully modified.')
+                return HttpResponseRedirect(reverse('pins:recent-pins'))
             else:
                 messages.success(request, 'New pin successfully added.')
                 return HttpResponseRedirect(reverse('pins:recent-pins'))

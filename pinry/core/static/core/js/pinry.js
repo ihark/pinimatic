@@ -198,7 +198,7 @@ function loadData(tag, user, reload) {
 		console.log('else if cTag update url to: '+nAddress);
 	}
 	
-	//add active tag to tag area
+	//add active tag to tag display div
 	if (tag){
 		$('#tags').show();
 		$('#tags .tags').html('<span class="label tag" onclick="loadData(null)">' + displaySafe(tag) + ' x</span>');
@@ -1107,6 +1107,10 @@ function cancelNewPin(){
 	//get default image
 	$(thumbTarget).attr("src", '/static/core/img/thumb-default.png');
 }
+//tags autocomplete
+$('input[name="tags"]').autocomplete({
+	source: ["tag 1", "tag 2", "tag 3", "tag 4"]
+});
 
 /** 
  * UTILITIES

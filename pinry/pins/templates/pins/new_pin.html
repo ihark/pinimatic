@@ -8,7 +8,7 @@
 {% block yield %}
     <div class="form-container">
 		<div class="form-header">
-			<h3 id="form-title" >Edit Pin</h3>
+			<h3 id="edit-form-title" >Edit Pin</h3>
 			<span>* Required fields</span>
 		</div>
 		{{ form.non_field_errors }}
@@ -23,7 +23,7 @@
 				{% endfor %}
 			</div>
 			<div class="form-actions">
-                <button type="submit" class="btn btn-primary">Post</button>
+                <button id="submit-btn" type="submit" class="btn btn-primary">Post</button>
 				<a href="{% url core:home %}" onClick="cancelNewPin();" class="btn">Cancel</a>
 			</div>
 		</form>
@@ -31,10 +31,13 @@
 	<script>
 		var id = document.getElementById('id_id')
 		var title = document.getElementById('edit-form-title')
+		var submitBtn = document.getElementById('submit-btn')
 		if (id.value){
 			title.innerHTML = 'Edit Pin'
+			submitBtn.innerHTML ='Save'
 		}else{
 			title.innerHTML = 'New Pin'
+			submitBtn.innerHTML ='Submit'
 		}
 	</script>
 			

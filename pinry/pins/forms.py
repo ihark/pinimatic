@@ -1,27 +1,41 @@
 from django import forms
 
 from taggit.forms import TagField, TagWidget
-
+from pinry.core.forms import CustomTagField, UserTagsField
+print '-import pinry.core.forms'
 from .models import Pin
 from pinry.core.widgets import CustomImage, CustomThumbnail, AdminImageWidget
 from django.forms.widgets import FileInput, HiddenInput, TextInput
 from pinry.settings import IMAGES_PATH, MEDIA_URL
+import re
 #from pinry.core.utils import MakeThumbnail, saveTempImg
 
 
 class PinForm(forms.ModelForm):
+    
     id = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='id', required=False)
     srcUrl = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='srcUrl', required=False)
     imgUrl = forms.CharField(widget=TextInput(attrs={'placeholder':'http://www.xxx.com/image.ext'}), label='Image URL', required=False)
     #thumbnail = forms.ImageField(widget=CustomThumbnail(), label='Current', required=False)
     image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
-    tags = TagField(widget=TagWidget(attrs={'placeholder':'required'}), label='*Tags')
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
     repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False, initial=None)
+    tags = CustomTagField(label='*New Tag', required=False)
+    tagsUser = UserTagsField(queryset=Pin.tags.all(), label='*Your Tags', required=False)
+    #tagsTest = ComboField(queryset=Pin.tags.all(), label='*Your Tags', required=False)
 
-
+    #NOTE: passing in user breaks tags validation, why?????
     def __init__(self, *args, **kwargs):
+        print '--form init'
+        user = kwargs.pop('user', None)
         super(forms.ModelForm, self).__init__(*args, **kwargs)
+        print '--form super ini'
+        if user:
+            qs = Pin.tags.most_common().filter(pin__submitter__exact=user).order_by('name')#num_times
+            self.fields['tagsUser'].queryset = qs #TODO: need to convert to set in UserTagsWidget
+            self.fields['tagsUser'].initial = Pin.tags.all().filter(pin__exact=self.instance)
+            tags_initial = self.fields['tagsUser'].initial
+        
         self.fields.keyOrder = (
             'id',
             'srcUrl',
@@ -29,11 +43,13 @@ class PinForm(forms.ModelForm):
             #'thumbnail',
             'image',
             'description',
-            'tags',
             'uImage',
             'repin',
+            'tagsUser',
+            'tags',
         )
 
+        print "--form end init"
 
     def check_if_image(self, data):
         print '--form check_if_img()'
@@ -53,18 +69,45 @@ class PinForm(forms.ModelForm):
             raise forms.ValidationError("Requested URL is not an image file. "
                                         "Only images are currently supported.")
     def clean_repin(self):
+        print '--form clean_repin'
         data = self.cleaned_data['repin']
         if data == '':
             data = None
         return data
 
 
+    
+    def clean_tags(self):
+        print '--form clean_tags'
+        try:
+            tags_keep = [str(item) for item in self.cleaned_data['tagsUser'].values_list('name', flat=True)]
+            tags_new = self.cleaned_data['tags']
+            tags_all_data = self['tagsUser']
+            tags_all_list = re.findall(r'<.*?>(.+?)<.*?>', str(tags_all_data))
+            tags_orig = [str(item) for item in self.instance.tags.all().values_list('name', flat=True)]
+            print '-tags_all_list:', tags_all_list
+            tags_diff = [item for item in tags_orig if not item in tags_keep]
+            
+            print '-tags_orig:', tags_orig #working: tags assigned to pin when form created
+            print '-tags_keep:', tags_keep #working: orig tags to be kept
+            print '-tags_diff:', tags_diff #TODO: working: removed tags for deletion, first test if used by other pins
+            print '-tags:', tags_new #working: tags to be assigned to pin
+            data = tags_keep + tags_new
+            print 'returned data:', data
+        except:
+            print '****clean_tags ValueError'
+            raise forms.ValidationError("Provide new tags below or select exiting tags from above.")
+        return data
+
     def clean(self):
+        print '--form clean'
         cleaned_data = super(PinForm, self).clean()
         id = cleaned_data.get('id')
         imgUrl = cleaned_data.get('imgUrl')
         image = cleaned_data.get('image')
         uImage = cleaned_data.get('uImage')
+        #tags = cleaned_data.get('tags')
+        #tagsUser = cleaned_data.get('tagsUser')
         #create saved_data attribute accecable by view with bound form
         self.saved_data = cleaned_data
         
@@ -103,10 +146,11 @@ class PinForm(forms.ModelForm):
        
         else:
             raise forms.ValidationError("Need either a url OR upload.")
+
         #update saved_data
         self.saved_data=self.cleaned_data
         return cleaned_data
 
     class Meta:
         model = Pin
-        exclude = ['submitter', 'thumbnail']
+        exclude = ['submitter', 'thumbnail', 'tagsUser']

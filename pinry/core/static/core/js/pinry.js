@@ -494,7 +494,7 @@ function onLoadData(data) {
 	}
 	
 	//TOUCH DEVICE SETUP features
-	if (!is_touch_device()){
+	if (is_touch_device()){
 		$('.touch-off').toggleClass('touch-off touch-on');
 		$('.touch-on').toggleClass('hide show');
 	}

@@ -494,7 +494,7 @@ function onLoadData(data) {
 	}
 	
 	//TOUCH DEVICE SETUP features
-	if (is_touch_device()){
+	if (!is_touch_device()){
 		$('.touch-off').toggleClass('touch-off touch-on');
 		$('.touch-on').toggleClass('hide show');
 	}
@@ -503,6 +503,10 @@ function onLoadData(data) {
 	$('#loader').hide();
 };
 
+//label tool-tips with ios support
+$(document).on( 'click touchstart', 'label[title]', function(e){	
+	alert(e.target.title)
+});
 
 //FORM SUBMIT FUNCTIONS
 $(document).ready(new function() {
@@ -1107,10 +1111,7 @@ function cancelNewPin(){
 	//get default image
 	$(thumbTarget).attr("src", '/static/core/img/thumb-default.png');
 }
-//tags autocomplete
-$('input[name="tags"]').autocomplete({
-	source: ["tag 1", "tag 2", "tag 3", "tag 4"]
-});
+
 
 /** 
  * UTILITIES

@@ -79,24 +79,34 @@ class PinForm(forms.ModelForm):
     
     def clean_tags(self):
         print '--form clean_tags'
+        tags_new = self.cleaned_data['tags']
+        print '-tags:', tags_new #working: tags to be assigned to pin
         try:
-            tags_keep = [str(item) for item in self.cleaned_data['tagsUser'].values_list('name', flat=True)]
-            tags_new = self.cleaned_data['tags']
             tags_all_data = self['tagsUser']
             tags_all_list = re.findall(r'<.*?>(.+?)<.*?>', str(tags_all_data))
-            tags_orig = [str(item) for item in self.instance.tags.all().values_list('name', flat=True)]
-            print '-tags_all_list:', tags_all_list
-            tags_diff = [item for item in tags_orig if not item in tags_keep]
             
-            print '-tags_orig:', tags_orig #working: tags assigned to pin when form created
-            print '-tags_keep:', tags_keep #working: orig tags to be kept
-            print '-tags_diff:', tags_diff #TODO: working: removed tags for deletion, first test if used by other pins
-            print '-tags:', tags_new #working: tags to be assigned to pin
-            data = tags_keep + tags_new
-            print 'returned data:', data
         except:
-            print '****clean_tags ValueError'
-            raise forms.ValidationError("Provide new tags below or select exiting tags from above.")
+            tags_all_list = None
+        print '-tags_all_list:', tags_all_list
+        try:
+            tags_keep = [str(item) for item in self.cleaned_data['tagsUser'].values_list('name', flat=True)]
+        except:
+            tags_keep = None
+        print '-tags_keep:', tags_keep #working: orig tags to be kept
+        try:
+            tags_orig = [str(item) for item in self.instance.tags.all().values_list('name', flat=True)]
+        except:
+            tags_orig = None
+        print '-tags_orig:', tags_orig #working: tags assigned to pin when form created
+
+        if tags_keep and tags_orig:
+            tags_diff = [item for item in tags_orig if not item in tags_keep]
+            print '-tags_diff:', tags_diff #TODO: working: removed tags for deletion, first test if used by other pins
+        if tags_keep:    
+            data = tags_keep + tags_new
+        else:
+            data = tags_new
+        print 'returned data:', data
         return data
 
     def clean(self):

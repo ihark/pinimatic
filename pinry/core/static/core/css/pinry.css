@@ -223,26 +223,35 @@ body {
 		line-height: 14px;
 		margin-top: 2px;
 	}
+	.background-50{
+		background-color: #eee;
+		opacity:0.8;
+		border: 1px solid #ccc;
+		-webkit-box-shadow: 0 1px 3px #ccc;
+		-moz-box-shadow: 0 1px 3px #ccc;
+		box-shadow: 0 1px 3px #ccc;
+		text-align: center;
+		padding: 2px 0px 4px 0px;
+		margin: 0px 15px 0px 15px;
+		
+	}
 	.pin-options {
-			margin: 5px;
-			line-height: 0px;
-			display: none;
-			right: 15px;
-			position: absolute;
-			padding: 1px 2px 1px 2px;
-			background-color: #eee;
-			border: 1px solid #ccc;
-			-webkit-box-shadow: 0 1px 3px #ccc;
-			   -moz-box-shadow: 0 1px 3px #ccc;
-					box-shadow: 0 1px 3px #ccc;
-			-webkit-border-radius: 3px;
-			   -moz-border-radius: 3px;
-					border-radius: 3px;
-			cursor: pointer;
+		margin: 0px;
+		line-height: 0px;
+		display: none;
+		right: 0px;
+		position: absolute;
+		cursor: pointer;
+		width: 100%;
+	}
+		.pin-options i{
+		margin: 3px;
 		}
-			.pin-options i{
-			margin: 3px;
-			}
+		.pin-options .inline {
+			width:39px;
+			text-align:center;
+			line-height:10px;
+		}
 		.pin-options-btn{
 			right: 0px;
 			top: 0px;
@@ -429,7 +438,7 @@ body {
 	position:relative;
 	display:inline-block;
 	text-align:left;
-	width:100%
+
 }
 .inline.tags > a{
 	float: left;

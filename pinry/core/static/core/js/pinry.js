@@ -339,19 +339,30 @@ function onLoadData(data) {
 				if (authUserO){
 				html += '<div class="pin-options-btn touch-off hide"><i id="options-btn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
 				html += '<div class="pin-options">';
-					html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
-					html += '<i id="delete-btn" title="Delete" class="icon-trash"></i>';
-					html += '</a>';
-					html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
-						html += '<i id="edit-btn" title="Edit" class="icon-edit"></i>';
-					html += '</a>';
-					if (userFav) {
-						html += '<i id="favs" data-state="'+userFav+'" title="Remove Favorite" class="icon-star"></i>';
-					} else {
-						html += '<i id="favs" data-state="'+userFav+'" title="Add Favorite" class="icon-star-empty"></i>';
-					};
-					html += '<i id="repins" data-state="'+userPin+'" title="Re-Pin" class="icon-plus"></i>';
-					html += '<i id="cmnts" data-state="false" title="Comment" class="icon-chat"></i>';
+					html += '<div class="background-50">';
+						html += '<div id="delete-btn" title="Delete" class="inline">'
+							html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
+							html += '<i class="icon-trash"></i>'
+							html += '<br>Delete</a></div>';
+						html += '<div id="edit-btn" title="Edit" class="inline">'
+							html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
+							html += '<i class="icon-edit"></i>'
+							html += '<br>Edit</a></div>';
+						html += '<div id="favs" data-state="'+userFav+'" class="inline">'
+							html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
+							if (userFav) {
+							html += '<i title="Remove Favorite" class="icon-star"></i>';
+							} else {
+							html += '<i title="Add Favorite" class="icon-star icon-star-empty"></i>';
+							};
+							html += '<br>Fav</a></div>'
+						html += '<div id="repins" data-state="'+userPin+'" title="Re-Pin" class="inline">'
+							html += '<a href="'+pinsPrefix+'/re-pin/'+image.id+'/">'
+							html += '<i class="icon-plus"></i><br>Add</a></div>';
+						html += '<div id="cmnts" data-state="true" title="Comment" class="inline">'
+							html += '<a href="'+pinsPrefix+'/cmnt-pin/'+image.id+'/">'
+							html += '<i class="icon-chat"></i><br>Comm</a></div>';
+					html += '</div>';
 				html += '</div>';
 				}
 				//IMAGE
@@ -618,7 +629,7 @@ $(document).on('click', '.pin-options-btn', function(e){
 //Options: Favorite
 $('#favs').live('click', function(e){
 	e.preventDefault();
-	togglePinStat(this, 'icon-star', 'icon-star-empty', '/toggle/pins/Pin/');
+	togglePinStat(this, 'icon-star-empty', '/toggle/pins/Pin/');
 });
 //Options: Repin
 $('#repins').live('click', function(e){
@@ -642,15 +653,23 @@ $('#repins').live('click', function(e){
 //Options: Comment: open form
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
-	var pin = $($(this).closest(".pin"));
-	var id = parseInt(pin.attr('id'));
-	pin.find('.pin-cmnts').append(insertCommentForm(id))
-	pin.find('.pin-cmnts').show()
-	applyLayout()
-	//scroll to comment form
-	ws = getWindowSize()
-	center = (ws.height/2)
-	$('html,body').animate({scrollTop: pin.find('form[name="pin-cmnt-form"]').offset().top-center}, 500);
+	state = $(this).attr('data-state');
+	if (state=="true"){
+		var pin = $($(this).closest(".pin"));
+		var id = parseInt(pin.attr('id'));
+		pin.find('.pin-cmnts').append(insertCommentForm(id));
+		pin.find('.pin-cmnts').show();
+		applyLayout();
+		//scroll to comment form
+		ws = getWindowSize();
+		center = (ws.height/2);
+		$('html,body').animate({scrollTop: pin.find('form[name="pin-cmnt-form"]').offset().top-center}, 500);
+		$(this).attr('data-state', "false");
+		icon = $(this).find('i');
+		icon.toggleClass('icon-chat-empty');
+	}else{
+		cancelCmnt(this);
+	}
 });
 
 //Comment: submit form
@@ -661,25 +680,33 @@ $(document).on( 'submit', '.pin form', function(e){
 	//TODO: validate comment exist here with max length
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
-	togglePinStat(target[0], 'icon-chat', 'icon-chat-empty', cmntURL, null, sData)
+	togglePinStat(target[0], 'icon-chat-empty', cmntURL, null, sData)
 });
 //Comment: cancel form
 $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	e.preventDefault();
 	console.log('click cancel');
-	pcf = $($(this).closest('form[name="pin-cmnt-form"]'));
-	cmnts = pcf.closest('.pin-cmnts');
-	cmnt = pcf.closest('.pin-cmnt');
-	console.log(cmnt[0])
-	if (cmnt[0]){cmnt.children().show()}else{cmnts.hide()}
-	pcf.remove();
-	applyLayout();
-	
+	cancelCmnt(this)
 	//pcfp = pcf.parent('.pin-cmnt')
 	//cmntp.replaceWith(insertComment(result.user.username , result.user.id ,result.comment))//relace edited comment div with new comment
-
-
 });
+function cancelCmnt(target){
+	var pin = $($(target).closest(".pin"));
+	var button = pin.find("#cmnts");
+	var pcf = pin.find('form[name="pin-cmnt-form"]');//pin comment form
+	var cmnts = pcf.closest('.pin-cmnts');
+	var cmnt1 = cmnts.find('.pin-cmnt');//first comment
+	var cmntE = pcf.closest('.pin-cmnt');//current edit comment
+	pcf.remove();
+	button.attr('data-state', 'true');
+	icon = button.find('i');
+	icon.toggleClass('icon-chat-empty');
+	//if there are no existing comments hide the comment section
+	if (!cmnt1[0]){cmnts.hide()}
+	//if there is a comment being edited, show the original comment.
+	if (cmntE[0]){cmnt.children().show()}
+	applyLayout();
+}
 //Comment: post success callback
 function cmntsSuccess(result, pin){
 	console.warn('result of post')
@@ -713,7 +740,7 @@ function insertComment(username, userid, cmntT, cmntId){
 	if (!cmntId){cmntId=""};
 	html += '<p class="pin-cmnt" data-cmnt='+cmntId+'>';
 	html += '<i class="icon cmnts"></i>';
-	html += '<a href="user/'+username+'">' +username+': </a>';
+	html += '<a href="/user/'+username+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';
 	if (userid == authUserO.id){html += '<i class="icon-edit"></i>'}
 	html += '</p> ';
@@ -758,10 +785,13 @@ function insertCommentForm(pinId, cmntT, cmntId){
 - Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
 */
 
-function togglePinStat(targetBtn, tIcon, fIcon, url, id, data){
+function togglePinStat(targetBtn, fIcon, url, id, data){
 	var button = $(targetBtn);
+	console.log(button)
+	var icon = $(button).find('i')
 	var name = button.attr('id');
 	var state = button.attr('data-state');
+	console.log(state)
 	var pin = $($(targetBtn).closest(".pin"));
 	if (url === undefined){
 		url = ""
@@ -789,8 +819,7 @@ function togglePinStat(targetBtn, tIcon, fIcon, url, id, data){
 			count--;
 			countP--;
 			button.attr('data-state', "false");
-			button.addClass(fIcon);
-			button.removeClass(tIcon);
+			icon.toggleClass(fIcon);
 			pin.attr('data-'+name, count);
 			dispText.html(count);
 			if (count == 0) {
@@ -804,8 +833,7 @@ function togglePinStat(targetBtn, tIcon, fIcon, url, id, data){
 			count++;
 			countP++;
 			button.attr('data-state', "true");
-			button.addClass(tIcon);
-			button.removeClass(fIcon);
+			icon.toggleClass(fIcon);
 			pin.attr('data-'+name, count);
 			dispText.html(count);
 			disp.show();

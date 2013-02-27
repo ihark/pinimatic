@@ -21,8 +21,8 @@ var pinA = [];
 var origin = window.location.origin;
 console.warn(origin);
 var av=url(3);//active view
-var authUserO = ajax(userURL, false);//authenticated user object//used to determine current authenticated user
-var aOptions //tracks active pin options floater for touch devices
+var authUserO = ajax(false, userURL, false);//authenticated user object//used to determine current authenticated user
+var aTouchHover //tracks active pin options floater for touch devices
 var vn = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
@@ -42,39 +42,42 @@ function is_touch_device() {
 /** generic function for ajax calls:
  *url: url to make ajax call
  *async: Boolien false makes non async call, Defaults to true
- *cbS: name of function to call on ajax success
- *cbE: name of function to call on ajax error
+ *cbS: success call back function name
+ *cbE: error call back function name
  *reqType: default='GET'
  */
 
-function ajax(url, async, reqType, cbS, cbE, data){
+function ajax(reload, url, async, reqType, cbS, cbE, data){
 	if (async == undefined) async = true;
 	if (reqType == undefined) reqType = 'GET';
 	var rData
 
-	onApiData = function( data, textStatus, XMLHttpRequest) {
-		console.warn(textStatus)
+	onApiData = function( data, ajaxStatus, XMLHttpRequest) {
 		var loc = XMLHttpRequest.getAllResponseHeaders();
-		console.warn(loc)
+		var statusCode = XMLHttpRequest.status;
+		var statusText = XMLHttpRequest.statusText;
+		console.warn(statusCode+' = '+statusText+' ajaxStatus = '+ajaxStatus)
 		//if callback exicute call back
 		if (cbS){
-			cbS()
-		//if data.objects are returned return just the bojects
-		}else if(data.objects){
-				console.warn('data.objects[0] returned below:')
+			cbS(data, ajaxStatus, XMLHttpRequest)
+		//if one object is returned return the object
+		}else if(statusText != "NO CONTENT" && data.objects.length==1){
+				console.warn('one one object returned below:')
 				console.warn(data.objects[0])
 				rData = data.objects[0]
 		//return all data
 		}else{
 			rData = data
-			console.log('data w/o objects returned below:')
+			console.log('streight data returned below:')
 			console.log(rData)
-			if (authUserO && authUserO.username == aProfileO.username || !aProfileO.username){
-				console.log('----reloading data after ajax')
-				loadData(undefined, undefined, true)//reloads data
-				
-			}
 		}
+		//TODO: im not sure what the below if was for but everyting seems to be ok without it.
+		//if (authUserO && authUserO.username == aProfileO.username || !aProfileO.username){
+		if (reload){
+			console.log('--TODO:eliminate need for this--reloading data after ajax')
+			loadData(undefined, undefined, true)//reloads data
+		}
+		//}
 	}
 	console.warn('-ajax - 1 custom ajax()');
 	$.ajax({//1 custom ajax function
@@ -109,7 +112,6 @@ function ajax(url, async, reqType, cbS, cbE, data){
  */
 
 //TODO TEST: fix error with manual scroll jitter, better with below (possibly need to stop ajax calls when no data left via pages??
-//TODO TEST: fix ios scroll to bottom not detected, may have fixed with $(window).bind
 
 //When scrolled all the way to the bottom, add more tiles.
 function onScroll(event) { 
@@ -291,7 +293,7 @@ window.onpopstate = function(e) {
  * 
  */
 
-function onLoadData(data) {
+function onLoadData(data, insert) {
 	data = data.objects;
 	page++;
 	var maxImages = 10 //max images to include on tag/group pin flow cover
@@ -306,7 +308,7 @@ function onLoadData(data) {
 		var userCmnt = false
 		//layout for all views except for those listed below
 		if (av != 'tags'){
-			console.log('-loadData-av != tags')
+			console.log('loadData() av != tags')
 			
 			//package pin data for js access(req for repin)
 			pinA[image.id] = {
@@ -328,7 +330,6 @@ function onLoadData(data) {
 						userCmnt = true;
 					}
 				}
-				console
 				if (image.submitter.id == authUserO.id){
 					userPin = true
 				}
@@ -337,14 +338,14 @@ function onLoadData(data) {
 			html += '<div class="pin image touch-off" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'">';
 				//OPTIONS
 				if (authUserO){
-				html += '<div class="pin-options-btn touch-off hide"><i id="options-btn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
+				html += '<div class="pin-options-btn touch-off hide"><i id="optionsBtn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
 				html += '<div class="pin-options">';
 					html += '<div class="background-50">';
-						html += '<div id="delete-btn" title="Delete" class="inline">'
+						html += '<div id="delete" title="Delete" class="inline">'
 							html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 							html += '<i class="icon-trash"></i>'
 							html += '<br>Delete</a></div>';
-						html += '<div id="edit-btn" title="Edit" class="inline">'
+						html += '<div id="edit" title="Edit" class="inline">'
 							html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
 							html += '<i class="icon-edit"></i>'
 							html += '<br>Edit</a></div>';
@@ -395,23 +396,24 @@ function onLoadData(data) {
 					html += '</l>';
 				}
 				html += '</div>';
-				//COMMENTS     TODO:Change api name to CmntsResource not Comnts
+				//COMMENTS
 				if (authUserO){
 					html += '<div class="section pin-cmnts">';
-						//FORM inserted by click
-						 
-						//CMNTS
 						if (image.comments){ 
 							for (cmnt in image.comments) {
-								//TODO: try to get user object from CmntResource instead or build one so user vars are consistant.
-								console.log(image.comments[cmnt])
+								//TODO: get user object from CmntResource instead or build one so user vars are consistant.
+								//console.log(image.comments[cmnt])
 								html += insertComment(image.comments[cmnt].user.username, image.comments[cmnt].user.id, image.comments[cmnt].comment, parseInt(image.comments[cmnt].id))
 							}
 						}
 					}
 				html += '</div>'//end pin-cmnts;
 			html += '</div>'//end pin;
-			$('#pins').append(html);
+			if (insert=="prepend"){
+				$('#pins').prepend(html);
+			}else{
+				$('#pins').append(html);
+			}
 			
 			//hide elements as required
 			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()//hide fav stat display
@@ -574,18 +576,6 @@ $(document).ready(new function() {
 			}
 		} 
 	}); 
-	//capture form submit funtions
-	$('#re-pin-form').submit(function () { //// catch the form's submit event
-		//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
-		data = $(this).serializeObject()
-		delete data.id
-		data.tags = [data.tags]//TODO: try {} for tags to solve comma parse issue
-		//TODO: validate tags exist here
-		sData = JSON.stringify(data)
-		ajax(pinURL, true, 'POST', undefined, undefined, sData);
-		$('#re-pin').modal('toggle')
-		return false
-	});
 	//load initial pin data
     loadData();
 });
@@ -608,29 +598,58 @@ $(document).on('click', '.pin-options-btn', function(e){
 	id = target[0].id;
 	console.warn(id);
 	target = $('#'+id+' .pin-options');
-	console.warn(aOptions)
+	toggleTouchHover(target)
+	
+});
+/* TOGGLE HOVER ELEMENT by touching another element for touch devices
+*- target is the hover element you want to show on touch
+*- use $(document).on('touchstart', 'select touch element', function(e){get target here} 
+*- the required css is: .class:hover .taget,.class .target.touch-hover{ hover state style }
+*/
+function toggleTouchHover(target){
+	console.warn(aTouchHover)
 	console.warn(target)
-	if(!aOptions){
+	if(!aTouchHover){
 		console.warn('1')
 		target.toggleClass('touch-hover');
-		aOptions = target;
-	}else if(aOptions && aOptions[0] == target[0]){
+		aTouchHover = target;
+	}else if(aTouchHover && aTouchHover[0] == target[0]){
 		console.warn('2')
-		aOptions.toggleClass('touch-hover')
-		aOptions = undefined;
-	}else if(aOptions != undefined && aOptions[0] != target[0]){
+		aTouchHover.toggleClass('touch-hover')
+		aTouchHover = undefined;
+	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
 		console.warn('3')
-		aOptions.toggleClass('touch-hover')
+		aTouchHover.toggleClass('touch-hover')
 		target.toggleClass('touch-hover');
-		aOptions = target;
+		aTouchHover = target;
 	}
+}
+//Comments: ios options
+$(document).on( 'click touchstart', '.pin-cmnt.touch-on .display', function(e){
+	e.preventDefault();
+	console.log('click cmnt');
+	var cmnt = $(this).closest('.pin-cmnt')
+	var opt = cmnt.find('.options')
+	toggleTouchHover(opt)
 }); 
 
 //Options: Favorite
 $('#favs').live('click', function(e){
 	e.preventDefault();
-	togglePinStat(this, 'icon-star-empty', '/toggle/pins/Pin/');
+	togglePinStat(this, 'icon-star-empty', 'POST', '/toggle/pins/Pin/');
 });
+//Options: Delete pin
+$('#delete').live('click', function(e){
+	e.preventDefault();
+	//TODO: this is ugly try $(this).closest(".pin")
+	var pin = $($(this).closest(".pin"));
+	var id = parseInt(pin.attr('id'));
+	console.log('del pin url: '+pinURL+id)
+	ajax(false, pinURL+id, true, 'DELETE');
+	pin.remove()
+	applyLayout()
+});
+
 //Options: Repin
 $('#repins').live('click', function(e){
 	e.preventDefault();
@@ -639,16 +658,35 @@ $('#repins').live('click', function(e){
 	var state = button.attr('data-state');
 	var pin = $($(this).closest(".pin"));
 	var id = parseInt(pin.attr('id'));
-	var data = pinA[id]
+	var data = pinA[id]//get data from pin arrray for this pin for form population
+	//populate repin form
 	$("#re-pin #id_srcUrl").attr("value", data.srcUrl);
 	$("#re-pin #id_imgUrl").attr("value", data.imgUrl);
 	$("#re-pin #id_repin").attr("value", data.repin);
 	$("#re-pin #thumb_id").attr("src", data.imgUrl);
-	//ts = "-moz-box-shadow: 0 2px 12px rgba(0,0,0,.75); -webkit-box-shadow: 0 2px 12px rgba(0,0,0,.75); box-shadow: 0 2px 12px rgba(0,0,0,.75); display: inline-block;";
-	//setStyles(t, ts);
+	//open repin form
 	$('#re-pin.modal').modal('toggle')
-	console.warn(data)
 });
+//repin: on form submit 
+$('#re-pin-form').submit(function () { //// catch the form's submit event
+	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
+	data = $(this).serializeObject()
+	delete data.id
+	data.tags = [data.tags]//TODO: try {} for tags to solve comma parse issue
+	//TODO: validate tags exist here
+	sData = JSON.stringify(data)
+	ajax(false, pinURL, true, 'POST', onRepinSuccess, undefined, sData);
+	$('#re-pin').modal('toggle')
+	return false
+});
+function onRepinSuccess(data, ajaxStatus, XMLHttpRequest){
+	console.log('onRepinSuccess');
+	console.log(data);
+	data = {objects:[data]};
+	console.log(data);
+	console.log(data.length);
+	onLoadData(data, 'prepend');
+}
 
 //Options: Comment: open form
 $('#cmnts').live('click', function(e){
@@ -671,7 +709,6 @@ $('#cmnts').live('click', function(e){
 		cancelCmnt(this);
 	}
 });
-
 //Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
@@ -680,9 +717,23 @@ $(document).on( 'submit', '.pin form', function(e){
 	//TODO: validate comment exist here with max length
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
-	togglePinStat(target[0], 'icon-chat-empty', cmntURL, null, sData)
+	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
 });
-//Comment: cancel form
+//Comment: toggel callback
+function cmntsSuccess(result, pin){
+	console.warn('result of post')
+	console.warn(result)
+	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
+	if(cmnt.length > 0){
+		console.warn('-id exists')
+		cmnt.replaceWith(insertComment(result.user.username , result.user.id ,result.comment, result.id))//relace edited comment div with new comment
+	}else{
+		pin.find('.pin-cmnts').append(insertComment(result.user.username , result.user.id ,result.comment, result.id))//append new comment to end of comments
+	}
+	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
+	applyLayout()
+}
+//Comment: cancel form click handler
 $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	e.preventDefault();
 	console.log('click cancel');
@@ -690,6 +741,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	//pcfp = pcf.parent('.pin-cmnt')
 	//cmntp.replaceWith(insertComment(result.user.username , result.user.id ,result.comment))//relace edited comment div with new comment
 });
+//Comment: cancel form (for post & edit)
 function cancelCmnt(target){
 	var pin = $($(target).closest(".pin"));
 	var button = pin.find("#cmnts");
@@ -707,22 +759,22 @@ function cancelCmnt(target){
 	if (cmntE[0]){cmnt.children().show()}
 	applyLayout();
 }
-//Comment: post success callback
-function cmntsSuccess(result, pin){
-	console.warn('result of post')
-	console.warn(result)
-	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
-	if(cmnt.length > 0){
-		console.warn('-id exists')
-		cmnt.replaceWith(insertComment(result.user.username , result.user.id ,result.comment))//relace edited comment div with new comment
-	}else{
-		pin.find('.pin-cmnts').append(insertComment(result.user.username , result.user.id ,result.comment))//append new comment to end of comments
-	}
-	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
-	applyLayout()
-}
+
+
+
+//Comment: delete
+$(document).on( 'click', '.pin-cmnt .delete', function(e){
+	e.preventDefault();
+	console.log('click delete');
+	var cmnt = $(this).closest('.pin-cmnt')
+	var id = cmnt.attr("data-cmnt");
+	ajax(false, cmntURL+id, true, "DELETE")
+	cmnt.remove();
+	applyLayout();
+});
+
 //Comment: edit
-$(document).on('click', '.pin-cmnt [class^="icon-"]', function(e){
+$(document).on('click', '.pin-cmnt .edit', function(e){
 	var pin = $($(this).closest(".pin"));
 	var pinId = parseInt(pin.attr('id'));
 	cmnt = $(this).closest(".pin-cmnt")
@@ -738,11 +790,11 @@ $(document).on('click', '.pin-cmnt [class^="icon-"]', function(e){
 function insertComment(username, userid, cmntT, cmntId){
 	var html = ""
 	if (!cmntId){cmntId=""};
-	html += '<p class="pin-cmnt" data-cmnt='+cmntId+'>';
+	html += '<p class="pin-cmnt touch-off" data-cmnt='+cmntId+'>';
 	html += '<i class="icon cmnts"></i>';
 	html += '<a href="/user/'+username+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';
-	if (userid == authUserO.id){html += '<i class="icon-edit"></i>'}
+	if (userid == authUserO.id){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '</p> ';
 	return html
 }
@@ -773,37 +825,40 @@ function insertCommentForm(pinId, cmntT, cmntId){
 //TODO: add follow function into this
 
 /*Toggles Pin Status for options bar icos and for pin sats area, icons & counts: 
-- xxx: is a unique name of the stat to toggle
-- targetBtn: the HTML element acting as the toggle button
-  must have: id="xxx" set staticly by onLoadData
-  must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
-- .pin #id-Pin: must have: data-xxx="qty of stat"
-  must have: class="display text xxx" to dispay the current count
-  must have: class="display icon-iconname xxx" to display's the icon (must be 11px X 11p)
-- pin.profile: must have:data-xxx="qty of stat" 
-  must have: class="display text xxx" to dispay the current count
-- Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
+*- xxx: is a unique name of the stat to toggle
+*- targetBtn: the HTML element acting as the toggle button
+*  must have: id="xxx" set staticly by onLoadData
+*  must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
+*- .pin #id-Pin: must have: data-xxx="qty of stat"
+*  must have: class="display text xxx" to dispay the current count
+*  must have: class="display icon-iconname xxx" to display's the icon (must be 11px X 11p)
+*- pin.profile: must have:data-xxx="qty of stat" 
+*  must have: class="display text xxx" to dispay the current count
+*- Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
 */
 
-function togglePinStat(targetBtn, fIcon, url, id, data){
+function togglePinStat(targetBtn, fIcon, type, url, id, data){
 	var button = $(targetBtn);
-	console.log(button)
 	var icon = $(button).find('i')
 	var name = button.attr('id');
 	var state = button.attr('data-state');
-	console.log(state)
 	var pin = $($(targetBtn).closest(".pin"));
+	//if no url set to pin url and current pin id
 	if (url === undefined){
 		url = ""
 		id = ""
+	//if url & no id get id from curent pin
 	}else if (id === undefined){
 		id = parseInt(pin.attr('id'));
 		url = url+id+'/';
+	//if id is null do not use id
 	}else if (id === null){
 		url = url
+	//
 	}else if (id){
 		url = url+id+'/'
 	}
+	if (!type){ type = 'POST'};
 	var count = pin.attr('data-'+name);
 	var disp = pin.find('.display.'+name);
 	var dispText = pin.find('.display.text.'+name);
@@ -846,15 +901,15 @@ function togglePinStat(targetBtn, fIcon, url, id, data){
 			window[name+'Success'](result, pin);
 		}
 	}
-	
+	console.log(url)
 	if (typeof url == "string" && url != ""){
 		console.warn('-ajax - 3 togglepin()');
 		$.ajax({//3
 			url: pinsPrefix+url,
-			type: 'POST',
+			type: type,
 			data: data,
 			contentType: 'application/json',
-			success: $.proxy(this.onSuccess, this),//TODO: swap fav image
+			success: $.proxy(this.onSuccess, this),
 			error: function(jqXHR, settings) {
 				console.warn('addfav - ajax error');
 			},

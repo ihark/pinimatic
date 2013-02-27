@@ -77,6 +77,8 @@ class PinForm(forms.ModelForm):
         data = self.cleaned_data['repin']
         if data == '':
             data = None
+        else:
+            data = Pin.objects.get(id = data)
         return data
 
 

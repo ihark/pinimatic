@@ -45,7 +45,11 @@
         {% endif %}
 
         {% block yield %}{% endblock %}
-
+		<div id="loader" class="container">
+			<div class="">
+				<img src="/static/core/img/loader.gif" alt="Loader">
+			</div>
+		</div>
         {% new_pin request %}
 		{% re_pin request %}
 

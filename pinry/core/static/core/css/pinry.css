@@ -88,8 +88,11 @@ body {
     }
 
 #loader {
-    margin-top: 70px;
-    text-align: center;
+	text-align: center;
+	z-index: 1000;
+	width: 100%;
+	position: fixed;
+	bottom: 100px;
 }
 
 
@@ -321,12 +324,13 @@ body {
 		font-size: 11px;
 		cursor: default;
 	}
-		.pin-cmnt [class^="icon-"] {
+		.pin-cmnt .options {
 			display: none;
 			float:right;
 			cursor:pointer;
 		}
-		.pin-cmnt:hover [class^="icon-"] {
+		.pin-cmnt:hover .options,
+		.pin-cmnt .options.touch-hover{
 			display: block;
 			float:right;
 		}

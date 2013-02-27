@@ -131,7 +131,7 @@ class PinResource(ModelResource):
         queryset = Pin.objects.all()
         resource_name = 'pin'
         include_resource_uri = False
-        allowed_methods = ['get', 'post']
+        allowed_methods = ['get', 'post', 'delete']
         filtering = {
             'published': ['gt'],
             'submitter': ALL_WITH_RELATIONS,
@@ -240,7 +240,7 @@ class PinResource(ModelResource):
     '''
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
-        bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='')
+        bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='', comments=[])
         return bundle
         
 class CmntResource(ModelResource):
@@ -259,7 +259,7 @@ class CmntResource(ModelResource):
         queryset = Comment.objects.all()
         resource_name = 'cmnt'
         include_resource_uri = False
-        allowed_methods = ['get', 'post']
+        allowed_methods = ['get', 'post', 'delete']
         filtering = {
             'object_pk': ALL_WITH_RELATIONS,
             'content_type': ALL_WITH_RELATIONS,

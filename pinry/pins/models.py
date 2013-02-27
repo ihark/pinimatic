@@ -49,7 +49,6 @@ class Pin(models.Model):
             default_storage.delete(exPin.thumbnail.url)
             self.srcUrl = self.imgUrl
 
-
     def save(self, *args, **kwargs):
         hash_name = os.urandom(32).encode('hex')
         #create image

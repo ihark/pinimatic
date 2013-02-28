@@ -5,8 +5,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+		
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
         <title>{{ site_name }} - {% block title %}{% endblock %}</title>
-
+		
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Monoton">
+		
         {% compress css %}
             <link rel="stylesheet" href="/static/vendor/bootstrap/2.2.2/css/bootstrap.css">
 			<link rel="stylesheet" href="/static/core/css/pinry.css">
@@ -14,7 +20,7 @@
             <link rel="stylesheet" href="/static/vendor/file-uploader/fileuploader.css">
         {% endcompress %}
 
-        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Monoton">
+        
     </head>
     <body style="background-color:#1F1F1F; background-image:url('/static/core/img/backgrounds/pw_maze_black.png');">
         <div class="navbar navbar-fixed-top">

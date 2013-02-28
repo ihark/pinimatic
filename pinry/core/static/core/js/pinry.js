@@ -32,8 +32,19 @@ var vn = { //viewname:"displayname"
 	cmnts:"Notes",
 	pop:"Popular"
 }
+//TOUCH: USER AGENT DETECTION 
+//alert('user agent: '+navigator.userAgent)
+//"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
 
-//TEST FOR TOUCH DEVICE
+if( /iPhone|iPod/i.test(navigator.userAgent) ) {
+	$('head').append('<meta name = "viewport" content = "initial-scale = .6">');
+}
+if( /iPad/i.test(navigator.userAgent) ) {
+	$('head').append('<meta name = "viewport" content = "initial-scale = 1.3">');
+}
+
+
+//TOUCH: TEST FOR TOUCH DEVICE
 function is_touch_device() {
 	return !!('ontouchstart' in window) // works on most browsers 
 	|| !!('onmsgesturechange' in window); // works on ie10)
@@ -505,19 +516,19 @@ function onLoadData(data, insert) {
 			applyLayout();
 		}
 	}
-	
-	//TOUCH DEVICE SETUP features
-	if (is_touch_device()){
-		$('.touch-off').toggleClass('touch-off touch-on');
-		$('.touch-on').toggleClass('hide show');
-	}
-	
 	isLoading = false;
 	$('#loader').hide();
+	
+	//TOUCH: DEVICE SETUP
+	if (is_touch_device() && authUserO.id){
+		$('.touch-off').toggleClass('touch-off touch-on');
+		$('.touch-on.hide').toggleClass('hide show');
+	}
 };
 
-//label tool-tips with ios support
-$(document).on( 'click touchstart', 'label[title]', function(e){	
+
+//TOUCH: form label tool-tips with ios support
+$(document).on( 'touchstart', 'label[title]', function(e){	
 	alert(e.target.title)
 });
 
@@ -526,9 +537,10 @@ $(document).ready(new function() {
 	//TODO TEST: chanded $(document) to $(window) for ios compat
     //TODO TRY: does this need to be in doc ready? 
 	$(window).bind('scroll', onScroll);
-	$(window).bind('touchstart', onScroll);
-	$(window).bind('touchend', onScroll);
-	$(window).bind('touchcancel', onScroll);
+	//TODO: TOUCH: is this necessary?
+	//$(window).bind('touchstart', onScroll);
+	//$(window).bind('touchend', onScroll);
+	//$(window).bind('touchcancel', onScroll);
 	
 	var _super = $.ajaxSettings.xhr;
 	$.ajaxSetup({
@@ -592,8 +604,8 @@ $('.fancybox').fancybox({
 /**Pin Functions.
  * 
  */
-//pin options button for touch devices
-$(document).on('click', '.pin-options-btn', function(e){
+//TOUCH: pin options button for touch devices
+$(document).on('touchstart', '.pin-options-btn', function(e){
 	target = $(e.target).closest('.pin');
 	id = target[0].id;
 	console.warn(id);
@@ -601,31 +613,9 @@ $(document).on('click', '.pin-options-btn', function(e){
 	toggleTouchHover(target)
 	
 });
-/* TOGGLE HOVER ELEMENT by touching another element for touch devices
-*- target is the hover element you want to show on touch
-*- use $(document).on('touchstart', 'select touch element', function(e){get target here} 
-*- the required css is: .class:hover .taget,.class .target.touch-hover{ hover state style }
-*/
-function toggleTouchHover(target){
-	console.warn(aTouchHover)
-	console.warn(target)
-	if(!aTouchHover){
-		console.warn('1')
-		target.toggleClass('touch-hover');
-		aTouchHover = target;
-	}else if(aTouchHover && aTouchHover[0] == target[0]){
-		console.warn('2')
-		aTouchHover.toggleClass('touch-hover')
-		aTouchHover = undefined;
-	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
-		console.warn('3')
-		aTouchHover.toggleClass('touch-hover')
-		target.toggleClass('touch-hover');
-		aTouchHover = target;
-	}
-}
-//Comments: ios options
-$(document).on( 'click touchstart', '.pin-cmnt.touch-on .display', function(e){
+
+//Options > Comment: TOUCH: handler to toggle options hover for touch devices
+$(document).on( 'MSPointerDown touchstart', '.pin-cmnt.touch-on .display', function(e){
 	e.preventDefault();
 	console.log('click cmnt');
 	var cmnt = $(this).closest('.pin-cmnt')
@@ -633,12 +623,12 @@ $(document).on( 'click touchstart', '.pin-cmnt.touch-on .display', function(e){
 	toggleTouchHover(opt)
 }); 
 
-//Options: Favorite
+//Options > Favorite
 $('#favs').live('click', function(e){
 	e.preventDefault();
 	togglePinStat(this, 'icon-star-empty', 'POST', '/toggle/pins/Pin/');
 });
-//Options: Delete pin
+//Options > Delete pin
 $('#delete').live('click', function(e){
 	e.preventDefault();
 	//TODO: this is ugly try $(this).closest(".pin")
@@ -650,7 +640,7 @@ $('#delete').live('click', function(e){
 	applyLayout()
 });
 
-//Options: Repin
+//Options > Repin:
 $('#repins').live('click', function(e){
 	e.preventDefault();
 	var button = $(this);
@@ -667,7 +657,7 @@ $('#repins').live('click', function(e){
 	//open repin form
 	$('#re-pin.modal').modal('toggle')
 });
-//repin: on form submit 
+//Options > repin: on form submit 
 $('#re-pin-form').submit(function () { //// catch the form's submit event
 	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
 	data = $(this).serializeObject()
@@ -688,7 +678,7 @@ function onRepinSuccess(data, ajaxStatus, XMLHttpRequest){
 	onLoadData(data, 'prepend');
 }
 
-//Options: Comment: open form
+//Options > Comment: open form
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
 	state = $(this).attr('data-state');
@@ -709,7 +699,7 @@ $('#cmnts').live('click', function(e){
 		cancelCmnt(this);
 	}
 });
-//Comment: submit form
+//Options > Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
 	data = $(this).serializeObject()
@@ -719,7 +709,7 @@ $(document).on( 'submit', '.pin form', function(e){
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
 	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
 });
-//Comment: toggel callback
+//Options > Comment: toggel callback
 function cmntsSuccess(result, pin){
 	console.warn('result of post')
 	console.warn(result)
@@ -733,7 +723,7 @@ function cmntsSuccess(result, pin){
 	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
 	applyLayout()
 }
-//Comment: cancel form click handler
+//Options > Comment: cancel form click handler
 $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	e.preventDefault();
 	console.log('click cancel');
@@ -741,7 +731,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	//pcfp = pcf.parent('.pin-cmnt')
 	//cmntp.replaceWith(insertComment(result.user.username , result.user.id ,result.comment))//relace edited comment div with new comment
 });
-//Comment: cancel form (for post & edit)
+//Options > Comment: cancel form (for post & edit)
 function cancelCmnt(target){
 	var pin = $($(target).closest(".pin"));
 	var button = pin.find("#cmnts");
@@ -760,9 +750,7 @@ function cancelCmnt(target){
 	applyLayout();
 }
 
-
-
-//Comment: delete
+//Options > Comment: delete
 $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	e.preventDefault();
 	console.log('click delete');
@@ -773,7 +761,7 @@ $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	applyLayout();
 });
 
-//Comment: edit
+//Options > Comment: edit
 $(document).on('click', '.pin-cmnt .edit', function(e){
 	var pin = $($(this).closest(".pin"));
 	var pinId = parseInt(pin.attr('id'));
@@ -786,19 +774,19 @@ $(document).on('click', '.pin-cmnt .edit', function(e){
 	pin.css('z-index', 1000);
 });
 
-//Comment: insert comment
+//Options > Comment: insert comment
 function insertComment(username, userid, cmntT, cmntId){
 	var html = ""
 	if (!cmntId){cmntId=""};
 	html += '<p class="pin-cmnt touch-off" data-cmnt='+cmntId+'>';
+	if (userid == authUserO.id){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '<i class="icon cmnts"></i>';
 	html += '<a href="/user/'+username+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';
-	if (userid == authUserO.id){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '</p> ';
 	return html
 }
-//Comment: insert comment form
+//Options > Comment: insert comment form
 function insertCommentForm(pinId, cmntT, cmntId){
 	var html = ""
 	html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">';
@@ -950,6 +938,7 @@ $('#Category-all').live('click', function(event){
 });
 
 //toggle follow / unfollow
+//TODO: see if it makes sence to refactor this into generic toggle
 function follow(targetBtn, display) {
 	var button = $(targetBtn);
 	if (display){var name = display}else{
@@ -990,12 +979,6 @@ function follow(targetBtn, display) {
 		url: url,
 		type: 'POST',
 		contentType: 'application/json',
-		/* headers:  {
-			'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
-		},
-		beforeSend: function(jqXHR, settings) {
-			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-		}, */
 		success: $.proxy(this.onFollow, this),//todo: need to detect if followed or not
 		error: function(jqXHR, settings) {
 			console.warn('follow - ajax error');
@@ -1004,7 +987,7 @@ function follow(targetBtn, display) {
 }
 
 /**
- * tag/group view click handlers
+ * Tag/Group view functions
  */
 //add click handler for pin functions
 //tag/groups
@@ -1199,6 +1182,30 @@ function cancelNewPin(){
 /** 
  * UTILITIES
  */
+ 
+/* TOGGLE TOUCH HOVER ELEMENT by touching another element for touch devices
+*- target is the hover element you want to show on touch
+*- use $(document).on('touchstart', 'select touch element', function(e){get target here} 
+*- the required css is: .class:hover .taget,.class .target.touch-hover{ hover state style }
+*/
+function toggleTouchHover(target){
+	console.warn(aTouchHover)
+	console.warn(target)
+	if(!aTouchHover){
+		console.warn('1')
+		target.toggleClass('touch-hover');
+		aTouchHover = target;
+	}else if(aTouchHover && aTouchHover[0] == target[0]){
+		console.warn('2')
+		aTouchHover.toggleClass('touch-hover')
+		aTouchHover = undefined;
+	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
+		console.warn('3')
+		aTouchHover.toggleClass('touch-hover')
+		target.toggleClass('touch-hover');
+		aTouchHover = target;
+	}
+}
 //checks if value is in an array return false or value
 function inArray(value, array){
 	var i;

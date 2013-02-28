@@ -97,7 +97,7 @@ body {
 
 
 #tags {
-    padding: 0px 0px 5px 20px;
+    padding-bottom: 5px;
 }
 
 	.tag {
@@ -108,7 +108,7 @@ body {
 		font-weight: Bold;
 		line-height: 13px;
 		color: #777;
-		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+		text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.97);
 		white-space: nowrap;
 		vertical-align: baseline;
 		border: 1px solid #ccc;
@@ -329,11 +329,15 @@ body {
 			float:right;
 			cursor:pointer;
 		}
-		.pin-cmnt:hover .options,
-		.pin-cmnt .options.touch-hover{
+			.pin-cmnt .options  i{
+			margin-left: 5px;
+		}
+		.pin-cmnt.touch-off:hover .options,
+		.pin-cmnt.touch-on .options.touch-hover{
 			display: block;
 			float:right;
 		}
+
 	.pin .pin-tags{
 		
 	}
@@ -578,7 +582,7 @@ body {
   vertical-align: top;
   text-align: center;
   display: inline-block;
-  margin-right: 30px;
+  margin-right: 25px;
   margin-top: 5px;
   width: 200px;
   height: 100%;

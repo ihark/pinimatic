@@ -19,7 +19,7 @@ from operator import attrgetter
 
 from django.contrib import messages
 from tastypie.exceptions import ImmediateHttpResponse
-from tastypie.http import HttpNoContent, HttpForbidden
+from tastypie.http import HttpNoContent, HttpForbidden, HttpGone
 
 #resource path = pinry.api.api.SomeResource
 
@@ -249,20 +249,26 @@ class PinResource(ModelResource):
         
 
     def obj_delete(self, bundle, **kwargs):
-
-        if not hasattr(bundle.obj, 'delete'):
-            try:
-                bundle.obj = self.obj_get(bundle=bundle, **kwargs)
-            except ObjectDoesNotExist:
-                raise NotFound("A model instance matching the provided arguments could not be found.")
-        if bundle.request.user == bundle.obj.submitter:
-            self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
-            bundle.obj.delete()
-        else:
-            bundle.data = {"django_messages": [{"extra_tags": "alert alert-error", "message": 'You can not delete other users pins.', "level": 25}]}
-            print bundle
-            raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
-
+            if not hasattr(bundle.obj, 'delete'):
+                try:
+                    bundle.obj = self.obj_get(bundle=bundle, **kwargs)
+                except ObjectDoesNotExist:
+                    raise NotFound("A model instance matching the provided arguments could not be found.")
+            if bundle.request.user == bundle.obj.submitter:
+                self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
+                bundle.obj.delete()
+                bundle.data = {"django_messages": [{"extra_tags": "alert alert-success", "message": 'Delete was successfull.', "level": 25}]}
+                print bundle
+                #using HttpGone in stead of HttpNoContent so message is displaied.
+                #TODO: how to add message to normal tasypie responce instead of forcing it here.  
+                #Also, why is it not getting picked up by middleware, so i can gust use django messages.
+                raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))
+            else:
+                bundle.data = {"django_messages": [{"extra_tags": "alert alert-error", "message": 'You can not delete other users pins.', "level": 25}]}
+                print bundle
+                raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
+        
+        
 class CmntResource(ModelResource):
     user = fields.ToOneField('pinry.api.api.UserResource', 'user', full=True)
     content_type_id = fields.CharField(attribute = 'content_type_id')

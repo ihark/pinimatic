@@ -67,10 +67,10 @@ class CustomTagField(forms.CharField):
                 
 class UserTagsWidget(forms.SelectMultiple):
     def render(self, name, value, attrs=None):
-        print '----UserTagsWidget render exicuted'
+        #print '----UserTagsWidget render exicuted'
         #self.choices = set(self.choices)
         #print self.choices
-        for c in self.choices: print 'choices:', c
+        #for c in self.choices: print 'choices:', c
         
         return super(UserTagsWidget, self).render(name, value, attrs)
                 
@@ -78,8 +78,8 @@ class UserTagsField(forms.ModelMultipleChoiceField):
     widget = UserTagsWidget
     def clean(self, value):
         value = super(UserTagsField, self).clean(value)
-        print '----UserTagsField form clean exicuted'
-        print '------vlue:', value
+        #print '----UserTagsField form clean exicuted'
+        #print '------vlue:', value
         
         return value
         

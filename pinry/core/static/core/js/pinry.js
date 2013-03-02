@@ -77,6 +77,7 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 		var statusCode = xhr.status;
 		var statusText = xhr.statusText;
 		console.warn(statusCode+' = '+statusText+' ajaxStatus = '+ajaxStatus)
+		console.log(xhr)
 		//precess & display ajax messages
 		var jsonMessage = getMessages(xhr)
 		alertFade()//set messages to fade out
@@ -597,6 +598,7 @@ $(document).ready(new function() {
 			};
 			return xhr;
 		},
+		headers: { "cache-control": "no-cache" },//to prevent ios safari from caching.
 		//TODO: temp added for X-CSRFToken header
 		beforeSend: function(xhr, settings) {
 			console.log('-------------before send--');
@@ -679,7 +681,7 @@ $('#delete').live('click', function(e){
 	var pin = $($(this).closest(".pin"));
 	var id = parseInt(pin.attr('id'));
 	console.log('del pin url: '+pinURL+id)
-	ajax(false, pinURL+id, true, 'DELETE');
+	ajax(false, pinURL+id+'/', true, 'DELETE');
 	pin.remove()
 	applyLayout()
 });

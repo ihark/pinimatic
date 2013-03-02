@@ -1,4 +1,8 @@
-$(document).ready(function() {
+$(document).ready(
+	alertFade()
+);
+
+function alertFade() {
     var delayTime  = 3000,
         alerts     = $('.alert');
 
@@ -7,6 +11,5 @@ $(document).ready(function() {
     alerts.each(function() {
         $(this).delay(delayTime).fadeOut('slow');
         delayTime -= 250;
-        console.log(delayTime);
     });
-});
+}

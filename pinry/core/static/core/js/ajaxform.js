@@ -1,7 +1,7 @@
 ﻿console.warn('ajaxform.js has exicuted: waiting for doc ready');
+var messageDivId = 'messageList';
 $(document).ready(function () {
 	console.warn('ajax form document ready');
-	var messageListName = 'messageList';
 	////ajax submit
 	$('#ajaxform').submit(function () { //// catch the form's submit event
 		var csrfToken = 'placeholder';
@@ -11,7 +11,7 @@ $(document).ready(function () {
 			type : $(this).attr('method'), //// GET or POST from method attribute
 			url : $(this).attr('action'), //// url from method attribute
  			headers:  {
-			'x-requested-with' : 'XMLHttpRequest' //// Required for cors with django, form validation and ajax messages , seems to be excluded from file fields
+			'x-requested-with' : 'XMLHttpRequest' //// Required for cors with django, form validation and ajax messages , seems to be excluded from forms with file fields
 			},
 			xhrFields: {
 			withCredentials: true //// enables xcrf validation with all but IE
@@ -21,53 +21,40 @@ $(document).ready(function () {
 				//xhr.setRequestHeader("X-CSRFToken", $('#csrfmiddlewaretoken').val()); //work arround for IE: gets cookie from from but problem with '' instad of "" used. TOTRY: put the cookie in the js instead.
 				////Only use with SSL! manual authentication, last resort
 				//xhr.setRequestHeader("Authorization", "user:pass");
-				clearMessages(messageListName);
+				clearMessages(messageDivId);
 				clear_form_field_errors('#ajaxform');
 			},
 			success : function (data, textStatus, xhr) { // on success..
-				var contentType = xhr.getResponseHeader("Content-Type");
-				if (contentType == "application/javascript" || contentType == "application/json") {
-					var jsonMessage = $.parseJSON(xhr.responseText);
-					$.each(jsonMessage, function(index, value) {
-						if (index === "django_messages") {
-							$.each(jsonMessage.django_messages, function (i, item) {
-								addMessage(messageListName, item.message, item.extra_tags);
-								////if success message
-								if (item.extra_tags == "alert alert-success"){
-									$("#cancel").text("Close");
-									$("#btnsubmit").remove();
-								////if not logged in
-								} else if (item.extra_tags.indexOf('login') > -1){
-									//chrome requires return false in submit or it crashs
-									//$("#ajaxform").attr( 'onsubmit', 'popForm(this)' );
-									//$("#ajaxform").attr( 'action', "http:"+baseurl+"/pins/new-pin/");
-									$("#btnsubmit").text('LogIn');
-									$('#ajaxform').unbind('submit').find('input:submit,input:image,button:submit').unbind('click');
-									$('#ajaxform').submit(function () {
-										data = $("#ajaxform").serialize()
-										popLoc(data);
-										removeOverlay();
-										return false;
-									});
-								}
-							});
-						////handle general form errors
-						} else if (index === "__all__") {
-							$.each(jsonMessage.__all__, function (i, item) {
-								addMessage(messageListName, item.message, item.extra_tags);
-							});
-						////handle form field errors
-						} else {
-							$.each(jsonMessage[index], function (i, item) {
-								apply_form_field_error(index, item.message, item.extra_tags);
-							});
-						}
-					});
-                }
+				var jsonMessage = getMessages(xhr, messageDivId)
+				console.log( jsonMessage )
+				$.each(jsonMessage, function(index, value) {
+					if (index === "django_messages") {
+						$.each(jsonMessage.django_messages, function (i, item) {
+							////if success message
+							if (item.extra_tags == "alert alert-success"){
+								$("#cancel").text("Close");
+								$("#btnsubmit").remove();
+							////if not logged in
+							} else if (item.extra_tags.indexOf('login') > -1){
+								//chrome requires return false in submit or it crashs
+								//$("#ajaxform").attr( 'onsubmit', 'popForm(this)' );
+								//$("#ajaxform").attr( 'action', "http:"+baseurl+"/pins/new-pin/");
+								$("#btnsubmit").text('LogIn');
+								$('#ajaxform').unbind('submit').find('input:submit,input:image,button:submit').unbind('click');
+								$('#ajaxform').submit(function () {
+									data = $("#ajaxform").serialize()
+									popLoc(data);
+									removeOverlay();
+									return false;
+								});
+							}
+						});
+					}
+				});
 			},
 			error : function(xhr, textStatus, errorThrown) {
 				console.warn("error: xhr.status: "+xhr.status+" / textStatus: "+textStatus);
-				addMessage(messageListName,"There was an error connectiong to the server, please try again later.", "alert alert-error");
+				addMessage(messageDivId,"There was an error connectiong to the server: "+xhr.status, "alert alert-error");
             },
 		});
 		return false;
@@ -81,8 +68,41 @@ $(document).ready(function () {
 		// nw.focus()
 	// }	
 // }
+function getMessages(xhr){
+	console.log('getMessages')
+	var contentType = xhr.getResponseHeader("Content-Type");
+	console.log(contentType)
+	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {
+		try{
+			var jsonMessage = $.parseJSON(xhr.responseText);
+			console.log('getMessages')
+			$.each(jsonMessage, function(index, value) {
+				console.log(index)
+				if (index === "django_messages") {
+					$.each(jsonMessage.django_messages, function (i, item) {
+						addMessage(messageDivId, item.message, item.extra_tags);
+					});
+				////handle general form errors
+				} else if (index === "__all__") {
+					$.each(jsonMessage.__all__, function (i, item) {
+						addMessage(messageDivId, item.message, item.extra_tags);
+					});
+				////handle form field errors
+				} else {
+					$.each(jsonMessage[index], function (i, item) {
+						apply_form_field_error(index, item.message, item.extra_tags);
+					});
+				}
+			});
+		}
+		catch(err){
+			console.log(err)
+		}
+	}
+	return jsonMessage
+}
 function popLoc(data) {
-	//&mode=save tells view to save pin in lew of POST
+	//&mode=save tells view to save pin without "POST"
 	nw = window.open("http:"+baseurl+"/new-pin/?"+data+"&save=True", 'popup', 'width=800, height=400, resizeable=true, scrollbars');
 	if (window.focus) {
 		nw.focus()

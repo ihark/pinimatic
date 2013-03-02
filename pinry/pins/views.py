@@ -44,7 +44,7 @@ def AjaxSubmit(request):
                 messages.error(request, 'Oops! Somthing went wrong while saving this pin.')
     else:
         print '--- user did not pass authentication----'#
-        messages.error(request, 'You are not loged in.', extra_tags='login')
+        messages.error(request, 'Please log in to submit this item.', extra_tags='login')
     
     return HttpResponse( simplejson.dumps( form.errors ), mimetype='application/json' ) 
     

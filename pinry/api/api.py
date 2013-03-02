@@ -12,10 +12,14 @@ from tastypie.authorization import DjangoAuthorization
 from pinry.pins.models import Pin
 from follow.models import Follow
 from django.http import HttpResponse
-from django.utils import simplejson as json
+from django.utils import simplejson
 
 from django.db.models import Count, Sum, F
 from operator import attrgetter
+
+from django.contrib import messages
+from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.http import HttpNoContent, HttpForbidden
 
 #resource path = pinry.api.api.SomeResource
 
@@ -149,7 +153,7 @@ class PinResource(ModelResource):
             #add comments to pin
             cqs = Comment.objects.filter(object_pk__exact=p.id).order_by('id').values('id', 'user_id', 'comment', 'submit_date', 'is_public')
             p.comments = cqs
-            #add username to comments
+            #add user to comments
             for c in cqs:
                 uqs = User.objects.filter(id__exact=c['user_id']).values()
                 c['user'] = uqs[0]
@@ -243,6 +247,22 @@ class PinResource(ModelResource):
         bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='', comments=[])
         return bundle
         
+
+    def obj_delete(self, bundle, **kwargs):
+
+        if not hasattr(bundle.obj, 'delete'):
+            try:
+                bundle.obj = self.obj_get(bundle=bundle, **kwargs)
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+        if bundle.request.user == bundle.obj.submitter:
+            self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
+            bundle.obj.delete()
+        else:
+            bundle.data = {"django_messages": [{"extra_tags": "alert alert-error", "message": 'You can not delete other users pins.', "level": 25}]}
+            print bundle
+            raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
+
 class CmntResource(ModelResource):
     user = fields.ToOneField('pinry.api.api.UserResource', 'user', full=True)
     content_type_id = fields.CharField(attribute = 'content_type_id')

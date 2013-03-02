@@ -35,22 +35,32 @@ var vn = { //viewname:"displayname"
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
-
+//set up screen size
 if( /iPhone|iPod/i.test(navigator.userAgent) ) {
 	$('head').append('<meta name = "viewport" content = "initial-scale = .6">');
 }
 if( /iPad/i.test(navigator.userAgent) ) {
-	$('head').append('<meta name = "viewport" content = "initial-scale = 1.3">');
+	$('head').append('<meta name = "viewport" content = "initial-scale = 1.0">');
 }
 
 
 //TOUCH: TEST FOR TOUCH DEVICE
-function is_touch_device() {
-	return !!('ontouchstart' in window) // works on most browsers 
-	|| !!('onmsgesturechange' in window); // works on ie10)
+var supportsTouch = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
+function setUpTouch() {
+	if (supportsTouch){
+		$('.touch-off').toggleClass('touch-on touch-off');
+		$('.touch-on.hide').toggleClass('hide show');
+	}
 };
+/* 
+$(document).on( 'touchstart', '.pin', function(e){	
+	alert('touchstart')
+});
+$(document).on( 'MSPointerUp', '.pin', function(e){	
+	alert('MSPointerUp')
+}); */
 
-/** generic function for ajax calls:
+/** GENERIC FUNCTION FOR AJAX CALLS:
  *url: url to make ajax call
  *async: Boolien false makes non async call, Defaults to true
  *cbS: success call back function name
@@ -63,14 +73,16 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 	if (reqType == undefined) reqType = 'GET';
 	var rData
 
-	onApiData = function( data, ajaxStatus, XMLHttpRequest) {
-		var loc = XMLHttpRequest.getAllResponseHeaders();
-		var statusCode = XMLHttpRequest.status;
-		var statusText = XMLHttpRequest.statusText;
+	onApiData = function( data, ajaxStatus, xhr) {
+		var statusCode = xhr.status;
+		var statusText = xhr.statusText;
 		console.warn(statusCode+' = '+statusText+' ajaxStatus = '+ajaxStatus)
+		//precess & display ajax messages
+		var jsonMessage = getMessages(xhr)
+		alertFade()//set messages to fade out
 		//if callback exicute call back
 		if (cbS){
-			cbS(data, ajaxStatus, XMLHttpRequest)
+			cbS(data, ajaxStatus, xhr)
 		//if one object is returned return the object
 		}else if(statusText != "NO CONTENT" && data.objects.length==1){
 				console.warn('one one object returned below:')
@@ -104,13 +116,15 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 		xhrFields: {
 			//withCredentials: true //// add credentials to the request
 		},
-		/* beforeSend: function(jqXHR, settings) {
+		/* //CSRF token handled by ajax setup function.
+		beforeSend: function(jqXHR, settings) {
 			//jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-				//TODO: xcrf solution needed
 		}, */
+		//TODO: what is getApiData doing???? i don't think its used any more. test!
 		success: $.proxy(onApiData, this.getApiData),
-		//TODO: swap fav image
 		error: function(jqXHR, settings) {
+			var jsonMessage = getMessages(jqXHR)
+			alertFade()//set messages to fade out
 			if (cbE){cbE()}else{console.warn('ajax() - ajax error')};
 		},
 		async: async,
@@ -168,7 +182,7 @@ function layoutThumbs(target) {
 };
 
 /**Loads data from the API. 
- * 
+ * relaod option: true reloads page after data loaded
  * set tag / user to null to clear
  * set tag / user to undefined to keep current filters.
  */
@@ -286,8 +300,13 @@ function loadData(tag, user, reload) {
 			success: onLoadData,
 			error: function(jqXHR, settings) {
 				console.warn('ladData - ajax error');
+				isLoading = false
+				$('#loader').hide();
 			},
 		});
+	}else{
+		isLoading = false
+		$('#loader').hide();
 	}
 };
 
@@ -301,9 +320,8 @@ window.onpopstate = function(e) {
 };
 
 /**Receives data from the API, creates HTML for images and updates the layout
- * 
+ * insert: set to "prepend" to prepend HTML  exclude appends data.
  */
-
 function onLoadData(data, insert) {
 	data = data.objects;
 	page++;
@@ -317,6 +335,7 @@ function onLoadData(data, insert) {
 		var userFav = false
 		var userPin = false
 		var userCmnt = false
+		var repined = false //TODO: used to determine if pin has been repined by authUser
 		//layout for all views except for those listed below
 		if (av != 'tags'){
 			console.log('loadData() av != tags')
@@ -346,45 +365,63 @@ function onLoadData(data, insert) {
 				}
 			}
 			//SETUP HTML FOR LARGE PINS DISPLAY
-			html += '<div class="pin image touch-off" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'">';
-				//OPTIONS
-				if (authUserO){
-				html += '<div class="pin-options-btn touch-off hide"><i id="optionsBtn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
-				html += '<div class="pin-options">';
-					html += '<div class="background-50">';
-						html += '<div id="delete" title="Delete" class="inline">'
-							html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
-							html += '<i class="icon-trash"></i>'
-							html += '<br>Delete</a></div>';
-						html += '<div id="edit" title="Edit" class="inline">'
-							html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
-							html += '<i class="icon-edit"></i>'
-							html += '<br>Edit</a></div>';
-						html += '<div id="favs" data-state="'+userFav+'" class="inline">'
-							html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
-							if (userFav) {
-							html += '<i title="Remove Favorite" class="icon-star"></i>';
-							} else {
-							html += '<i title="Add Favorite" class="icon-star icon-star-empty"></i>';
-							};
-							html += '<br>Fav</a></div>'
-						html += '<div id="repins" data-state="'+userPin+'" title="Re-Pin" class="inline">'
-							html += '<a href="'+pinsPrefix+'/re-pin/'+image.id+'/">'
-							html += '<i class="icon-plus"></i><br>Add</a></div>';
-						html += '<div id="cmnts" data-state="true" title="Comment" class="inline">'
-							html += '<a href="'+pinsPrefix+'/cmnt-pin/'+image.id+'/">'
-							html += '<i class="icon-chat"></i><br>Comm</a></div>';
+			html += '<div class="pin item" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'">';
+			//IMAGE CONTAINER
+				html += '<div class="image touch-off">';
+			//OPTIONS
+					if (authUserO.id){
+					//was used to toggle options//html += '<div class="pin-options-btn touch-off hide"><i id="optionsBtn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
+					html += '<div class="pin-options">';
+			//PIN OPTIONS BUTTON
+						html += '<div class="background-50 btn-lg">';
+							if (userPin){
+							html += '<div id="delete" title="Delete" class="inline">'
+								html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
+								html += '<i class="icon-trash"></i>'
+								html += '<br>Delete</a></div>';
+							html += '<div id="edit" title="Edit" class="inline">'
+								html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
+								html += '<i class="icon-edit"></i>'
+								html += '<br>Edit</a></div>';
+							}
+							html += '<div id="favs" data-state="'+userFav+'" class="inline">'
+								html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
+								if (userFav) {
+								html += '<i title="Remove Favorite" class="icon-star"></i>';
+								} else {
+								html += '<i title="Add Favorite" class="icon-star icon-star-empty"></i>';
+								};
+								html += '<br>Fav</a></div>'
+							if (!userPin  && !repined){
+							html += '<div id="repins" data-state="'+userPin+'" title="Re-Pin" class="inline">'
+								html += '<a href="'+pinsPrefix+'/re-pin/'+image.id+'/">'
+								html += '<i class="icon-plus"></i><br>Add</a></div>';
+							}
+							html += '<div id="cmnts" data-state="true" title="Comment" class="inline">'
+								html += '<a href="'+pinsPrefix+'/cmnt-pin/'+image.id+'/">'
+								html += '<i class="icon-chat"></i><br>Comm</a></div>';
+						html += '</div>';
+			//SOURCE BUTTON
+						html += '<div id="source" class="background-50 btn-lg">';
+							html += '<a target="_blank" href="'+image.srcUrl+'/">'
+							html += '<div class="inline icon"><i class="icon-bookmark"></i><br>GO</div>';
+							html += '<div class="inline text">'+getHost(image.srcUrl)+'</div></a>';
+						html += '</div>';
+			//DETAILS BUTTON
+						html += '<div id="details" class="background-50 btn-lg">';
+							html += '<a href="'+image.srcUrl+'/">'
+							html += '<div class="inline icon"><i class="icon-info-sign"></i><br>INFO</div>';
+							html += '<div class="inline text">PIN DETAILS</div></a>';
+						html += '</div>';
 					html += '</div>';
+					}
+			//IMAGE
+					html += '<div class="img-btn touch-off"></div>';//prevent fancybox
+					html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
+					html += '<img src="'+image.thumbnail+'" width="200" ></a>';
 				html += '</div>';
-				}
-				//IMAGE
-				html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
-					html += '<img src="'+image.thumbnail+'" width="200" >';
-				html += '</a>';
-				//INFO / STATS
+			//INFO - STATS
 				html += '<div class="pin-info">';
-					html += '<l><span class="">From: </span>'
-					html += '<a class="pin-src" rel="pins" title="Source" href="'+image.srcUrl+'">'+getHost(image.srcUrl)+'</a></l>';
 					html += '<l><span class="">By: </span>'
 					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
@@ -392,11 +429,11 @@ function onLoadData(data, insert) {
 						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
 						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
 				html +='</div>'
-				//DESCRIPTION
+			//DESCRIPTION
 				html += '<div class="pin-desc">';
 					if (image.description) html += '<p id="desc">'+image.description+'</p>';
 				html += '</div>';
-				//TAGS
+			//TAGS
 				html += '<div class="pin-tags section">';
 				if (image.tags) {
 					html += '<l>';
@@ -407,7 +444,7 @@ function onLoadData(data, insert) {
 					html += '</l>';
 				}
 				html += '</div>';
-				//COMMENTS
+			//COMMENTS
 				if (authUserO){
 					html += '<div class="section pin-cmnts">';
 						if (image.comments){ 
@@ -518,17 +555,13 @@ function onLoadData(data, insert) {
 	}
 	isLoading = false;
 	$('#loader').hide();
-	
 	//TOUCH: DEVICE SETUP
-	if (is_touch_device() && authUserO.id){
-		$('.touch-off').toggleClass('touch-off touch-on');
-		$('.touch-on.hide').toggleClass('hide show');
-	}
+	setUpTouch()
 };
 
 
 //TOUCH: form label tool-tips with ios support
-$(document).on( 'touchstart', 'label[title]', function(e){	
+$(document).on( 'touchend', 'label[title]', function(e){	
 	alert(e.target.title)
 });
 
@@ -595,29 +628,40 @@ $(document).ready(new function() {
 /**On clicking an image show fancybox original.
  * 
  */
+ //setup fancy box
 $('.fancybox').fancybox({
     openEffect: 'none',
     closeEffect: 'none'
 });
+//set up #details button to trigger fancybox on click
+$('.pin #details').live('click', function(e){
+   e.preventDefault();
+   fb = $(e.target).closest('.pin').find('.fancybox')
+   fb.click();
+});
+
+
 
 
 /**Pin Functions.
  * 
  */
-//TOUCH: pin options button for touch devices
+ 
+/* no longer needed //TOUCH: pin options button for touch devices
 $(document).on('touchstart', '.pin-options-btn', function(e){
-	target = $(e.target).closest('.pin');
-	id = target[0].id;
-	console.warn(id);
-	target = $('#'+id+' .pin-options');
+	 e.preventDefault();
+	target = $(e.target).closest('.pin').find('.pin-options');
 	toggleTouchHover(target)
-	
+}); */
+//TOUCH: pin image overlay button for touch devices
+$(document).on('click', '.pin.item .image.touch-on', function(e){
+	//do not preventDefault() or inner option hrefs will not work.
+	target = $(e.target).closest('.pin').find('.pin-options');
+	toggleTouchHover(target, true)
 });
-
 //Options > Comment: TOUCH: handler to toggle options hover for touch devices
-$(document).on( 'MSPointerDown touchstart', '.pin-cmnt.touch-on .display', function(e){
+$(document).on( 'MSPointerUp touchstart', '.pin-cmnt.touch-on .display', function(e){
 	e.preventDefault();
-	console.log('click cmnt');
 	var cmnt = $(this).closest('.pin-cmnt')
 	var opt = cmnt.find('.options')
 	toggleTouchHover(opt)
@@ -669,7 +713,7 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	$('#re-pin').modal('toggle')
 	return false
 });
-function onRepinSuccess(data, ajaxStatus, XMLHttpRequest){
+function onRepinSuccess(data, ajaxStatus, xhr){
 	console.log('onRepinSuccess');
 	console.log(data);
 	data = {objects:[data]};
@@ -1184,25 +1228,28 @@ function cancelNewPin(){
  */
  
 /* TOGGLE TOUCH HOVER ELEMENT by touching another element for touch devices
-*- target is the hover element you want to show on touch
-*- use $(document).on('touchstart', 'select touch element', function(e){get target here} 
-*- the required css is: .class:hover .taget,.class .target.touch-hover{ hover state style }
+*- target is the element you want to show on touch & hover
+*- use $(document).on('touchend', '.class', function(e){get target here} 
+*- the required css is: .class:hover.touch-off .taget,.class.touch-on .target.touch-hover{ hover state style }
 */
-function toggleTouchHover(target){
+function toggleTouchHover(target, self){
+	console.warn(self)
+	if(self===undefined){self = true}
 	console.warn(aTouchHover)
 	console.warn(target)
+	console.warn(self)
 	if(!aTouchHover){
 		console.warn('1')
 		target.toggleClass('touch-hover');
 		aTouchHover = target;
-	}else if(aTouchHover && aTouchHover[0] == target[0]){
+	}else if(aTouchHover && aTouchHover[0] == target[0] && self){
 		console.warn('2')
 		aTouchHover.toggleClass('touch-hover')
 		aTouchHover = undefined;
 	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
 		console.warn('3')
-		aTouchHover.toggleClass('touch-hover')
 		target.toggleClass('touch-hover');
+		aTouchHover.toggleClass('touch-hover')
 		aTouchHover = target;
 	}
 }

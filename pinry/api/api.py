@@ -21,6 +21,9 @@ from django.contrib import messages
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.http import HttpNoContent, HttpForbidden, HttpGone
 
+from taggit.utils import parse_tags
+from pinry.core.utils import format_tags
+
 #resource path = pinry.api.api.SomeResource
 
 class UserResource(ModelResource):
@@ -225,6 +228,12 @@ class PinResource(ModelResource):
     
     def dehydrate_tags(self, bundle):
         return map(str, bundle.obj.tags.all())
+        
+    def hydrate_tags(self, bundle):
+        tags = bundle.data['tags']
+        bundle.data['tags'] = parse_tags(format_tags(tags))
+        print bundle.data['tags']
+        return bundle
         
     def save_m2m(self, bundle):
         tags = bundle.data.get('tags', [])

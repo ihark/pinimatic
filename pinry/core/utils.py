@@ -9,6 +9,7 @@ from django.utils import simplejson
 from django.http import HttpResponse, Http404
 from django.conf import settings
 import os
+import re
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
 
@@ -115,3 +116,37 @@ def delete_upload(request, fileName = None):
         return HttpResponse( json.dumps( ret_json ) )
     print success
 
+#apply formating to tags string
+#TODO: this is retarded, could have used parse_tags(value) to get tags array then did my formats....
+def format_tags(value):
+    try:
+        #check for comma-sep list
+        comma = re.match(r'.*?,', value)
+        #remove any spaces between quote and first charicter
+        value = re.sub(r'"\s+?(?P<tag>[^\s].*?")', '"'+r'\g<tag>', value)
+        #find quoted tags & make list
+        quotedTags = re.findall(r'".*?"', value)
+        #remove quoted from value string and make list
+        for qt in quotedTags:
+            value = value.replace(qt,'')
+        uQuotedTags = value.split(',')
+        #strip white space from uQuoted
+        uQuotedTags = [tag.strip() for tag in uQuotedTags]
+        #remove blank tags
+        uQuotedTags = filter(bool, uQuotedTags)
+        print '*uQuotedTags: ', uQuotedTags
+        #handle coma-sep list of tags (first letter of each tag to uppercase)
+        if comma:
+            value = ', '.join(tag[0].upper() + tag[1:].lower() for tag in uQuotedTags)
+        #handle space-sep list of tags (first letter of each tag uppercase)
+        elif uQuotedTags:
+            value = ' '.join(word[0].upper() + word[1:].lower() for word in uQuotedTags[0].split(' '))
+        #handle quoted tags (no change)
+        if quotedTags:
+            value += ' '
+            value += ' '.join(tag[0] + tag[1:] for tag in quotedTags)
+        return value
+    except ValueError:
+        print '****CustomTagField ValueError'
+        return False
+        

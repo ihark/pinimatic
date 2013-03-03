@@ -69,15 +69,12 @@ $(document).ready(function () {
 	// }	
 // }
 function getMessages(xhr){
-	console.log('getMessages')
 	var contentType = xhr.getResponseHeader("Content-Type");
-	console.log(contentType)
 	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {
 		try{
 			var jsonMessage = $.parseJSON(xhr.responseText);
 			console.log('getMessages')
 			$.each(jsonMessage, function(index, value) {
-				console.log(index)
 				if (index === "django_messages") {
 					$.each(jsonMessage.django_messages, function (i, item) {
 						addMessage(messageDivId, item.message, item.extra_tags);

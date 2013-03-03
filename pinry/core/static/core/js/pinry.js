@@ -708,8 +708,6 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
 	data = $(this).serializeObject()
 	delete data.id
-	data.tags = [data.tags]//TODO: try {} for tags to solve comma parse issue
-	//TODO: validate tags exist here
 	sData = JSON.stringify(data)
 	ajax(false, pinURL, true, 'POST', onRepinSuccess, undefined, sData);
 	$('#re-pin').modal('toggle')

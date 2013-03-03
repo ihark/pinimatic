@@ -736,8 +736,13 @@ $('#cmnts').live('click', function(e){
 		applyLayout();
 		//scroll to comment form
 		ws = getWindowSize();
-		center = (ws.height/2);
-		$('html,body').animate({scrollTop: pin.find('form[name="pin-cmnt-form"]').offset().top-center}, 500);
+		centerH = (ws.height/2);
+		centerW = (ws.width/2);
+		console.log(centerW)
+		pin.find('form[name="pin-cmnt-form"] textarea').focus();
+		//causes issue with ios (temp removed)
+		//$('body').animate({scrollTop: pin.find('form[name="pin-cmnt-form"]').offset().top-centerH}, 500);
+		//$('body').animate({scrollLeft: pin.find('form[name="pin-cmnt-form"]').offset().left-centerW}, 200);
 		$(this).attr('data-state', "false");
 		icon = $(this).find('i');
 		icon.toggleClass('icon-chat-empty');

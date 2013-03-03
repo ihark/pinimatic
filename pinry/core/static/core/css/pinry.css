@@ -576,10 +576,10 @@ body {
 /* MODIFICATIONS TO BOOTSTRAP */
 .modal {
   width: 498px;
-  margin: -230px 0 0 -250px;
+  margin: -280px 0 0 -250px;
 }
 .modal.fade {
-  top: -50%;
+  top: -100%;
 }
 .modal.fade.in {
   top: 50%;

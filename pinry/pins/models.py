@@ -10,6 +10,8 @@ from PIL import Image
 from django.conf import settings
 from django.core.files.storage import default_storage
 from pinry.core.utils import delete_upload
+from django.contrib.comments.models import Comment
+from django.contrib.contenttypes import generic
 
 from follow import utils
 
@@ -23,6 +25,9 @@ class Pin(models.Model):
     published = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
     repin = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = generic.GenericRelation(Comment,
+                               content_type_field='content_type',
+                               object_id_field='object_pk')
 
 
     def __unicode__(self):

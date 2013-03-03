@@ -850,8 +850,9 @@ function insertCommentForm(pinId, cmntT, cmntId){
 				html += '<textarea id="id_comment" placeholder="Enter your comment here." name="comment">'
 				if(cmntT){html += cmntT}
 				html +='</textarea>'
-				html += '<input type="hidden" name="object_pk" value='+pinId+' id="id_content_type">'
-				html += '<input type="hidden" name="content_type_id" value=10 id="id_object_pk">'
+				html += '<input type="hidden" name="object_pk" value='+pinId+' id="id_object_pk">'
+				html += '<input type="hidden" name="content_type_id" value=10 id="id_content_type">'
+				html += '<input type="hidden" name="site_id" value=1 id="id_site_id">'
 			html += '</div>'
 			html += '<button href="" class="cancel btn btn-mini">Cancel</button>'
 			html += '<button type="submit" class="btn btn-mini btn-primary">Post</button>'

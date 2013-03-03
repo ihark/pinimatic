@@ -125,10 +125,8 @@ class PinResource(ModelResource):
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)
-    #comments = fields.ToManyField('pinry.api.api.CmntResource', 'tagged_items', full = True, null=True)
-    comments = fields.ListField(attribute='comments', null=True)
-    #NOTE: tagged_items = content_type, id, object_id, pin, tag
-    #NOTE: content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    comments = fields.ToManyField('pinry.api.api.CmntResource', 'comments', full=True, null=True)
+
 
     class Meta:
         always_return_data = True
@@ -145,7 +143,7 @@ class PinResource(ModelResource):
         }
         #ordering = ['popularity']
         authorization = DjangoAuthorization()
-
+    '''No longer needed since comments foreign relation started working (keeping for reference)
     def obj_get_list(self, bundle, **kwargs):
         print '--obj_get_list--'
         objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
@@ -158,7 +156,7 @@ class PinResource(ModelResource):
                 uqs = User.objects.filter(id__exact=c['user_id']).values()
                 c['user'] = uqs[0]
         return objects
-
+    '''
     
     def apply_filters(self, request, applicable_filters):
         print '---apply_filters----'
@@ -259,7 +257,7 @@ class PinResource(ModelResource):
                 bundle.obj.delete()
                 bundle.data = {"django_messages": [{"extra_tags": "alert alert-success", "message": 'Delete was successfull.', "level": 25}]}
                 print bundle
-                #using HttpGone in stead of HttpNoContent so message is displaied.
+                #using HttpGone in stead of HttpNoContent so success can be displaied.
                 #TODO: how to add message to normal tasypie responce instead of forcing it here.  
                 #Also, why is it not getting picked up by middleware, so i can gust use django messages.
                 raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))
@@ -272,13 +270,10 @@ class PinResource(ModelResource):
 class CmntResource(ModelResource):
     user = fields.ToOneField('pinry.api.api.UserResource', 'user', full=True)
     content_type_id = fields.CharField(attribute = 'content_type_id')
-    id = fields.IntegerField(attribute = 'id')
-    #content_object = GenericForeignKeyField({
-    #  Pin: PinResource,
-    #}, 'content_object', null=True, related_name='comments')
-    #content_type = fields.ToOneField('pinry.api.api.ContentTypeResource', 'content_type', full = True, null = True)
-    #content_type = fields.CharField(attribute = 'content_type', null=True)
-    #content_object = fields.ToOneField('pinry.api.api.PinResource', 'content_object', null = True)
+    site_id = fields.CharField(attribute = 'site_id')
+    content_object = GenericForeignKeyField({
+        Pin: PinResource,
+    }, 'content_object', null=True)
     
     class Meta:
         always_return_data = True
@@ -305,5 +300,5 @@ class CmntResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
-        bundle = super(CmntResource, self).obj_create(bundle, site_id=settings.SITE_ID, user=bundle.request.user)
+        bundle = super(CmntResource, self).obj_create(bundle, user=bundle.request.user)
         return bundle

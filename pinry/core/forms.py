@@ -57,11 +57,9 @@ class CustomTagField(forms.CharField):
                     value += ' '.join(tag[0] + tag[1:] for tag in quotedTags)
                 print 'parse', parse_tags(value)
                 return parse_tags(value)
-
             except ValueError:
                 print '****CustomTagField ValueError'
-                raise forms.ValidationError(_("Provide one or more comma-separated tags."))
-          
+                raise forms.ValidationError("Provide one or more comma-separated tags.")
         else: 
             return []
                 

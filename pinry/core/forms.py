@@ -5,8 +5,6 @@ from django.utils.translation import ugettext as _
 from taggit.utils import parse_tags, edit_string_for_tags
 import re
 
-from pinry.core.utils import format_tags
-
 
 class CustomTagWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
@@ -22,28 +20,26 @@ class CustomTagWidget(forms.TextInput):
             value = ""#remove exising values from form
         return super(CustomTagWidget, self).render(name, value, attrs)
 
-
+from pinry.core.utils import format_tags, format_tags_list
 class CustomTagField(forms.CharField):
     widget = CustomTagWidget
-
     def clean(self, value):
         value = super(CustomTagField, self).clean(value)
         print '----CustomTagField form clean exicuted'
-        print "customTagFiled Clean value",value
         if value:
             try:
-                value = format_tags(value)
+                print '----CustomTagField parse_tags exicuted'
                 return parse_tags(value)
             except ValueError:
                 print '****CustomTagField ValueError'
                 raise forms.ValidationError("Provide one or more comma-separated tags.")
         else: 
-            return []
+            return value
                 
 class UserTagsWidget(forms.SelectMultiple):
     def render(self, name, value, attrs=None):
-        #print '----UserTagsWidget render exicuted'
-        #self.choices = set(self.choices)
+        print '----UserTagsWidget render exicuted'
+        self.choices = set(self.choices)
         #print self.choices
         #for c in self.choices: print 'choices:', c
         
@@ -53,7 +49,7 @@ class UserTagsField(forms.ModelMultipleChoiceField):
     widget = UserTagsWidget
     def clean(self, value):
         value = super(UserTagsField, self).clean(value)
-        #print '----UserTagsField form clean exicuted'
+        print '----UserTagsField form clean exicuted'
         #print '------vlue:', value
         
         return value

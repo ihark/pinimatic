@@ -150,3 +150,12 @@ def format_tags(value):
         print '****CustomTagField ValueError'
         return False
         
+def format_tags_list(value):
+    try:
+        #first letter of each tag to uppercase
+        value = [tag[0].upper() + tag[1:].lower() for tag in value]
+        return value
+    except ValueError:
+        print '****CustomTagField ValueError'
+        return False
+        

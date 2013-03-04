@@ -347,7 +347,7 @@ function onLoadData(data, insert) {
 				imgUrl:image.imgUrl,//CHECK: this was changed from origin+image.image, if it works we dont need origin
 				//the origin did not work with heroku due to amazon
 				//thumbnail:origin+image.image,
-				repin:'/api/v1/pin/'+image.id+'/',//:TODO: this may need to be just id or pin object???
+				repin:image.id,//:TODO: this may need to be just id or pin object???
 			};
 			
 			if (authUserO){
@@ -706,9 +706,12 @@ $('#repins').live('click', function(e){
 //Options > repin: on form submit 
 $('#re-pin-form').submit(function () { //// catch the form's submit event
 	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
+	console.warn(this)
 	data = $(this).serializeObject()
+	console.warn(data)
 	delete data.id
 	sData = JSON.stringify(data)
+	console.warn(sData)
 	ajax(false, pinURL, true, 'POST', onRepinSuccess, undefined, sData);
 	$('#re-pin').modal('toggle')
 	return false
@@ -1329,65 +1332,43 @@ function urlSafe(s){
 
 //jquery function to format form data as assoc.array
 (function($){
-    $.fn.serializeObject = function(){
-        var self = this,
-            json = {},
-            push_counters = {},
-            patterns = {
-                "validate": /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
-                "key":      /[a-zA-Z0-9_]+|(?=\[\])/g,
-                "push":     /^$/,
-                "fixed":    /^\d+$/,
-                "named":    /^[a-zA-Z0-9_]+$/
-            };
-        this.build = function(base, key, value){
-            base[key] = value;
-            return base;
-        };
+// Use internal $.serializeArray to get list of form elements which is
+// consistent with $.serialize
+//
+// From version 2.0.0, $.serializeObject will stop converting [name] values
+// to camelCase format. This is *consistent* with other serialize methods:
+//
+//   - $.serialize
+//   - $.serializeArray
+//
+// If you require camel casing, you can either download version 1.0.4 or map
+// them yourself.
+//
+$.fn.serializeObject = function () {
+	"use strict";
 
-        this.push_counter = function(key){
-            if(push_counters[key] === undefined){
-                push_counters[key] = 0;
-            }
-            return push_counters[key]++;
-        };
+	var result = {};
+	var extend = function (i, element) {
+		var node = result[element.name];
 
-        $.each($(this).serializeArray(), function(){
+// If node with same name exists already, need to convert it to an array as it
+// is a multi-value field (i.e., checkboxes)
 
-            // skip invalid keys
-            if(!patterns.validate.test(this.name)){
-                return;
-            }
+		if ('undefined' !== typeof node && node !== null) {
+			if ($.isArray(node)) {
+				node.push(element.value);
+			} else {
+				result[element.name] = [node, element.value];
+			}
+		} else {
+			result[element.name] = element.value;
+		}
+	};
 
-            var k,
-                keys = this.name.match(patterns.key),
-                merge = this.value,
-                reverse_key = this.name;
+// For each serialzable element, convert element names to camelCasing and
+// extend each of them to a JSON object
 
-            while((k = keys.pop()) !== undefined){
-
-                // adjust reverse_key
-                reverse_key = reverse_key.replace(new RegExp("\\[" + k + "\\]$"), '');
-
-                // push
-                if(k.match(patterns.push)){
-                    merge = self.build([], self.push_counter(reverse_key), merge);
-                }
-
-                // fixed
-                else if(k.match(patterns.fixed)){
-                    merge = self.build([], k, merge);
-                }
-
-                // named
-                else if(k.match(patterns.named)){
-                    merge = self.build({}, k, merge);
-                }
-            }
-
-            json = $.extend(true, json, merge);
-        });
-
-        return json;
-    };
+	$.each(this.serializeArray(), extend);
+	return result;
+};
 })(jQuery);

@@ -9,6 +9,7 @@ from django.forms.widgets import FileInput, HiddenInput, TextInput
 from pinry.settings import IMAGES_PATH, MEDIA_URL
 import re
 #from pinry.core.utils import MakeThumbnail, saveTempImg
+from pinry.core.utils import format_tags, format_tags_list
 
 
 class PinForm(forms.ModelForm):
@@ -81,42 +82,45 @@ class PinForm(forms.ModelForm):
             data = Pin.objects.get(id = data)
         return data
 
-
-    
     def clean_tags(self):
         print '--form clean_tags'
         tags_new = self.cleaned_data['tags']
-        print '-tags:', tags_new #new tags to be assigned to pin
+        tags_new = format_tags_list(tags_new) #new formatted tags to be assigned to pin
         try:#find tag names in list of all user tags
             tags_all_data = self['tagsUser']
             tags_all_list = re.findall(r'<.*?>(.+?)<.*?>', str(tags_all_data))
         except:
             tags_all_list = None
-        print '-tags_all_list:', tags_all_list
         try:#find currently selected tag names in list of all user tags
+            print 'self.cleaned_data["tagsUser"]: ', self.cleaned_data['tagsUser']
             tags_keep = [str(item) for item in self.cleaned_data['tagsUser'].values_list('name', flat=True)]
+            print 'tags_keep: ', tags_keep
         except:
             tags_keep = None
-        print '-tags_keep:', tags_keep #working: orig tags to be kept
         try:#find original selected tag names in list of all user tags
             tags_orig = [str(item) for item in self.instance.tags.all().values_list('name', flat=True)]
         except:
             tags_orig = None
-        print '-tags_orig:', tags_orig #working: tags assigned to pin when form created
         if tags_keep and tags_orig: 
             #TODO: delete these tags if not used by other users.
             tags_diff = [item for item in tags_orig if not item in tags_keep]
-            print '-tags_diff:', tags_diff 
         if tags_keep:    
             data = tags_keep + tags_new
         else:
             data = tags_new
+        '''DEBUG
+        print '-tags psot format:', tags_new 
+        print '-tags_all_list:', tags_all_list
+        print '-tags_keep:', tags_keep 
+        print '-tags_orig:', tags_orig 
+        print '-tags_diff:', tags_diff 
         print 'returned data:', data
+        '''
         #Make sure there is at least one tag
         if len(data)>0:
             return data
         else:
-            raise forms.ValidationError("You must provide at least one tag.  Select from list above or enter new comma seperated tags below.")
+            raise forms.ValidationError("Form val: You must provide at least one tag.  Select from list above or enter new comma seperated tags below.")
 
     def clean(self):
         print '--form clean'
@@ -125,6 +129,7 @@ class PinForm(forms.ModelForm):
         imgUrl = cleaned_data.get('imgUrl')
         image = cleaned_data.get('image')
         uImage = cleaned_data.get('uImage')
+        repin = cleaned_data.get('repin')
         #tags = cleaned_data.get('tags')
         #tagsUser = cleaned_data.get('tagsUser')
         #create saved_data attribute accecable by view with bound form
@@ -133,8 +138,8 @@ class PinForm(forms.ModelForm):
         if image and imgUrl and not id:
             print '--form image and imgUrl and not id'
             raise forms.ValidationError("Choose a url OR upload")
-            
-        if imgUrl and not id:
+        print 'repin = ', repin  
+        if imgUrl and not id and not repin:
             print '--form imgUrl without ID found: '+str(imgUrl)
             self.check_if_image(imgUrl)
             try:

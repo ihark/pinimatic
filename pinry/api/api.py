@@ -23,6 +23,10 @@ from tastypie.http import HttpNoContent, HttpForbidden, HttpGone
 
 from taggit.utils import parse_tags
 from pinry.core.utils import format_tags
+from pinry.pins.forms import PinForm
+from django import forms
+from tastypie.validation import CleanedDataFormValidation
+
 
 #resource path = pinry.api.api.SomeResource
 
@@ -121,10 +125,12 @@ class ContentTypeResource(ModelResource):
 
 
 class PinResource(ModelResource):
+
     tags = fields.ListField()
     imgUrl = fields.CharField(attribute='imgUrl')
     srcUrl = fields.CharField(attribute='srcUrl', null=True)
-    repin = fields.ForeignKey('pinry.api.api.PinResource', 'repin', null=True)
+    repinObj = fields.ForeignKey('pinry.api.api.PinResource', 'repinObj', null=True)
+    repin = fields.CharField(attribute='repinObj__id', null=True)
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)
@@ -144,6 +150,7 @@ class PinResource(ModelResource):
             'popularity': ALL,
             'tags': ALL,
         }
+        validation = CleanedDataFormValidation(form_class=PinForm)
         #ordering = ['popularity']
         authorization = DjangoAuthorization()
     '''No longer needed since comments foreign relation started working (keeping for reference)
@@ -230,9 +237,13 @@ class PinResource(ModelResource):
         return map(str, bundle.obj.tags.all())
         
     def hydrate_tags(self, bundle):
-        tags = bundle.data['tags']
-        bundle.data['tags'] = parse_tags(format_tags(tags))
-        print bundle.data['tags']
+        #if one tagsUser is recieved convert string to a list
+        try: 
+            tagsUser = bundle.data['tagsUser']
+            if type(tagsUser) == str:
+                bundle.data['tagsUser'] = [tagsUser]
+        except: pass
+        #hydrate tags is handled by form validation!
         return bundle
         
     def save_m2m(self, bundle):
@@ -251,7 +262,8 @@ class PinResource(ModelResource):
     '''
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
-        bundle = super(PinResource, self).obj_create(bundle, submitter=bundle.request.user, uImage='', comments=[])
+        repinUrl = '/api/v1/pin/'+bundle.data['repin']+'/'
+        bundle = super(PinResource, self).obj_create(bundle, repinObj=repinUrl,  submitter=bundle.request.user, uImage=None, comments=[])
         return bundle
         
 

@@ -123,10 +123,10 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 		}, */
 		//TODO: what is getApiData doing???? i don't think its used any more. test!
 		success: $.proxy(onApiData, this.getApiData),
-		error: function(jqXHR, settings) {
+		error: function(jqXHR, settings, what) {
 			var jsonMessage = getMessages(jqXHR)
 			alertFade()//set messages to fade out
-			if (cbE){cbE()}else{console.warn('ajax() - ajax error')};
+			if (cbE){cbE(jqXHR, settings, what)}else{console.warn('ajax() - ajax error')};
 		},
 		async: async,
 	});
@@ -712,17 +712,24 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	delete data.id
 	sData = JSON.stringify(data)
 	console.warn(sData)
-	ajax(false, pinURL, true, 'POST', onRepinSuccess, undefined, sData);
-	$('#re-pin').modal('toggle')
+	ajax(false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
+	
 	return false
 });
 function onRepinSuccess(data, ajaxStatus, xhr){
-	console.log('onRepinSuccess');
+	console.log('-onRepinSuccess');
 	console.log(data);
 	data = {objects:[data]};
 	console.log(data);
 	console.log(data.length);
 	onLoadData(data, 'prepend');
+	$('#re-pin').modal('toggle')
+}
+function onRepinError(xhr, ajaxStatus, textStatus){
+	console.warn('-onRepinEror');
+	console.log('textStatus: '+textStatus);
+	console.log('ajaxStatus: '+ajaxStatus);
+	console.log(xhr.responseText);
 }
 
 //Options > Comment: open form

@@ -25,7 +25,7 @@
 				<h5>2) Copy The Text:</h5>
 				<p>
 					<li>Highlight all the text in the box below by holding you finger down on it.</li>
-					<textarea onclick="javascript:this.focus();this.select()" readonly="true" class="code">javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='//pinry.herokuapp.com/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())</textarea>
+					<textarea onclick="javascript:this.focus();this.select()" readonly="true" class="code">javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())</textarea>
 					<li>Tap Copy.</li>
 				</p>
 				<h5>3) Edit Bookmarklet:</h5>

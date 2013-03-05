@@ -356,8 +356,8 @@ function onLoadData(data, insert) {
 						userFav = true;
 					}
 				}
-				for (f in image.comments){
-					if (image.comments[f].user_id == authUserO.id){
+				for (c in image.comments){
+					if (image.comments[c].user_id == authUserO.id){
 						userCmnt = true;
 					}
 				}
@@ -452,7 +452,7 @@ function onLoadData(data, insert) {
 							for (cmnt in image.comments) {
 								//TODO: get user object from CmntResource instead or build one so user vars are consistant.
 								//console.log(image.comments[cmnt])
-								html += insertComment(image.comments[cmnt].user.username, image.comments[cmnt].user.id, image.comments[cmnt].comment, parseInt(image.comments[cmnt].id))
+								html += insertComment(image.comments[cmnt].username, image.comments[cmnt].user_id, image.comments[cmnt].comment, parseInt(image.comments[cmnt].id))
 							}
 						}
 					}
@@ -680,7 +680,7 @@ $('#delete').live('click', function(e){
 	//TODO: this is ugly try $(this).closest(".pin")
 	var pin = $($(this).closest(".pin"));
 	var id = parseInt(pin.attr('id'));
-	console.log('del pin url: '+pinURL+id)
+	console.log('del pin url: '+pinURL+id+'/')
 	ajax(false, pinURL+id+'/', true, 'DELETE');
 	pin.remove()
 	applyLayout()
@@ -775,9 +775,9 @@ function cmntsSuccess(result, pin){
 	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
 	if(cmnt.length > 0){
 		console.warn('-id exists')
-		cmnt.replaceWith(insertComment(result.user.username , result.user.id ,result.comment, result.id))//relace edited comment div with new comment
+		cmnt.replaceWith(insertComment(result.username , result.user_id ,result.comment, result.id))//relace edited comment div with new comment
 	}else{
-		pin.find('.pin-cmnts').append(insertComment(result.user.username , result.user.id ,result.comment, result.id))//append new comment to end of comments
+		pin.find('.pin-cmnts').append(insertComment(result.username , result.user_id ,result.comment, result.id))//append new comment to end of comments
 	}
 	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
 	applyLayout()
@@ -788,7 +788,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	console.log('click cancel');
 	cancelCmnt(this)
 	//pcfp = pcf.parent('.pin-cmnt')
-	//cmntp.replaceWith(insertComment(result.user.username , result.user.id ,result.comment))//relace edited comment div with new comment
+	//cmntp.replaceWith(insertComment(result.username , result.user_id ,result.comment))//relace edited comment div with new comment
 });
 //Options > Comment: cancel form (for post & edit)
 function cancelCmnt(target){
@@ -815,7 +815,7 @@ $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	console.log('click delete');
 	var cmnt = $(this).closest('.pin-cmnt')
 	var id = cmnt.attr("data-cmnt");
-	ajax(false, cmntURL+id, true, "DELETE")
+	ajax(false, cmntURL+id+'/', true, "DELETE")
 	cmnt.remove();
 	applyLayout();
 });
@@ -858,8 +858,10 @@ function insertCommentForm(pinId, cmntT, cmntId){
 				html += '<textarea id="id_comment" placeholder="Enter your comment here." name="comment">'
 				if(cmntT){html += cmntT}
 				html +='</textarea>'
-				html += '<input type="hidden" name="object_pk" value='+pinId+' id="id_object_pk">'
-				html += '<input type="hidden" name="content_type_id" value=10 id="id_content_type">'
+				//html += '<input type="hidden" name="object_pk" value='+pinId+' id="id_object_pk">'
+				//html += '<input type="hidden" name="content_type_id" value="10" id="id_content_type_id">'
+				//html += '<input type="hidden" name="content_type" value="/api/v1/contrib/contenttype/10/" id="id_content_type">'
+				html += '<input type="hidden" name="content_object" value="/api/v1/pin/'+pinId+'/" id="id_content_object">'
 				html += '<input type="hidden" name="site_id" value=1 id="id_site_id">'
 			html += '</div>'
 			html += '<button href="" class="cancel btn btn-mini">Cancel</button>'

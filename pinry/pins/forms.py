@@ -91,7 +91,7 @@ class PinForm(forms.ModelForm):
             print url
             if url: raise forms.ValidationError("Form: Tags can not be url's")
             length = len(tag)
-            if length>10: raise forms.ValidationError("Form: Max tag length is 10 charicters")
+            if length>20: raise forms.ValidationError("Form: Max tag length is 10 charicters")
             
         tags_new = format_tags_list(tags_new) #new formatted tags to be assigned to pin
         try:#find tag names in list of all user tags

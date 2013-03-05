@@ -120,8 +120,9 @@ class ContentTypeResource(ModelResource):
         fields = ['model']
         allowed_methods = ['get']
         include_resource_uri = False
-        def determine_format(self, request): 
-            return "application/json" 
+        
+    def determine_format(self, request): 
+        return "application/json" 
 
 
 class PinResource(ModelResource):
@@ -276,6 +277,7 @@ class PinResource(ModelResource):
             if bundle.request.user == bundle.obj.submitter:
                 self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
                 bundle.obj.delete()
+                #TODO:try += so i dont accendnetly over write the bundle data.
                 bundle.data = {"django_messages": [{"extra_tags": "alert alert-success", "message": 'Delete was successfull.', "level": 25}]}
                 print bundle
                 #using HttpGone in stead of HttpNoContent so success can be displaied.
@@ -290,18 +292,27 @@ class PinResource(ModelResource):
         
 class CmntResource(ModelResource):
     user = fields.ToOneField('pinry.api.api.UserResource', 'user', full=True)
-    content_type_id = fields.CharField(attribute = 'content_type_id')
+    #content_type_id = fields.CharField(attribute = 'content_type_id')
+    #content_type = fields.ForeignKey('pinry.api.api.ContentTypeResource', 'content_type', null=True)
+    #object_pk = fields.IntegerField(attribute = 'object_pk')
     site_id = fields.CharField(attribute = 'site_id')
     content_object = GenericForeignKeyField({
         Pin: PinResource,
-    }, 'content_object', null=True)
+    }, 'content_object')
+    username = fields.CharField(attribute = 'user__username', null=True)
+    user_id = fields.CharField(attribute = 'user__id', null=True)
     
     class Meta:
         always_return_data = True
         queryset = Comment.objects.all()
         resource_name = 'cmnt'
         include_resource_uri = False
-        allowed_methods = ['get', 'post', 'delete']
+        allowed_methods = ['get', 'post', 'delete']#TODO: I should be using put for comment edits....
+        #fields, object_pk & content_type_id are REQUIRED for generic foreign key
+        fields = ['id', 'comment', 'submit_date']
+        #excludes = ["ip_address", "is_public", "is_removed", "user_email", "user_name", "user_url"]
+        #other fields: "comment", "content_type_id", "id", "object_pk", "submit_date", "user_id", "username"
+
         filtering = {
             'object_pk': ALL_WITH_RELATIONS,
             'content_type': ALL_WITH_RELATIONS,
@@ -316,10 +327,31 @@ class CmntResource(ModelResource):
                 bundle.data['follows'].remove(f)
         return bundle
     '''
+
+    def alter_list_data_to_serialize(self, request, bundle):
+        for obj in bundle['objects']:
+            del obj.data['user']
+            del obj.data['site_id']
+            #del obj.data['object_pk']
+            #del obj.data['content_type_id']
+            del obj.data['content_object']
+        return bundle
+       
+    def alter_detail_data_to_serialize(self, request, bundle):
+        del bundle.data['user']
+        del bundle.data['site_id']
+        del bundle.data['content_object']
+        #DO NOT BLOCK THE BELOW. they need to be serialized for object creation with GFK!
+        #del bundle.data['object_pk']
+        #del bundle.data['content_type_id']
+        return bundle
+
     def determine_format(self, request): 
         return "application/json" 
 
     def obj_create(self, bundle, **kwargs):
         print '----obj_create------'
+        #content_type='/api/v1/contrib/contenttype/'+bundle.data['content_type_id']+'/'
+        #content_object_url = '/api/v1/pin/'+bundle.data['object_pk']+'/'
         bundle = super(CmntResource, self).obj_create(bundle, user=bundle.request.user)
         return bundle

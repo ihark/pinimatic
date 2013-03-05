@@ -1,4 +1,4 @@
-from pinry.settings.settings import *
+#from pinry.settings.settings import *
 from pinry.settings import *
 
 import os

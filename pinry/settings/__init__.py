@@ -1,9 +1,9 @@
 import os
+import socket
 from django.contrib.messages import constants as messages
 
 SITE_ID = 1
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
-
 
 import socket
 try:

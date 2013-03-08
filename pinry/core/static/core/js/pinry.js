@@ -19,9 +19,9 @@ var aProfileO = {username:aProfile.attr('data-profile')};
 //var aProfileU = aProfile.attr('data-profile');
 var pinA = [];
 var origin = window.location.origin;
-console.warn(origin);
+console.log(origin);
 var av=url(3);//active view
-var authUserO = ajax(false, userURL, false);//authenticated user object//used to determine current authenticated user
+var authUserO = ajax(this, false, userURL, false);//authenticated user object//used to determine current authenticated user
 var aTouchHover //tracks active pin options floater for touch devices
 var vn = { //viewname:"displayname"
 	favs:"Favorites",
@@ -45,9 +45,9 @@ if( /iPad/i.test(navigator.userAgent) ) {
 
 
 //TOUCH: TEST FOR TOUCH DEVICE
-var supportsTouch = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
+var touchOn = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
 function setUpTouch() {
-	if (supportsTouch){
+	if (touchOn){
 		$('.touch-off').toggleClass('touch-on touch-off');
 		$('.touch-on.hide').toggleClass('hide show');
 	}
@@ -68,7 +68,7 @@ $(document).on( 'MSPointerUp', '.pin', function(e){
  *reqType: default='GET'
  */
 
-function ajax(reload, url, async, reqType, cbS, cbE, data){
+function ajax(self, reload, url, async, reqType, cbS, cbE, data){
 	if (async == undefined) async = true;
 	if (reqType == undefined) reqType = 'GET';
 	var rData
@@ -76,18 +76,16 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 	onApiData = function( data, ajaxStatus, xhr) {
 		var statusCode = xhr.status;
 		var statusText = xhr.statusText;
-		console.warn(statusCode+' = '+statusText+' ajaxStatus = '+ajaxStatus)
-		console.log(xhr)
 		//precess & display ajax messages
-		var jsonMessage = getMessages(xhr)
+		var jsonMessage = getMessages(xhr, $(self))
 		alertFade()//set messages to fade out
 		//if callback exicute call back
 		if (cbS){
 			cbS(data, ajaxStatus, xhr)
 		//if one object is returned return the object
 		}else if(statusText != "NO CONTENT" && data.objects.length==1){
-				console.warn('one one object returned below:')
-				console.warn(data.objects[0])
+				console.log('one one object returned below:')
+				console.log(data.objects[0])
 				rData = data.objects[0]
 		//return all data
 		}else{
@@ -103,8 +101,16 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 		}
 		//}
 	}
-	console.warn('-ajax - 1 custom ajax()');
+	function onApiError(xhr, settings, what) {
+		//TODO: may wnat to change tastypie form field error responce if possible to success.....
+		var jsonMessage = getMessages(xhr, $(self))
+		alertFade()//set messages to fade out
+		if (cbE){cbE(xhr, settings, what)}else{console.warn('ajax() - ajax error')};
+	}
+	console.log('-ajax - 1 custom ajax()');
+
 	$.ajax({//1 custom ajax function
+		context: self,
 		url: url,
 		type: reqType,
 		contentType: 'application/json',
@@ -122,12 +128,8 @@ function ajax(reload, url, async, reqType, cbS, cbE, data){
 			//jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
 		}, */
 		//TODO: what is getApiData doing???? i don't think its used any more. test!
-		success: $.proxy(onApiData, this.getApiData),
-		error: function(jqXHR, settings, what) {
-			var jsonMessage = getMessages(jqXHR)
-			alertFade()//set messages to fade out
-			if (cbE){cbE(jqXHR, settings, what)}else{console.warn('ajax() - ajax error')};
-		},
+		success: onApiData,
+		error: onApiError,
 		async: async,
 	});
 	if (!cbS) return rData;
@@ -288,7 +290,7 @@ function loadData(tag, user, reload) {
 	
 	//prevent api request when not in apiPrefix domain
 	if (url(1) == apiPrefix) {
-		console.warn('-ajax - 2 loaddata()');
+		console.log('-ajax - 2 loaddata()');
 		$.ajax({//2 load data
 			url: loadURL,
 			contentType: 'application/json',
@@ -489,7 +491,6 @@ function onLoadData(data, insert) {
 				//add group for each unique tag in tags array.
 				if (tags[tag] == 1){
 					tagId = idSafe(tag)
-					console.warn(tagId)
 					html += '<div class="pin group" id="'+tagId+'">'
 						html += '<a class="thumbs"></a>'
 						html += '<div class="info">'
@@ -505,17 +506,17 @@ function onLoadData(data, insert) {
 			//for each tag/group in images.tags, add image to tag/group untill max images reached
 			for (key in image.tags){
 				tag = image.tags[key]
-				console.warn('image.tags: '+image.tags)
-				console.warn('key: '+key)
-				console.warn('image.tags[key]: '+image.tags[key])
-				console.warn('tag: '+tag)
-				console.warn('tags (below)')
-				console.warn(tags)
-				console.warn(tags[tag])
+				console.log('image.tags: '+image.tags)
+				console.log('key: '+key)
+				console.log('image.tags[key]: '+image.tags[key])
+				console.log('tag: '+tag)
+				console.log('tags (below)')
+				console.log(tags)
+				console.log(tags[tag])
 				//add images to group untill max images reached
 				if (tags[tag] <= maxImages){
 					tagId = idSafe(tag)
-					console.warn('--adding image to tag id: '+tagId)
+					console.log('--adding image to tag id: '+tagId)
 					$('#'+tagId+' .thumbs').append('<div class="'+tagId+' thumb"><img src="'+image.thumbnail+'" alt=""></div>');
 					w = image.image.wdth
 					h = image.image.height
@@ -681,7 +682,7 @@ $('#delete').live('click', function(e){
 	var pin = $($(this).closest(".pin"));
 	var id = parseInt(pin.attr('id'));
 	console.log('del pin url: '+pinURL+id+'/')
-	ajax(false, pinURL+id+'/', true, 'DELETE');
+	ajax(this, false, pinURL+id+'/', true, 'DELETE');
 	pin.remove()
 	applyLayout()
 });
@@ -706,14 +707,10 @@ $('#repins').live('click', function(e){
 //Options > repin: on form submit 
 $('#re-pin-form').submit(function () { //// catch the form's submit event
 	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
-	console.warn(this)
 	data = $(this).serializeObject()
-	console.warn(data)
 	delete data.id
 	sData = JSON.stringify(data)
-	console.warn(sData)
-	ajax(false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
-	
+	ajax(this, false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
 	return false
 });
 function onRepinSuccess(data, ajaxStatus, xhr){
@@ -726,7 +723,7 @@ function onRepinSuccess(data, ajaxStatus, xhr){
 	$('#re-pin').modal('toggle')
 }
 function onRepinError(xhr, ajaxStatus, textStatus){
-	console.warn('-onRepinEror');
+	console.log('-onRepinEror');
 	console.log('textStatus: '+textStatus);
 	console.log('ajaxStatus: '+ajaxStatus);
 	console.log(xhr.responseText);
@@ -736,6 +733,7 @@ function onRepinError(xhr, ajaxStatus, textStatus){
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
 	state = $(this).attr('data-state');
+	//only open form if data-stat = true
 	if (state=="true"){
 		var pin = $($(this).closest(".pin"));
 		var id = parseInt(pin.attr('id'));
@@ -754,15 +752,17 @@ $('#cmnts').live('click', function(e){
 		$(this).attr('data-state', "false");
 		icon = $(this).find('i');
 		icon.toggleClass('icon-chat-empty');
+	//if data-stat = false cancel comment form
 	}else{
 		cancelCmnt(this);
 	}
 });
+
 //Options > Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
 	data = $(this).serializeObject()
-	console.warn(data)
+	console.log(data)
 	//TODO: validate comment exist here with max length
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
@@ -770,15 +770,17 @@ $(document).on( 'submit', '.pin form', function(e){
 });
 //Options > Comment: toggel callback
 function cmntsSuccess(result, pin){
-	console.warn('result of post')
-	console.warn(result)
 	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
-	if(cmnt.length > 0){
-		console.warn('-id exists')
+	if(result && cmnt.length > 0){//edit comment
 		cmnt.replaceWith(insertComment(result.username , result.user_id ,result.comment, result.id))//relace edited comment div with new comment
-	}else{
+	}else if (result){//new comment
 		pin.find('.pin-cmnts').append(insertComment(result.username , result.user_id ,result.comment, result.id))//append new comment to end of comments
+	}else{//on delete
+		console.log('del cmnt callback')
+		pin.find('#cmnts').attr('data-state',true)
+		pin.find('#cmnts i').toggleClass('icon-chat-empty');
 	}
+	//TODO:give posting indicator here
 	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
 	applyLayout()
 }
@@ -792,12 +794,17 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 });
 //Options > Comment: cancel form (for post & edit)
 function cancelCmnt(target){
-	var pin = $($(target).closest(".pin"));
+	var pin = $(target).closest(".pin");
 	var button = pin.find("#cmnts");
 	var pcf = pin.find('form[name="pin-cmnt-form"]');//pin comment form
 	var cmnts = pcf.closest('.pin-cmnts');
 	var cmnt1 = cmnts.find('.pin-cmnt');//first comment
 	var cmntE = pcf.closest('.pin-cmnt');//current edit comment
+	var opt = cmntE.find('.options');//options
+	console.log(cmnts);
+	console.log(cmnt1);
+	console.log(cmntE);
+	console.log(opt);
 	pcf.remove();
 	button.attr('data-state', 'true');
 	icon = button.find('i');
@@ -805,7 +812,7 @@ function cancelCmnt(target){
 	//if there are no existing comments hide the comment section
 	if (!cmnt1[0]){cmnts.hide()}
 	//if there is a comment being edited, show the original comment.
-	if (cmntE[0]){cmnt.children().show()}
+	if (cmntE[0]){cmnt.children().css('display', '')}//do not use .show()
 	applyLayout();
 }
 
@@ -813,10 +820,17 @@ function cancelCmnt(target){
 $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	e.preventDefault();
 	console.log('click delete');
+	var cmnts = $(this).closest('.pin-cmnts');
 	var cmnt = $(this).closest('.pin-cmnt')
 	var id = cmnt.attr("data-cmnt");
-	ajax(false, cmntURL+id+'/', true, "DELETE")
+	var button = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
+	togglePinStat(button[0], 'icon-chat-empty', 'DELETE', cmntURL, id)
+	button.attr('data-state',true)
+	//ajax(false, cmntURL+id+'/', true, "DELETE")
 	cmnt.remove();
+	//hide cmnt section if no more cmnts
+	var cmnt1 = cmnts.find('.pin-cmnt');//first comment
+	if (!cmnt1[0]){cmnts.hide()}
 	applyLayout();
 });
 
@@ -837,7 +851,9 @@ $(document).on('click', '.pin-cmnt .edit', function(e){
 function insertComment(username, userid, cmntT, cmntId){
 	var html = ""
 	if (!cmntId){cmntId=""};
-	html += '<p class="pin-cmnt touch-off" data-cmnt='+cmntId+'>';
+	html += '<p class="pin-cmnt'
+		if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
+	html += ' data-cmnt='+cmntId+'>';
 	if (userid == authUserO.id){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '<i class="icon cmnts"></i>';
 	html += '<a href="/user/'+username+'">' +username+': </a>';
@@ -919,7 +935,8 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 		var updateProfile = true;
 	}
 
-	this.onSuccess = function(result) {
+	this.onSuccess = function(result, ajaxStutus, xhr) {
+		//console.log(result, ajaxStutus, xhr)
 		if (state == "true"){
 			count--;
 			countP--;
@@ -947,13 +964,16 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 				dispTextP.html(countP);
 			}
 		}
-		if (result && typeof(window[name+'Success']) === "function"){
+		//exicute callback with nameSucess
+		var statA = new Array(201, 204)
+		var stat = xhr.status
+		if (statA.indexOf(stat)>=0 && typeof(window[name+'Success']) === "function"){
 			window[name+'Success'](result, pin);
 		}
 	}
 	console.log(url)
 	if (typeof url == "string" && url != ""){
-		console.warn('-ajax - 3 togglepin()');
+		console.log('-ajax - 3 togglepin()');
 		$.ajax({//3
 			url: pinsPrefix+url,
 			type: type,
@@ -961,7 +981,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 			contentType: 'application/json',
 			success: $.proxy(this.onSuccess, this),
 			error: function(jqXHR, settings) {
-				console.warn('addfav - ajax error');
+				console.warn('togglePinStat() - ajax error');
 			},
 		});
 	}
@@ -1036,7 +1056,7 @@ function follow(targetBtn, display) {
 	};
 	
 	var url = pinsPrefix+'/toggle/auth/User/'+id+'/';
-	console.warn('-ajax - 4 follow()');
+	console.log('-ajax - 4 follow()');
 	$.ajax({//4
 		url: url,
 		type: 'POST',
@@ -1054,7 +1074,6 @@ function follow(targetBtn, display) {
 //add click handler for pin functions
 //tag/groups
 $(document).on( 'click', '.pin.group .thumbs', function(event){
-	console.warn('group clicked')
 	target = $(event.target).closest('.pin.group')
 	id = target[0].id
 	loadData(id, aProfileO.username);
@@ -1251,21 +1270,14 @@ function cancelNewPin(){
 *- the required css is: .class:hover.touch-off .taget,.class.touch-on .target.touch-hover{ hover state style }
 */
 function toggleTouchHover(target, self){
-	console.warn(self)
 	if(self===undefined){self = true}
-	console.warn(aTouchHover)
-	console.warn(target)
-	console.warn(self)
 	if(!aTouchHover){
-		console.warn('1')
 		target.toggleClass('touch-hover');
 		aTouchHover = target;
 	}else if(aTouchHover && aTouchHover[0] == target[0] && self){
-		console.warn('2')
 		aTouchHover.toggleClass('touch-hover')
 		aTouchHover = undefined;
 	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
-		console.warn('3')
 		target.toggleClass('touch-hover');
 		aTouchHover.toggleClass('touch-hover')
 		aTouchHover = target;

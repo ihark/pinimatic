@@ -6,6 +6,7 @@ $(document).ready(function () {
 	$('#ajaxform').submit(function () { //// catch the form's submit event
 		var csrfToken = 'placeholder';
 		$.ajax({ //// create an AJAX call...
+			context: $(this),
 			data : $(this).serialize(), //// get the form data
 			dataType : "json",
 			type : $(this).attr('method'), //// GET or POST from method attribute
@@ -25,8 +26,7 @@ $(document).ready(function () {
 				clear_form_field_errors('#ajaxform');
 			},
 			success : function (data, textStatus, xhr) { // on success..
-				var jsonMessage = getMessages(xhr, messageDivId)
-				console.log( jsonMessage )
+				var jsonMessage = getMessages(xhr, $(this))
 				$.each(jsonMessage, function(index, value) {
 					if (index === "django_messages") {
 						$.each(jsonMessage.django_messages, function (i, item) {
@@ -36,15 +36,13 @@ $(document).ready(function () {
 								$("#btnsubmit").remove();
 							////if not logged in
 							} else if (item.extra_tags.indexOf('login') > -1){
-								//chrome requires return false in submit or it crashs
-								//$("#ajaxform").attr( 'onsubmit', 'popForm(this)' );
-								//$("#ajaxform").attr( 'action', "http:"+baseurl+"/pins/new-pin/");
 								$("#btnsubmit").text('LogIn');
 								$('#ajaxform').unbind('submit').find('input:submit,input:image,button:submit').unbind('click');
 								$('#ajaxform').submit(function () {
 									data = $("#ajaxform").serialize()
 									popLoc(data);
 									removeOverlay();
+									//chrome requires return false in submit or it crashes
 									return false;
 								});
 							}
@@ -68,12 +66,13 @@ $(document).ready(function () {
 		// nw.focus()
 	// }	
 // }
-function getMessages(xhr){
+
+//get and process messages targetForm should be sent as $(targetForm)
+function getMessages(xhr, targetForm){
 	var contentType = xhr.getResponseHeader("Content-Type");
 	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {
 		try{
 			var jsonMessage = $.parseJSON(xhr.responseText);
-			console.log('getMessages')
 			$.each(jsonMessage, function(index, value) {
 				if (index === "django_messages") {
 					$.each(jsonMessage.django_messages, function (i, item) {
@@ -84,10 +83,16 @@ function getMessages(xhr){
 					$.each(jsonMessage.__all__, function (i, item) {
 						addMessage(messageDivId, item.message, item.extra_tags);
 					});
+				////handle tastypie field errors for pin
+				} else if (index === "pin") {
+					$.each(jsonMessage.pin, function (i, item) {
+						addMessage(messageDivId, item, "alert");
+						apply_form_field_error(targetForm, i, item, item.extra_tags);
+					});
 				////handle form field errors
 				} else {
 					$.each(jsonMessage[index], function (i, item) {
-						apply_form_field_error(index, item.message, item.extra_tags);
+						apply_form_field_error(targetForm, index, item.message, item.extra_tags);
 					});
 				}
 			});
@@ -128,11 +133,10 @@ function addMessage(html_id, text, extra_tags) {
         // });
     // }, 10000);
 }
-function apply_form_field_error(fieldname, error, tags) {
-    var input = $( "#id_"+fieldname+"_label"),
-        container = $( "#div_id_"+fieldname),
-        error_msg = $("<span />").addClass("help-inline ajax-error").text(error);
-
+function apply_form_field_error(targetForm, fieldname, error, tags) {
+	var input = targetForm.find( "#id_"+fieldname+"_label");
+    var container = targetForm.find( "#div_id_"+fieldname);
+    var error_msg = $("<span />").addClass("help-inline ajax-error").text(error);
     container.addClass("error");
     error_msg.insertAfter(input);
 }

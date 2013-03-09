@@ -8,36 +8,66 @@
 {% block yield %}
 <div class="container">
 	<div class="help-page">
-		<div id="all" class="indent">
-			<h3>Installing the bookmarklet:</h3>
-			<h4>All browsers except iOS: (iPhone, iTouch & iPad)</h4>
-			<p class="indent">Drag this Button<a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">Pinify It</a>to your bookmarks or favorites bar</p>
-		</div>
-		<div id="ios" class="indent">
-			<h4>iOS (iPhone & iPad)-More steps but not hard :)</h4>
-				<h5>1) Setup Bookmark:</h5>
-				<p>
+		<div id="all">
+			<h4>Installing the bookmarklet:</h4>
+			<h5>All browsers except iOS</h5>
+				<ol>
+				<li>Drag this Button<a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">Pinify It</a>to your bookmarks or favorites bar</li>
+				</ol>
+			<h5>iOS (iPhone, iPodTouch, & iPad) - More steps but not hard :)</h5>
+				<ol TYPE="I">
+				<li><b>Setup the Bookmarklet:</b></li>
+					<ol>
 					<li>Tap the Share Icon (box with curved arrow) next to the address bar.</li>
 					<li>Tap Bookmark.</li>
 					<li>Tap the last box and select "Bookmarks Bar".</li>
 					<li>Tap Save.</li>
-				</p>
-				<h5>2) Copy The Text:</h5>
-				<p>
-					<li>Highlight all the text in the box below by holding you finger down on it.</li>
-					<textarea onclick="javascript:this.focus();this.select()" readonly="true" class="code">javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())</textarea>
-					<li>Tap Copy.</li>
-				</p>
-				<h5>3) Edit Bookmarklet:</h5>
-				<p>
+						</ol>
+				<li><b>Edit the Bookmarklet:</b></li>
+					<ol>
 					<li>Open your Bookmarks by taping the book icon then navigate to the Bookmarks Bar folder. (If your bookmarks are not shown, tap the book icon at the bottom of the window.)</li>
 					<li>Tap Edit</li>
-					<li>Tap Pinimatic - PinifyIt</li>
-					<li>Tap in the Address field, and clear it by tapping the X</li>
-					<li>Tap double tap the empty Address field, and tap Paste.</li>
-					<li>Tap Done on the keyboard or anyplace out side the Bookmarks window.</li>
-				</p>
+					<li>Tap in the Address field, and remove all the text shown below: </li>
+					<li>"{{ BASE_URL }}/help/#-delete_"</li>
+					<li>The first word in the address field should now be "javascript"</li>
+					<li>Tap Done on the keyboard or any place out side the Bookmarks window.</li>
+					</ol>
+				</ol>
+			<h4>Using the bookmarklet:</h4>
+				<ul>
+				<li><b>You shold now have a bookmark called 'Pinify it" on you bookmarks bar.</b></li>
+					<ol>
+					<li>Navigate to any webpage you would like to rememeber and tap/click the "Pinify" it button.</li>
+					<li>Select and image.</li>
+					<li>Tag it & give it an optional description.</li>
+					<li>Click post and you have just added your first pin.</li>
+					</ol>
+				</ul>
+			<h4>What are tags?:</h4>
+				<ul>
+				<li>Tags are like folders, but you can have one pin in many folders.</li>
+				<li>You will use tags to organize and filter your pin views</li>
+				<li>Tags are entered as comma seperated lists.  If you do not use a comma each word will be a tag.</li>
+					<ul TYPE="circle">
+					<li>If you enter: <span class="light" style="padding:1px 3px; line-height:12px; border:1px solid #999;">Photography, Landscapes, Alex Filatov</li>
+					<p>- Result: <span class="tag">Photography</span> <span class="tag">Landscapes</span> <span class="tag">Alex Filatov</span></p>
+					<li>If you enter: <span class="light" style="padding:1px 3px; line-height:12px; border:1px solid #999;">Alex Filatov,</span>(notice the comma)</li>
+					<p>- Result: <span class="tag">Alex Filatov</span></p>
+					<li>If you enter: <span class="light" style="padding:1px 3px; line-height:12px; border:1px solid #999;">Alex Filatov</span>(notice the lack of a comma)</li>
+					<p>- Result: <span class="tag">Alex</span> <span class="tag">Filatov</span></p>
+					</ul>
+				<li>Use generic tags to keep your pins organized. For example, if you are pining a photo of a landscape by the photographer Alex Filatov:</li>
+					<ul TYPE="circle">
+					<li>Good example: <span class="tag">Photography</span> <span class="tag">Landscapes</span> <span class="tag">Alex Filatov</span></li>
+					<p>- In this example you can view all Photography, or Photograpy of Landsapes, or Photograpy by Alex Filatov or Paintings of Landscapes.</p>
+					<li>Bad example: <span class="tag">Photos of landscapes</span></li>
+					<p>- In this example you can not filter by Photos and Landscapes seperately, your only option is to see Photos of Landscapes.</p>
+					<li>Bad example: <span class="tag">Trees</span> <span class="tag">Mountains</span> <span class="tag">Lake</span> <span class="tag">Birds</span> <span class="tag">Grass</span> <span class="tag">Sun</span></li>
+					<p>- In this example the tags are too specific and you will end up with hundreds of tags that are not usefull.</p>
+					</ul>
+				</ul>
 		</div>
 	</div>
 </div>
+<script>document.title = "Pinify it";var stateObj = '#-delete_javascript:void((function(){ var e=document.createElement("script"); e.type="text/javascript"; e.src="{{ BASE_URL }}/bookmarklet/?srcUrl="+location.href; document.body.appendChild(e);})())';window.history.pushState(stateObj, 'Pinfy it', stateObj)</script>
 {% endblock %}

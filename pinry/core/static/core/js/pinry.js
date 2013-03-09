@@ -1,4 +1,5 @@
 //Global Variables
+//STATIC_URL passed from base.html template context
 var apiURL = '/api/v1/'
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
@@ -406,7 +407,7 @@ function onLoadData(data, insert) {
 						html += '</div>';
 			//SOURCE BUTTON
 						html += '<div id="source" class="background-50 btn-lg">';
-							html += '<a target="_blank" href="'+image.srcUrl+'/">'
+							html += '<a target="_blank" href="'+image.srcUrl+'">'
 							html += '<div class="inline icon"><i class="icon-bookmark"></i><br>GO</div>';
 							html += '<div class="inline text">'+getHost(image.srcUrl)+'</div></a>';
 						html += '</div>';
@@ -1135,7 +1136,7 @@ function replaceFileUpload(target){
 				//remove previous item from list
 				$('.qq-upload-list').children().remove()
 				//get loading image
-				$(thumbTarget).attr("src", '/static/core/img/thumb-loader.gif');
+				$(thumbTarget).attr("src", STATIC_URL+'core/img/thumb-loader.gif');
 			},
 			onComplete: function( id, fileName, responseJSON ) {
 				if( responseJSON.success ) {
@@ -1256,7 +1257,7 @@ function cancelNewPin(){
 	//remove previous item from list
 	$('.qq-upload-list').children().remove()
 	//get default image
-	$(thumbTarget).attr("src", '/static/core/img/thumb-default.png');
+	$(thumbTarget).attr("src", STATIC_URL+'core/img/thumb-default.png');
 }
 
 

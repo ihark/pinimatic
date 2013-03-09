@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Monoton">
 
 {% compress css %}
-    <link name="cssbs" rel="stylesheet" href="{{ BASE_URL }}/static/vendor/bootstrap/2.0.3/css/bootstrap.css">
-    <link name="csspo" rel="stylesheet" href="{{ BASE_URL }}/static/core/css/pinryOverlay.css">
+    <link name="cssbs" rel="stylesheet" href="{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/bootstrap/2.0.3/css/bootstrap.css">
+    <link name="csspo" rel="stylesheet" href="{{ STATIC_PREFIX }}{{ STATIC_URL }}core/css/pinryOverlay.css">
 {% endcompress %}
 
 
@@ -17,5 +17,5 @@
 
 
 {% compress js %}
-    <script name="jq" src="{{ BASE_URL }}/static/core/js/pinry.js"></script>
+    <script name="jq" src="{{ STATIC_PREFIX }}{{ STATIC_URL }}core/js/pinry.js"></script>
 {% endcompress %}

@@ -11,6 +11,7 @@ from django.conf import settings
 import os
 import re
 from django.core.files.storage import default_storage
+from django.core.files.storage import FileSystemStorage
 from django.core.files.images import ImageFile
 
 #ajax thumbnail uplaod
@@ -102,13 +103,11 @@ def save_upload( uploaded, filePath, raw_data ):
 
 def delete_upload(request, fileName = None):
     print 'utils delete_uplaod called: '+fileName
-    exists = default_storage.exists(settings.TMP_ROOT+fileName)
-    success = 'utils - File has been found'
-    print success
-    if exists:
-        default_storage.delete(settings.TMP_ROOT+fileName)
+    tempFS = FileSystemStorage(location=settings.TMP_ROOT)
+    try:
+        tempFS.delete(settings.TMP_ROOT+fileName)
         success = 'utils - File has been deleted'
-    else:
+    except:
         success = 'utils - File was not found'
     if request:
         success = 'utils - File was deleted (json sent)'

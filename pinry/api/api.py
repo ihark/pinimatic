@@ -27,6 +27,8 @@ from pinry.pins.forms import PinForm
 from django import forms
 from tastypie.validation import CleanedDataFormValidation
 
+from django.core.files.storage import default_storage
+
 
 #resource path = pinry.api.api.SomeResource
 
@@ -277,10 +279,13 @@ class PinResource(ModelResource):
             if bundle.request.user == bundle.obj.submitter:
                 self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
                 bundle.obj.delete()
+                #delete the images
+                default_storage.delete(bundle.obj.image.name)
+                default_storage.delete(bundle.obj.thumbnail.name)
                 #TODO:try += so i dont accendnetly over write the bundle data.
                 bundle.data = {"django_messages": [{"extra_tags": "alert alert-success", "message": 'Delete was successfull.', "level": 25}]}
                 print bundle
-                #using HttpGone in stead of HttpNoContent so success can be displaied.
+                #using HttpGone in stead of HttpNoContent so success message can be displaied.
                 #TODO: how to add message to normal tasypie responce instead of forcing it here.  
                 #Also, why is it not getting picked up by middleware, so i can gust use django messages.
                 raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))

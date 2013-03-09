@@ -1,12 +1,13 @@
+#manage.py uses RACK_ENV to determine the settings file to use
 #from pinry.settings.settings import *
 from pinry.settings import *
-
 import os
 
+print '----development'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-HTTPS=1
+HTTPS=1#was used to test https but not used now?
 
 DATABASES = {
     'default': {

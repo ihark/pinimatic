@@ -41,7 +41,7 @@
 		////add jquery to overlay
 		jq = d.createElement("script");
 		jq.type = "text/javascript";
-		jq.src = "{{ BASE_URL }}/static/vendor/jquery/1.7.2/jquery.js";
+		jq.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/jquery/1.7.2/jquery.js";
 		o.appendChild(jq);
 		
 		////create header
@@ -114,12 +114,12 @@
         console.warn('--jqReady');
 		bs = d.createElement("script");
 		bs.type = "text/javascript";
-		bs.src = "{{ BASE_URL }}/static/vendor/bootstrap/2.0.3/js/bootstrap.js";
+		bs.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/bootstrap/2.0.3/js/bootstrap.js";
 		d.getElementById("overlay").appendChild(bs);
         console.warn('bootstrap.js added');
 		s4 = d.createElement("script");
 		s4.type = "text/javascript";
-		s4.src = "{{ BASE_URL }}/static/core/js/ajaxform.js";
+		s4.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}core/js/ajaxform.js";
 		d.getElementById("overlay").appendChild(s4);
 		console.warn('ajaxform.js added');
 		////set form action url to ajaxsubmit view

@@ -2,23 +2,21 @@ import os
 import socket
 from django.contrib.messages import constants as messages
 
+print '--General Settings Loading'
+
 SITE_ID = 1
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
 import socket
 try:
-    HOSTNAME = socket.gethostname()#not used
+    HOST = socket.gethostname()#not used
     SITE_IP = socket.gethostbyname(socket.gethostname())
-    FQDN = socket.getfqdn()#not used
 except:
-    HOSTNAME = 'localhost'
-    SITE_IP = 'localhost'
-    FQDN = 'localhost'
+    HOST = 'localhost:8000'
+    SITE_IP = 'localhost:8000'
 
 print 'SITE_IP = '+str(SITE_IP)
-print 'HOSTNAME = '+str(HOSTNAME)
-print 'FQDN = '+str(FQDN)
-
+print 'HOST = '+str(HOST)
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
@@ -42,6 +40,11 @@ TMP_URL = 'http://'+SITE_IP+':8000/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
 IMAGES_PATH = 'pins/pin/originals/'
+'''STATIC_PREFIX
+Static url can not be full url on local dev server so 
+this adds it to the bookmarklet. MUST BE = '' on production.
+'''
+STATIC_PREFIX = 'http://'+SITE_IP+':8000'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -74,7 +77,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "pinry.core.context_processors.template_settings",
-    "pinry.core.context_processors.baseurl",
+    "pinry.core.context_processors.baseUrl",
+    "pinry.core.context_processors.staticPrefix",
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']

@@ -1,5 +1,98 @@
+/* MODIFICATIONS TO BOOTSTRAP */
+.modal {
+  width: 498px;
+  margin: -280px 0 0 -250px;
+}
+.modal.fade {
+  top: -100%;
+}
+.modal.fade.in {
+  top: 50%;
+}
+.modal-footer {
+  padding: 10px 15px;
+}
+.modal-body {
+  max-height: 425px;
+}
+.modal-header h3{
+  display:inline-block;
+  margin-right: 25px;
+}
+
+.form-container {
+    border: 1px solid #ccc;
+    background-color: white;
+	width: 470px;
+    padding: 15px;
+	overflow: hidden;
+	margin-right: auto;
+	margin-left: auto;
+}
+.form-container .form-actions{
+  float: left;
+  text-align: right;
+  width: 100%;
+  padding: 10px 15px 10px 15px;
+  margin: 0px 0px -15px -15px;
+}
+.form-container .form-header{
+  width: 100%;
+  padding: 5px 15px 5px 15px;
+  margin: -15px 0px 15px -15px;
+  border-bottom: 1px solid #CCC;
+  
+}
+.form-header h3{
+  display:inline-block;
+  margin: 0px 25px 0px 0px ;
+  
+}
+.form-actions {
+	margin-bottom: 0;
+}
+
+.form{
+    text-align: center;
+}
+
+.form #fields_div{
+  text-align: left;
+  display: inline-block;
+  width: 220px;
+}
+.form #thumb_div{
+  vertical-align: top;
+  text-align: center;
+  display: inline-block;
+  margin-right: 25px;
+  margin-top: 5px;
+  width: 200px;
+  height: 100%;
+}
 
 
+.form .control-group.error > label {
+  color: black;
+  display: inline-block;
+}
+.form .help-inline.control-label {
+  display: inline;
+  vertical-align: inherit;
+  padding-left: 0px;
+  cursor: default;
+  font-size: 12px;
+}
+[class^="icon-"],
+[class*=" icon-"] {
+  background-image: url("/static/vendor/bootstrap/2.2.2/img/glyphicons-halflings.png");
+}
+/*File Uplader overides*/
+.qq-upload-spinner {
+	background: url("/static/vendor/file-uploader/loading.gif");
+	}
+
+	/* PINIMATIC */
 a:hover{
 	color: #398F00;
 	text-decoration:none;
@@ -265,6 +358,7 @@ body {
 		}
 		.pin-options .btn-lg {
 			width:160px;
+			height: 32px;
 			margin: 10px auto;
 			border-radius: 3px;
 			-moz-border-radius:3px; 
@@ -276,7 +370,7 @@ body {
 		
 		.pin-options .btn-lg .icon {
 			height:30px;
-			width:40px;
+			width:35px;
 			margin:0px;
 			font-weight:bold;
 		}
@@ -284,8 +378,14 @@ body {
 			line-height:30px;
 			font-size:14px;
 			font-weight:bold;
-			width:115px;
-			float:right;
+			width:120px;
+			overflow: hidden;
+			height: 28px;
+			margin: 2px 4px 2px 0px;
+			vertical-align: middle;
+			height: 100%;
+			position: relative;
+			top: -6px;
 		}
 		/* (not used) cog toggle button */
 		.pin-options-btn{
@@ -543,18 +643,18 @@ body {
 
 /* ICONS */
 .icon-chat{
-	background-image: url("../img/icons-chat-12.png");
+	background-image: url("/static/core/img/icons-chat-12.png");
 	background-position: -0px 2px;
 }
 .icon-chat-empty{
-	background-image: url("../img/icons-chat-o-12.png");
+	background-image: url("/static/core/img/icons-chat-o-12.png");
 	background-position: -0px 2px;
 }
 .icon.favs {
-	background-image: url("../img/icons-star.png");
+	background-image: url("/static/core/img/icons-star.png");
 }
 .icon.cmnts {
-	background-image: url("../img/icons-chat-11.png");
+	background-image: url("/static/core/img/icons-chat-11.png");
 	background-position: -0px 1px;
 }
 
@@ -564,91 +664,4 @@ body {
 }
 .touch-off{
 
-}
-
-
-/* MODIFICATIONS TO BOOTSTRAP */
-.modal {
-  width: 498px;
-  margin: -280px 0 0 -250px;
-}
-.modal.fade {
-  top: -100%;
-}
-.modal.fade.in {
-  top: 50%;
-}
-.modal-footer {
-  padding: 10px 15px;
-}
-.modal-body {
-  max-height: 425px;
-}
-.modal-header h3{
-  display:inline-block;
-  margin-right: 25px;
-}
-
-.form-container {
-    border: 1px solid #ccc;
-    background-color: white;
-	width: 470px;
-    padding: 15px;
-	overflow: hidden;
-	margin-right: auto;
-	margin-left: auto;
-}
-.form-container .form-actions{
-  float: left;
-  text-align: right;
-  width: 100%;
-  padding: 10px 15px 10px 15px;
-  margin: 0px 0px -15px -15px;
-}
-.form-container .form-header{
-  width: 100%;
-  padding: 5px 15px 5px 15px;
-  margin: -15px 0px 15px -15px;
-  border-bottom: 1px solid #CCC;
-  
-}
-.form-header h3{
-  display:inline-block;
-  margin: 0px 25px 0px 0px ;
-  
-}
-.form-actions {
-	margin-bottom: 0;
-}
-
-.form{
-    text-align: center;
-}
-
-.form #fields_div{
-  text-align: left;
-  display: inline-block;
-  width: 220px;
-}
-.form #thumb_div{
-  vertical-align: top;
-  text-align: center;
-  display: inline-block;
-  margin-right: 25px;
-  margin-top: 5px;
-  width: 200px;
-  height: 100%;
-}
-
-
-.form .control-group.error > label {
-  color: black;
-  display: inline-block;
-}
-.form .help-inline.control-label {
-  display: inline;
-  vertical-align: inherit;
-  padding-left: 0px;
-  cursor: default;
-  font-size: 12px;
 }

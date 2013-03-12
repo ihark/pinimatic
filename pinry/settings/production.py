@@ -41,5 +41,5 @@ TMP_URL = 'http://pinry.herokuapp.com/media/tmp/'
 #STATIC_URL = S3_URL
 
 # TODO: Be sure to set this.
-SECRET_KEY = os.environ.get('S3_BUCKET_NAME')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 

@@ -3,7 +3,7 @@
 from pinry.settings import *
 import os
 
-print '----development'
+print '--Development Settings Loading'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

@@ -54,4 +54,3 @@ Compressing... Error: An error occured during rendering /app/pinry/pins/template
 strap/2.0.3/css/bootstrap.css' isn't accessible via COMPRESS_URL ('http://pinry.s3.amazonaws.com/static/') and can't be
 compressed
 '''
-

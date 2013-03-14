@@ -50,7 +50,7 @@ def logout_user(request):
     logout(request)
     messages.success(request, 'You have successfully logged out.')
     return HttpResponseRedirect(reverse('core:home'))
-	
+
 def bookmarklet(request):
     srcUrl = request.GET.get('srcUrl','')
     resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {"srcUrl": srcUrl}))

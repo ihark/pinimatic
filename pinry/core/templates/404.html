@@ -1,15 +1,12 @@
 {% extends 'core/base.html' %}
 
-
 {% block title %}404{% endblock %}
 
 {% block yield %}
-    <div class="container">
-        <div class="row">
-            <div id="form" class="span6 offset3">
-                <h1>404</h1>
-                <p>This page does not exist.</p>
-            </div>
-        </div>
-    </div>
+<div class="container error-page">
+	<h1>404</h1>
+	<p>This page does not exist, please check the URL and try again.</p>
+	<!-- {{ request }} is here if i need it-->
+
+</div>
 {% endblock %}

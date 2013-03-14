@@ -2,6 +2,7 @@ import os
 import socket
 from django.contrib.messages import constants as messages
 
+
 print '--General Settings Loading'
 
 SITE_ID = 1
@@ -22,10 +23,18 @@ print 'HOST = '+str(HOST)
 SITE_NAME = 'Pinimatic'
 # Set to False to disable people from creating new accounts.
 ALLOW_NEW_REGISTRATIONS = True
-
 # Set to False to force users to login before seeing any pins. 
 PUBLIC = True
 
+# Set up email
+EMAIL_USE_TLS = True
+EMAIL_PORT = '587'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# Set ture to send a start up email to admins.
+SEND_TEST_EMAIL = True
 
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'

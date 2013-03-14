@@ -4,7 +4,7 @@ from pinry.pins.models import Pin
 
 
 class PinAdmin(admin.ModelAdmin):
-    list_display = ['published', 'description']
+    list_display = ['pk', 'id', 'submitter', 'published', 'description']
 
 
 admin.site.register(Pin, PinAdmin)

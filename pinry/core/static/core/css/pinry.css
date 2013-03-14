@@ -87,12 +87,27 @@
 [class*=" icon-"] {
   background-image: url("/static/vendor/bootstrap/2.2.2/img/glyphicons-halflings.png");
 }
+.container{
+	width:auto;
+	margin:auto;
+}
 /*File Uplader overides*/
 .qq-upload-spinner {
 	background: url("/static/vendor/file-uploader/loading.gif");
 	}
 
 	/* PINIMATIC */
+
+.error-page{
+	width:400px;
+	font-size: 12px;
+	overflow-wrap: break-word;
+	color: #888;
+}
+
+.error-page h1{
+	color: #333;
+}
 a:hover{
 	color: #398F00;
 	text-decoration:none;
@@ -226,10 +241,7 @@ body {
     z-index: 100;
 	float: left;
 }
-.container{
-	width:600px;
-	margin:auto;
-}
+
 .indent p,
 .indent li,
 .indent textarea{

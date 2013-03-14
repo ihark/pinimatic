@@ -13,6 +13,6 @@ print 'ADMINS: ', settings.ADMINS
 #SEND TEST EMAIL
 if settings.SEND_TEST_EMAIL:
     from django.core.mail import send_mail, mail_admins
-    #send_mail('DEVELOPMENT SERVER STARTED', 'The server has been started @ '+settings.SITE_IP, 'pinimatic@gmail.com', ['jpogrob@gmail.com'], fail_silently=False)
-    mail_admins('AMDINS: SEVER HAS BEEN STARTED', 'The server has been started @ '+settings.SITE_IP, fail_silently=False)
+    #send_mail('DEVELOPMENT SERVER STARTED', 'The server has been started @ '+settings.SITE_URL, 'pinimatic@gmail.com', ['jpogrob@gmail.com'], fail_silently=False)
+    mail_admins('AMDINS: SEVER HAS BEEN STARTED', 'The server has been started @ '+settings.SITE_URL, fail_silently=False)
     print 'Test email sent to ADMINS, set SEND_TEST_EMAIL=False to stop this'

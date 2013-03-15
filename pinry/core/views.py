@@ -58,8 +58,6 @@ def bookmarklet(request):
 
 def feedback(request):
 
-    
-    #if current_site.domain == 'foo.com':
     context = {
             #'pin': pin
         }

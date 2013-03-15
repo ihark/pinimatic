@@ -55,7 +55,7 @@ COMPRESS_ENABLED = True
 COMPRESS_STORAGE = STATICFILES_STORAGE 
 COMPRESS_URL = STATIC_URL
 COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE = False
 '''COMPRESS_OFFLINE issue:
 Compressing... Error: An error occured during rendering /app/pinry/pins/templates/pins/bmbase.html: '/static/vendor/boot
 strap/2.0.3/css/bootstrap.css' isn't accessible via COMPRESS_URL ('http://pinry.s3.amazonaws.com/static/') and can't be

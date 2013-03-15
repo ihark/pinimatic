@@ -14,3 +14,4 @@ django-storages==1.1.6
 boto==2.7.0
 django-follow==0.6.1
 gunicorn==0.17.2
+git+git://github.com/pennersr/django-allauth.git@bcaaaadd97d4b6d4a8741472066244daa7edd32e

@@ -95,6 +95,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "pinry.core.context_processors.template_settings",
     "pinry.core.context_processors.baseUrl",
     "pinry.core.context_processors.staticPrefix",
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']
@@ -106,6 +108,14 @@ LOGIN_URL = '/login/'
 DEFAULT_USER_GROUP = 'Basic'
 
 INTERNAL_IPS = ['127.0.0.1']
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
 MESSAGE_TAGS = {
     messages.WARNING: 'alert',
@@ -135,5 +145,11 @@ INSTALLED_APPS = (
     'storages',
     'follow',
     'gunicorn',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ... include the providers you want to enable:
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
 )
 

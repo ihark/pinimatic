@@ -45,7 +45,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 # Set ture to send a start up email to admins.
-SEND_TEST_EMAIL = True
+SEND_TEST_EMAIL = False
 
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'

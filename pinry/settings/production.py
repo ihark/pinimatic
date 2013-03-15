@@ -17,6 +17,7 @@ DATABASES = {
     'PASSWORD': os.environ.get("DB_PASSWORD"),
   }
 }
+SEND_TEST_EMAIL = True
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 

@@ -34,4 +34,4 @@ if settings.SITE_IP.split('.')[0] == '192':
         }),
     )
 
-handler500 = TemplateView.as_view(template_name="500.html")
+#handler500 = TemplateView.as_view(template_name="500.html")

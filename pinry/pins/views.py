@@ -226,5 +226,5 @@ def comment(request, pk=1):
     context = {
             'pin': pin
         }
-    return TemplateResponse(request, 'comments/comment.html', context)
+    return TemplateResponse(request, 'pins/comments/comment.html', context)
   

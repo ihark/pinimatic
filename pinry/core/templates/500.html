@@ -1,17 +1,13 @@
 {% extends 'core/base.html' %}
 
-
 {% block title %}500{% endblock %}
 
 {% block yield %}
-    <div class="container">
-        <div class="row">
-            <div id="form" class="span6 offset3">
-                <h1>500</h1>
-                <p>Something went wrong! If you figure out what it was please
-                    submit an issue on Pinry's
-                    <a href="https://github.com/overshard/pinry/issues">GitHub Issue's page</a>.</p>
-            </div>
-        </div>
-    </div>
+<div class="container error-page">
+	<h1>500: Woops!</h1>
+	<p><h6>{{request.user}}, something went wrong. Rest assured we have been sent all of the 
+	ugly details involved in this atrocity and will have it corrected ASAP.</h6><p>
+	<p>If you are a developer and you know what happened, submit an issue on Pinimatic's
+	<a target="window" href="https://github.com/arctelix/pinimatic/issues">GitHub Issue's page</a>.</p>
+</div>
 {% endblock %}

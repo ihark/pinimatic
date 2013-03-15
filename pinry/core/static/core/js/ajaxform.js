@@ -104,7 +104,7 @@ function getMessages(xhr, targetForm){
 	return jsonMessage
 }
 function popLoc(data) {
-	//&mode=save tells view to save pin without "POST"
+	//&save=True tells view to save pin without "POST"
 	nw = window.open("http:"+baseurl+"/new-pin/?"+data+"&save=True", 'popup', 'width=800, height=400, resizeable=true, scrollbars');
 	if (window.focus) {
 		nw.focus()

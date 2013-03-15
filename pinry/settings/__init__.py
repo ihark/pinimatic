@@ -2,32 +2,50 @@ import os
 import socket
 from django.contrib.messages import constants as messages
 
+
+print '--General Settings Loading'
+
 SITE_ID = 1
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
 import socket
 try:
-    HOSTNAME = socket.gethostname()#not used
+    HOST = socket.gethostname()#not used
     SITE_IP = socket.gethostbyname(socket.gethostname())
-    FQDN = socket.getfqdn()#not used
 except:
-    HOSTNAME = 'localhost'
+    HOST = 'localhost'
     SITE_IP = 'localhost'
-    FQDN = 'localhost'
+
+#must run server with this port ie: python manage.py runserver 0.0.0.0:5000
+#forman start uses 5000 by default.
+SITE_PORT = ':5000'
+SITE_URL = 'http://'+SITE_IP+SITE_PORT
+'''STATIC_PREFIX
+Static url can not be full url on local dev server so 
+this adds it to the bookmarklet. MUST BE = '' on production.
+'''
+STATIC_PREFIX = SITE_URL
 
 print 'SITE_IP = '+str(SITE_IP)
-print 'HOSTNAME = '+str(HOSTNAME)
-print 'FQDN = '+str(FQDN)
-
+print 'HOST = '+str(HOST)
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
 # Set to False to disable people from creating new accounts.
 ALLOW_NEW_REGISTRATIONS = True
-
 # Set to False to force users to login before seeing any pins. 
 PUBLIC = True
 
+
+# Set up email
+EMAIL_USE_TLS = True
+EMAIL_PORT = '587'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# Set ture to send a start up email to admins.
+SEND_TEST_EMAIL = False
 
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'
@@ -36,12 +54,13 @@ USE_L10N = True
 USE_TZ = True
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-MEDIA_URL = 'http://'+SITE_IP+':8000/media/'
+MEDIA_URL = SITE_URL+'/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
-TMP_URL = 'http://'+SITE_IP+':8000/media/tmp/'
+TMP_URL = SITE_URL+'/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
 IMAGES_PATH = 'pins/pin/originals/'
+
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -74,7 +93,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "pinry.core.context_processors.template_settings",
-    "pinry.core.context_processors.baseurl",
+    "pinry.core.context_processors.baseUrl",
+    "pinry.core.context_processors.staticPrefix",
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']
@@ -114,5 +134,6 @@ INSTALLED_APPS = (
     'pinry.bookmarklet',
     'storages',
     'follow',
+    'gunicorn',
 )
 

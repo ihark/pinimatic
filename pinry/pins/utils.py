@@ -1,6 +1,7 @@
 #utilites related to pins
-
+import operator
 from urlparse import urlparse, urlunparse 
+
 def get_top_domains(srcUrls, qty):
     srcDomains = {}
     for url in srcUrls:
@@ -13,7 +14,6 @@ def get_top_domains(srcUrls, qty):
             srcDomains[dom] = count, url
         elif dom != '':
             srcDomains[dom] = srcDomains[dom][0]+count, url
-    print srcDomains
-    import operator
+
     srcDomains = sorted(srcDomains.iteritems(), key=operator.itemgetter(1), reverse=True)
     return srcDomains[:qty]

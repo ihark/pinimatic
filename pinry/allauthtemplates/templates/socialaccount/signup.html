@@ -1,0 +1,38 @@
+{% extends "socialaccount/base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% load bootstrap_field %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Sign Up" %}</h1>
+
+<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+Please complete the following form to link your {{provider_name}} account to a new {{site_name}} account:{% endblocktrans %}</p>
+{% if form.errors %}
+	<ul class="errorlist">
+		<li>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+		NOTE: If you already have a {{site_name}} account and want to link your {{provider_name}} account please click {% endblocktrans %}
+		<a href="{% url 'socialaccount_connections' %}">{% trans " Here" %}</a> to log in first.</li>
+	</ul>
+{% endif %}
+    
+<form class="signup" id="signup_form" method="post" action="">
+  {% csrf_token %}
+  {% for field in form %}
+    {% if field.name != 'remember' %}
+      {% bootstrap_field field %}
+    {% endif %}
+  {% endfor %}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+ 
+  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+</form>
+        
+
+{% endblock %}
+
+

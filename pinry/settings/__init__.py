@@ -59,8 +59,25 @@ TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = SITE_URL+'/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
+#Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
 
+ROOT_URLCONF = 'pinry.urls'
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
+DEFAULT_USER_GROUP = 'Basic'
+
+INTERNAL_IPS = ['127.0.0.1']
+
+#ALLAUTH
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/user/all/'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_PASSWORD_MIN_LENGTH =6
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -101,13 +118,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']
 
-ROOT_URLCONF = 'pinry.urls'
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
-DEFAULT_USER_GROUP = 'Basic'
-
-INTERNAL_IPS = ['127.0.0.1']
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -142,14 +153,25 @@ INSTALLED_APPS = (
     'pinry.pins',
     'pinry.api',
     'pinry.bookmarklet',
+    'pinry.allauthtemplates',
     'storages',
     'follow',
     'gunicorn',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    # ... include the providers you want to enable:
+    # ... include social providers you want to enable:
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.linkedin',
+    #'allauth.socialaccount.providers.twitter',
 )
+SOCIALACCOUNT_PROVIDERS ={ 
+    'facebook':
+        { 'SCOPE': ['email', 'publish_stream'],
+          'AUTH_PARAMS': { 'auth_type': 'reauthenticate' },
+          'METHOD': 'js_sdk'},
+    'linkedin':
+        { 'SCOPE': ['r_emailaddress'] }
+    }
 

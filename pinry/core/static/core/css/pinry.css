@@ -1,4 +1,8 @@
 /* MODIFICATIONS TO BOOTSTRAP */
+input[type="radio"], input[type="checkbox"] {
+  margin: 0px 2px 2px 0px;
+}
+
 .modal {
   width: 498px;
   margin: -280px 0 0 -250px;
@@ -28,7 +32,11 @@
 	overflow: hidden;
 	margin-right: auto;
 	margin-left: auto;
+	webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
 }
+
 .form-container .form-actions{
   float: left;
   text-align: right;
@@ -70,8 +78,9 @@
   width: 200px;
   height: 100%;
 }
-
-
+h1, h2, h3, h4, h5, h6 {
+	margin: 5px 0;
+}
 .form .control-group.error > label {
   color: black;
   display: inline-block;
@@ -95,9 +104,34 @@
 .qq-upload-spinner {
 	background: url("/static/vendor/file-uploader/loading.gif");
 	}
+/* ALLAUTH FORMS*/
+.form-container.accounts {
+	width:220px;
+	background-color: transparent;
+	color: #AAA;
+}
+	.form-container.accounts h1{
+		color:#444;
+		font-size:24px;
+		line-height:24px;
+		width: 100%;
+		padding: 9px 15px;
+		margin: -15px 0px 15px -15px;
+		border-bottom: 1px solid #AAA;
+		background-color: White;
+	}
+	.form-container.accounts  label{
 
-	/* PINIMATIC */
+	}
 
+.socialaccount_providers{
+	margin:0px -5px;
+}
+/* PINIMATIC */
+.errorlist {
+	margin: 0 0 10px 15px;
+	color: #B94A48
+}
 .error-page{
 	width:400px;
 	font-size: 12px;
@@ -124,8 +158,8 @@ body {
 	padding:0px 5px 0px 5px !important;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	line-height: 20px;
-	font-size: 14px;
-	color: #999;
+	font-size: 12px;
+	color: #999 !important;
 	text-shadow: none;
 	margin: 0px 5px 0px 5px;
 	cursor: pointer;
@@ -136,13 +170,12 @@ body {
 	background: white;
 	display: inline-block;
 	text-decoration: none;
+	font-family: 'Fugaz One';
 }
 .button-bm:hover{
 	color: #398F00 !important;
 	text-decoration:none !important;
 }
-
-
 
 .navbar .button-bm{
 		margin: 8px 10px 8px 10px !important;
@@ -158,8 +191,8 @@ body {
 }
 	
 	.navbar .brand {
-		color: #999;
-		font-family: 'Monoton';
+		color: #444;
+		font-family: 'Fugaz One';
 		font-size: 26px;
 
 		padding-left:0px;

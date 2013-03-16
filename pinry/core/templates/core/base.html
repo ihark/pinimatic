@@ -9,9 +9,9 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		
-        <title>{{ site_name }} - {% block title %}{% endblock %}</title>
+        <title>{{ site_name }} - {% block title %}{% endblock %}{% block head_title %}{% endblock %}</title>
 		
-		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Monoton">
+		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Fugaz One">
 		
         {% compress css %}
             <link rel="stylesheet" href="{{STATIC_URL}}vendor/bootstrap/2.2.2/css/bootstrap.css">
@@ -19,25 +19,28 @@
             <link rel="stylesheet" href="{{STATIC_URL}}vendor/file-uploader/fileuploader.css">
 			<link rel="stylesheet" href="{{STATIC_URL}}core/css/pinry.css">
         {% endcompress %}
+		
+		{% block extra_head %}{% endblock %}
 
         
     </head>
-    <body style="background-color:#1F1F1F; background-image:url('{{STATIC_URL}}core/img/backgrounds/pw_maze_black.png');">
+    <body style="background-color:#111; background-image:url('{{STATIC_URL}}core/img/backgrounds/pw_maze_black.png');">
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a href="{% url core:home %}" class="brand pull-left">{{ site_name }}</a>
 
                 <ul class="nav pull-right">
                     {% if user.is_authenticated %}
-						<li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">Pinify It</a></li>
+						<li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">PiniFy It</a></li>
                         <li><a href="{% url core:help %}">Help</a></li>
 						<li><a href="#new-pin" data-toggle="modal">New Pin</a></li>
 						<li><a id="user" data-user="{{ user }}" href="{% url pins:user %}{{ user }}/" onclick="loadData(undefined, '{{ user }}');">{{ user }}</a></li>
                         <li><a href="{% url core:logout %}">Logout</a></li>
                     {% else %}
-                        <li><a href="{% url core:login %}">Login</a></li>
-                        <li><a href="{% url core:register %}">Register</a></li>
+                        <li><a href="{% url account_login %}">Login</a></li>
+                        <li><a href="{% url account_signup %}">Sign Up</a></li>
                     {% endif %}
+					{% block account-nav %}{% endblock %}
                 </ul>
             </div>
         </div>
@@ -48,9 +51,9 @@
                 <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
                 {% endfor %}
             </ul>
-
-
+		
         {% block yield %}{% endblock %}
+		
 		<div id="loader" class="container">
 			<div class="">
 				<img src="{{STATIC_URL}}core/img/loader.gif" alt="Loader">

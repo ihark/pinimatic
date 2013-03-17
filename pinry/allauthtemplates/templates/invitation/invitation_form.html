@@ -1,0 +1,25 @@
+{% extends "account/base.html" %}
+
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Invitation" %}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Invite a friend" %}</h1>
+
+{% ifequal remaining_invitations 0 %}
+<p>{% trans "You currently have no invitations to send." %}</p>
+
+{% else %}
+<p>{% trans "Please enter your friends email address below." %}</p>
+<form action="{% url invitation_invite %}" method="POST">
+	{% csrf_token %}
+	{{form.as_p}}
+
+	<button class="btn btn-primary" type="submit">{% trans "Invite " %}&raquo;</button>
+</form>
+{% endifequal %}
+
+{% endblock %}

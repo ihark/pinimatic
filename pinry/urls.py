@@ -17,6 +17,7 @@ urlpatterns = patterns('',
         'document_root': settings.TMP_ROOT,
     }),
     url(r'^comments/', include('django.contrib.comments.urls')),
+    (r'^accounts/', include('invitation.urls')),
     (r'^accounts/', include('allauth.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

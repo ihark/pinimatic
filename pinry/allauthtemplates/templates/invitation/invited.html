@@ -1,0 +1,10 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{% trans "You have been invited!" %}</h1>
+key={{ invitation_key }}
+<a class="btn btn-primary" href="{% url registration_register %}?invitation_key={{ invitation_key }}">{% trans "proceed to registration" %} &raquo; </a>
+
+{% endblock %}

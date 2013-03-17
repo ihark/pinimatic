@@ -7,8 +7,16 @@
 
 {% block content %}
 <h1>{% trans "Sign Up Closed" %}</h1>
+<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+We are sorry, but new registration's are by invitation only.{% endblocktrans %}</p>
+<form action="" method="POST">
+	{% csrf_token %}
+	{{form.as_p}}
 
-<p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
+	<button class="btn btn-primary" type="submit">{% trans "Request Invitation " %}&raquo;</button>
+</form>
+
 {% endblock %}
+
 
 

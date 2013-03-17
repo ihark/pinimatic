@@ -31,27 +31,47 @@ print 'HOST = '+str(HOST)
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
-# Set to False to disable people from creating new accounts.
-ALLOW_NEW_REGISTRATIONS = True
 # Set to False to force users to login before seeing any pins. 
 PUBLIC = True
 
+#LOGIN IN (keep above allauth)
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
+ALLOW_NEW_REGISTRATIONS = True
 
-# Set up email
-EMAIL_USE_TLS = True
-EMAIL_PORT = '587'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
-# Set ture to send a start up email to admins.
+#TEST EMAIL
 SEND_TEST_EMAIL = False
 
+#ALLAUTH
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/user/all/'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_PASSWORD_MIN_LENGTH =6
+ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
+
+#INVITATIONS
+INVITATION_USE_ALLAUTH = True
+INVITE_MODE = True
+ACCOUNT_INVITATION_DAYS = 30
+ACCOUNT_ACTIVATION_DAYS = 20
+INVITATIONS_PER_USER = 5
+
+#USERS
+DEFAULT_USER_GROUP = 'Basic'
+
+#LOCATION
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+#URLS
+ROOT_URLCONF = 'pinry.urls'
+INTERNAL_IPS = ['127.0.0.1']
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
 MEDIA_URL = SITE_URL+'/media/'
@@ -62,22 +82,12 @@ STATIC_URL = '/static/'
 #Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
 
-ROOT_URLCONF = 'pinry.urls'
-
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/login/'
-DEFAULT_USER_GROUP = 'Basic'
-
-INTERNAL_IPS = ['127.0.0.1']
-
-#ALLAUTH
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/user/all/'
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_USERNAME_MIN_LENGTH = 3
-ACCOUNT_PASSWORD_MIN_LENGTH =6
+# Set up email
+EMAIL_USE_TLS = True
+EMAIL_PORT = '587'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -165,6 +175,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.linkedin',
     #'allauth.socialaccount.providers.twitter',
+    'invitation',
 )
 SOCIALACCOUNT_PROVIDERS ={ 
     'facebook':

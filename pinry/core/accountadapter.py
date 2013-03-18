@@ -15,9 +15,8 @@ class AccountAdapter(DefaultAccountAdapter):
         Next to simply returning True/False you can also intervene the
         regular flow by raising an ImmediateHttpResponse
         """
-        print request.REQUEST
         invitation_key = request.session.get('invitation_key', False)
-        print invitation_key
+        print '--account adapter--invitation key--', invitation_key
         
         if getattr(settings, 'ALLOW_NEW_REGISTRATIONS', False):
             if getattr(settings, 'INVITE_MODE', False):

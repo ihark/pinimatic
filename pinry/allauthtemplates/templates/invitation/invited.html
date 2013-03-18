@@ -3,8 +3,13 @@
 
 {% block content %}
 
-<h1>{% trans "You have been invited!" %}</h1>
-key={{ invitation_key }}
-<a class="btn btn-primary" href="{% url registration_register %}?invitation_key={{ invitation_key }}">{% trans "proceed to registration" %} &raquo; </a>
+<h1>{% trans "Welcome!" %}</h1>
+
+<p>{% blocktrans %}
+Click the button below to create a {{site_name}} account.
+{% endblocktrans %}</p>
+
+<a class="btn btn-primary" href="{% url registration_register %}?invitation_key={{ invitation_key }}">
+{% trans "proceed to registration" %} &raquo; </a>
 
 {% endblock %}

@@ -51,6 +51,7 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH =6
 ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
+SOCIALACCOUNT_ADAPTER ="pinry.core.accountadapter.SocialAccountAdapter"
 
 #INVITATIONS
 INVITATION_USE_ALLAUTH = True
@@ -180,7 +181,7 @@ INSTALLED_APPS = (
 SOCIALACCOUNT_PROVIDERS ={ 
     'facebook':
         { 'SCOPE': ['email', 'publish_stream'],
-          'AUTH_PARAMS': { 'auth_type': 'reauthenticate' },
+          'AUTH_PARAMS': { },
           'METHOD': 'js_sdk'},
     'linkedin':
         { 'SCOPE': ['r_emailaddress'] }

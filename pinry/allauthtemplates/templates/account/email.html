@@ -21,20 +21,22 @@
       <input id="email_radio_{{forloop.counter}}" type="radio" name="email" {% if emailaddress.primary %}checked="checked"{%endif %} value="{{emailaddress.email}}"/>
 
 {{ emailaddress.email }}
+	<p style="margin-left:18px;">
     {% if emailaddress.verified %}
     <span class="verified">{% trans "Verified" %}</span>
     {% else %}
     <span class="unverified">{% trans "Unverified" %}</span>
     {% endif %}
-      {% if emailaddress.primary %}<span class="primary">{% trans "Primary" %}</span>{% endif %}
+      {% if emailaddress.primary %}<span class="primary">{% trans "(Primary)" %}</span>{% endif %}
+	</p>
 </label>
 </div>
   {% endfor %}
 
 <div class="buttonHolder">
-      <button class="secondaryAction" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
-      <button class="secondaryAction" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
-      <button class="primaryAction" type="submit" name="action_remove" >{% trans 'Remove' %}</button>
+      <button class="btn btn-small" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
+      <button class="btn btn-small" type="submit" name="action_send" >{% trans 'Verify' %}</button>
+      <button class="btn btn-danger btn-small" type="submit" name="action_remove" >{% trans 'Remove' %}</button>
 </div>
 
 </fieldset>
@@ -51,7 +53,7 @@
     <form method="post" action="" class="add_email uniForm">
         {% csrf_token %}
         {{ add_email_form.as_p}}
-        <button name="action_add" type="submit">{% trans "Add E-mail" %}</button>
+        <button class="btn btn-primary btn-small" name="action_add" type="submit">{% trans "Add E-mail" %}</button>
     </form>
     
 {% endblock %}

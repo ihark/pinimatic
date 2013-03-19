@@ -2,7 +2,6 @@ import os
 import socket
 from django.contrib.messages import constants as messages
 
-
 print '--General Settings Loading'
 
 SITE_ID = 1

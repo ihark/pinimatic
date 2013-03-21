@@ -8,11 +8,11 @@ jsmin==2.0.2
 -e git://github.com/hcarvalhoalves/django-taggit.git@e0f9642d7b94c8e6c0feb520d96bb6ae4d78a4d0#egg=django-taggit
 simplejson==2.5.2
 psycopg2==2.4.5
--e hg+https://bitbucket.org/etienned/pil-2009-raclette/#egg=PIL
+
 dj-database-url==0.2.0
 django-storages==1.1.6
 boto==2.7.0
 django-follow==0.6.1
 gunicorn==0.17.2
-git+git://github.com/pennersr/django-allauth.git@1d2a4621c73a6f984275ec47c7e6778d9d612d02
-git+git://github.com/lizrice/django-invitation.git@0835043e67784d8ca4e25b9333447c59ab3bac0a
+git+git://github.com/arctelix/django-allauth.git
+git+git://github.com/arctelix/django-invitation.git

@@ -9,7 +9,6 @@ from invitation.backends import InvitationBackend
 is_key_valid = InvitationKey.objects.is_key_valid
 
 class AccountAdapter(DefaultAccountAdapter):
-
     def is_open_for_signup(self, request):
         """
         Checks whether or not the site is open for signups.
@@ -18,34 +17,13 @@ class AccountAdapter(DefaultAccountAdapter):
         regular flow by raising an ImmediateHttpResponse
         """
         print '--is open for signup--'
-        print request.session.items()
         invitation_key = request.session.get('invitation_key', False)
         invitation_email = request.session.get('invitation_email', False)
-        social_login = request.session.get('socialaccount_sociallogin', False)
-        if social_login:
-            user = social_login.account.user
-            social_email = user.email
-        else:
-            social_email = False
         if getattr(settings, 'ALLOW_NEW_REGISTRATIONS', False):
             if getattr(settings, 'INVITE_MODE', False):
                 if invitation_key:
                     if is_key_valid(invitation_key):
                         self.stash_email_verified(request, invitation_email)
-                        if social_email and invitation_email == social_email:
-                            self.stash_email_verified(request, social_email)
-                            is_verified = self.is_email_verified(request, user.email)
-                            print 'social_email: ',social_email, is_verified
-                            #save verifed email address (need user object...)
-                            '''
-                            from allauth.account.models import EmailAddress
-                            print '------is open for sign up - set up verified email------'
-                            email_address = EmailAddress.objects.create(user=user,
-                                                email=user.email,
-                                                verified=is_verified,
-                                                primary=True)
-                            '''
-                        print 'invitation_email: ',invitation_email
                         return True
                     else:
                         template_name = 'invitation/wrong_invitation_key.html'
@@ -54,6 +32,9 @@ class AccountAdapter(DefaultAccountAdapter):
                 return True
         else:
             return False
+        print request.session.items()
+        
+        
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
 

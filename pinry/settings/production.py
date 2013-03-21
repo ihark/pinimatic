@@ -4,6 +4,9 @@ import os
 
 print '--Production Settings Loading'
 
+DEBUG = False
+#TEMPLATE_DEBUG = DEBUG
+
 #LOGIN CONTROLL
 ALLOW_NEW_REGISTRATIONS = True
 INVITE_MODE = True

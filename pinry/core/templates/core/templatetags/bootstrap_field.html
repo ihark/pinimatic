@@ -1,6 +1,6 @@
 {% if field.is_hidden %}
 <div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}" style="display:none;">
-{% elif filed.name == login or filed.name == password%}
+{% elif field.name == "login" or field.name == "password"%}
 <div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}">
 {% elif not field.is_hidden %}
 <div id="div_{{ field.id_for_label }}" class="control-group{% if field.errors %} error{% endif %}">

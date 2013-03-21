@@ -52,6 +52,7 @@ ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH =6
 ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
 SOCIALACCOUNT_ADAPTER ="pinry.core.accountadapter.SocialAccountAdapter"
+SOCIALACCOUNT_EMAIL_PRIMARY ="social" "verified"
 
 #INVITATIONS
 INVITATION_USE_ALLAUTH = True

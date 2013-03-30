@@ -7,6 +7,8 @@ print '--Production Settings Loading'
 DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
+ADMINS = [('admin', os.environ.get("EMAIL_HOST_USER"))]
+
 #LOGIN CONTROLL
 ALLOW_NEW_REGISTRATIONS = True
 INVITE_MODE = True

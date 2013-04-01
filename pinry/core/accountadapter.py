@@ -16,7 +16,6 @@ class AccountAdapter(DefaultAccountAdapter):
         Next to simply returning True/False you can also intervene the
         regular flow by raising an ImmediateHttpResponse
         """
-        print '--is open for signup--'
         invitation_key = request.session.get('invitation_key', False)
         invitation_email = request.session.get('invitation_email', False)
         if getattr(settings, 'ALLOW_NEW_REGISTRATIONS', False):
@@ -32,9 +31,6 @@ class AccountAdapter(DefaultAccountAdapter):
                 return True
         else:
             return False
-        print request.session.items()
-        
-        
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
 

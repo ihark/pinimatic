@@ -11,6 +11,10 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.auth.models import Group
 from django.views.generic.simple import direct_to_template
+from django.core.mail import send_mail
+from .forms import ContactForm
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 
 def home(request):
@@ -57,9 +61,24 @@ def bookmarklet(request):
     return HttpResponse(resp, mimetype="text/javascript")
 
 @login_required
-def feedback(request):
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            sender = form.cleaned_data['sender']
+            cc_myself = form.cleaned_data['cc_myself']
+            #set where to send the contact email
+            recipients = ['pinimatic@gmail.com']
+            if cc_myself:
+                recipients.append(sender)
+            send_mail(subject, sender+"\n\n"+message, sender, recipients)
+            return TemplateResponse(request, 'core/contact_thanks.html', {
+                                                                'subject': subject,
+                                                                'sender': sender,
+                                                                }) 
+    else:
+        form = ContactForm()
 
-    context = {
-            #'pin': pin
-        }
-    return TemplateResponse(request, 'feedback/feedback.html', context)
+    return TemplateResponse(request, 'core/contact.html', {'form': form})

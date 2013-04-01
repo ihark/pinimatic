@@ -3,7 +3,7 @@
 You have been invited by {{ username }} to join {{ sitename }}!
 {% endblocktrans %}
 
-Click the link below to register for your account.
+Click the link below to register for your account within the next {{expiration_days}} days.
 http://{{site.domain}}/accounts/invited/{{ invitation_key.key }}&{{email}}/
 
 

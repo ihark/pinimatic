@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% load bootstrap_field %}
+
+
+{% block title %}Thank You{% endblock %}
+
+
+{% block yield %}
+    <div class="form-container">
+		<div>
+		{% if subject == "Support" %}
+		Thank your for contacting the {{site_name}} support team. We will get back to you at {{sender}} as soon as possible.
+		{% elif subject == "Bugs" %}
+		Thank you for contacting the {{site_name}} trouble shooting team. We will look into this bug and get it resolved
+		as soon as possible.  We appreciate you taking the time to help improve {{site_name}}.  We will get back to you at
+		{{sender}} if we have any questions.
+		{% elif subject == "Feedback" %}
+		Thank your for contacting the {{site_name}} development team. We appreciate your feedback!
+		{% endif %}
+    </div>
+{% endblock %}

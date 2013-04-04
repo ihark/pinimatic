@@ -13,6 +13,6 @@ django-storages==1.1.6
 boto==2.7.0
 django-follow==0.6.1
 gunicorn==0.17.2
--e git://github.com/arctelix/django-allauth.git@eev-model#egg=django-allauth
+-e git://github.com/arctelix/django-allauth.git#egg=django-allauth
 -e git://github.com/arctelix/django-invitation.git#egg=django-invitation
 requests-oauthlib

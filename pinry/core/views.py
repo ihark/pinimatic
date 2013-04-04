@@ -13,7 +13,7 @@ from django.contrib.auth.models import Group
 from django.views.generic.simple import direct_to_template
 from django.core.mail import send_mail
 from .forms import ContactForm
-from django.contrib.admin.views.decorators import staff_member_required
+#from django.contrib.admin.views.decorators import staff_member_required
 
 
 

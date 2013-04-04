@@ -5,6 +5,9 @@ from django.conf import settings
 from invitation.models import InvitationKey
 from invitation.forms import InvitationKeyForm
 from invitation.backends import InvitationBackend
+from django.contrib.auth.models import Group 
+from allauth.account.signals import user_signed_up
+from django.dispatch import receiver 
 
 is_key_valid = InvitationKey.objects.is_key_valid
 
@@ -31,6 +34,17 @@ class AccountAdapter(DefaultAccountAdapter):
                 return True
         else:
             return False
+
+    @receiver (user_signed_up)
+    def complete_social_signup(sender, **kwargs):
+        user = kwargs.pop('user')
+        request = kwargs.pop('request')
+        sociallogin = request.session['socialaccount_sociallogin']
+
+        user.groups.add(Group.objects.get(name=settings.DEFAULT_USER_GROUP))
+        user.save()
+        print(user.username, ": has signed up!")
+        
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
 

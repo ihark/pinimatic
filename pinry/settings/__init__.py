@@ -184,6 +184,6 @@ SOCIALACCOUNT_PROVIDERS ={
           'AUTH_PARAMS': { },
           'METHOD': 'js_sdk'},
     'linkedin':
-        { 'SCOPE': ['r_emailaddress'] }
+        { 'SCOPE': ['r_emailaddress', 'r_basicprofile'] }
     }
 

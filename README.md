@@ -6,7 +6,7 @@ built on top of Django. Originally started as [Pinry][2], I greatly expanded upo
 Pinry it to make a fully functional, socially integrated, pinboard site.  Pinimatic is currently in 
 Alpha/Development, some upgrades may be ugly/not work till v1.0.0 is release.
 
-![Pinry Screenshot](https://github.com/arctelix/pinimatic/raw/master/screenshot.png)
+![Pinimatic Screenshot](https://github.com/arctelix/pinimatic/raw/master/screenshot.png)
 
 ## Getting Started
 
@@ -24,6 +24,7 @@ Note: On Ubuntu you can get the build deps by running
     $ git clone git://github.com/overshard/Pinimatic.git
     $ cd Pinimatic
     $ virtualenv .
+	$ Scripts\activate (activate your virtual env)
     $ pip install -r requirements.txt
     $ python manage.py syncdb
     $ python manage.py migrate

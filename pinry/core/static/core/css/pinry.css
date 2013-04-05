@@ -212,11 +212,11 @@ body {
 	.navbar .nav > li > a{
         color: #999;
         text-shadow: none;
-        /*border-left: 1px solid #ccc;*/
+        border-left: 1px solid #ccc;
 		margin: 0px;
 		cursor: pointer;
-		/*controll height*/
-		padding: 5px 5px 5px;
+		/*controll height & center*/
+		padding: 5px 8px;
     }
 
 	.navbar .nav > li > a:hover{

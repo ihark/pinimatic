@@ -2,7 +2,6 @@ import os
 import socket
 from django.contrib.messages import constants as messages
 
-
 print '--General Settings Loading'
 
 SITE_ID = 1
@@ -16,10 +15,12 @@ except:
     HOST = 'localhost'
     SITE_IP = 'localhost'
 
-#must run server with this port ie: python manage.py runserver 0.0.0.0:5000
-#forman start uses 5000 by default.
+# You must run server with the port specified below
+# ie: python manage.py runserver 0.0.0.0:5000
+# forman start uses 5000 by default.
 SITE_PORT = ':5000'
 SITE_URL = 'http://'+SITE_IP+SITE_PORT
+
 '''STATIC_PREFIX
 Static url can not be full url on local dev server so 
 this adds it to the bookmarklet. MUST BE = '' on production.
@@ -39,9 +40,6 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 ALLOW_NEW_REGISTRATIONS = True
 
-#TEST EMAIL
-SEND_TEST_EMAIL = False
-
 #ALLAUTH
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
@@ -54,11 +52,11 @@ ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
 SOCIALACCOUNT_ADAPTER ="pinry.core.accountadapter.SocialAccountAdapter"
 
 #INVITATIONS
-INVITATION_USE_ALLAUTH = True
 INVITE_MODE = True
 ACCOUNT_INVITATION_DAYS = 30
 ACCOUNT_ACTIVATION_DAYS = 20
 INVITATIONS_PER_USER = 5
+INVITATION_USE_ALLAUTH = True
 
 #USERS
 DEFAULT_USER_GROUP = 'Basic'
@@ -83,12 +81,14 @@ STATIC_URL = '/static/'
 #Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
 
-# Set up email
+# EMAIL
 EMAIL_USE_TLS = True
 EMAIL_PORT = '587'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+#TEST EMAIL ON SERVER START
+SEND_TEST_EMAIL = False
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

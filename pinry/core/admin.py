@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.conf import settings
 from pinry.pins.models import Pin
 from django.contrib.auth.models import User
-from django.core.mail import send_mail, mail_admins
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 

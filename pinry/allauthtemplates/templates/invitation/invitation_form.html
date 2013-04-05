@@ -13,12 +13,16 @@
 <p>{% trans "You currently have no invitations to send." %}</p>
 
 {% else %}
-<p>{% trans "Please enter your friends email address below." %}</p>
+{% blocktrans with remaining_invitations as qty %}
+<p>You have {{qty}} invitations remaining!</p>
+<p>Please enter your friends email address below to send an invitation.</p>
+{% endblocktrans %}
 <form action="{% url invitation_invite %}" method="POST">
 	{% csrf_token %}
 	{{form.as_p}}
-
-	<button class="btn btn-primary" type="submit">{% trans "Invite " %}&raquo;</button>
+	<b>Email Preview:</b>
+	<p>{{email_preview}}</p>
+	<button class="btn btn-primary" type="submit">{% trans "Send Invitation " %}&raquo;</button>
 </form>
 {% endifequal %}
 

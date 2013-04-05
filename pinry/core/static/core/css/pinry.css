@@ -161,7 +161,7 @@ margin: 0px 0px;
 }
 
 body {
-    margin-top: 70px;
+    margin-top: 60px;
 }
 .button-bm{
 	padding:0px 5px 0px 5px !important;
@@ -193,27 +193,30 @@ body {
     background-image: none;
     background: white;
     filter: none;
-	height: 40px;
+	min-height: 30px;
+	height: 30px;
     border-bottom: 1px solid #999;
 	/*set to prevent nave bar overlap*/
-	min-width: 600px;
+	min-width: 540px;
 }
 	
 	.navbar .brand {
 		color: #444;
 		font-family: 'Fugaz One';
-		font-size: 26px;
-
+		font-size: 18px;
 		padding-left:0px;
 		margin-left:10px;
+		/*controll height & center*/
+		padding-top: 5px;
     }
 	.navbar .nav > li > a{
         color: #999;
         text-shadow: none;
-        border-left: 1px solid #ccc;
+        /*border-left: 1px solid #ccc;*/
 		margin: 0px;
 		cursor: pointer;
-		
+		/*controll height*/
+		padding: 5px 5px 5px;
     }
 
 	.navbar .nav > li > a:hover{
@@ -306,6 +309,9 @@ body {
 	padding:10px 20px 10px 20px;
 	background: White;
 	border-radius: 6px;
+}
+.help-page.container {
+	margin-top:40px;
 }
 
 .pin {

@@ -28,20 +28,57 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a href="{% url core:home %}" class="brand pull-left">{{ site_name }}</a>
-
-                <ul class="nav pull-right">
-                    {% if user.is_authenticated %}
-						<li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">PiniFy It</a></li>
-                        <li><a href="{% url core:help %}">Help</a></li>
-						<li><a href="#new-pin" data-toggle="modal">New Pin</a></li>
-						<li><a id="user" data-user="{{ user }}" href="{% url pins:user %}{{ user }}/" onclick="loadData(undefined, '{{ user }}');">{{ user }}</a></li>
-                        <li><a href="{% url core:logout %}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{% url account_login %}">Login</a></li>
-                        <li><a href="{% url account_signup %}">Sign Up</a></li>
-                    {% endif %}
-					{% block account-nav %}{% endblock %}
-                </ul>
+				{% if user.is_authenticated %}
+				<!-- <li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">PiniFy It</a></li> -->
+				<ul class="nav pull-right">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							{{ user }}
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a id="user" data-user="{{ user }}" href="{% url pins:user %}{{ user }}/" onclick="loadData(undefined, '{{ user }}');">Your Profile</a></li>
+							<li class="divider"></li>
+							<li><a href="{% url socialaccount_connections %}">Social Connections</a></li>
+							<li><a href="{% url account_email %}">Manage Email</a></li>
+							{% if user.password == "!" %}
+							<li><a href="{% url account_set_password %}">Set Password</a></li>
+								{% else %}
+								<li><a href="{% url account_change_password %}">Change Password</a></li>
+							{% endif %}
+							{% if remaining_invitations %}
+							<li><a href="{% url invitation_invite %}">Invite Friends</a></li>
+							{% endif %}
+							{% if user.is_staff %}
+							<li><a href="{% url invitation_invite_bulk %}">Send Bulk Invitations</a></li>
+							{% endif %}
+							<li class="divider"></li>
+							<li><a href="{% url core:logout %}">Logout</a></li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="nav pull-right">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							Get Started
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+						<li><a href="#new-pin" data-toggle="modal">Add A New Pin</a></li>
+						<li class="divider"></li>
+						<li><a href="{% url core:help %}#install">Install Bookmarklet</a></li>
+						<li><a href="{% url core:help %}#use">Use Bookmarklet</a></li>
+						<li><a href="{% url core:help %}#tag ">What are Tags?</a></li>
+						</ul>
+					</li>
+				</ul>
+				{% else %}
+				<ul class="nav pull-right">
+					<li><a href="{% url account_login %}">Login</a></li>
+					<li><a href="{% url account_signup %}">Sign Up</a></li>
+				</ul>
+				{% endif %}
+				{% block account-nav %}{% endblock %}
             </div>
         </div>
 		

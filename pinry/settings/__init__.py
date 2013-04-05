@@ -125,6 +125,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "pinry.core.context_processors.staticPrefix",
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
+    "invitation.context_processors.remaining_invitations",
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.cssmin.CSSMinFilter']

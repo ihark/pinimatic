@@ -28,7 +28,7 @@ def help(request):
 def private(request):
     return TemplateResponse(request, 'core/private.html', None)
 
-
+#not used switched to allauth
 def register(request):
    
     if not settings.ALLOW_NEW_REGISTRATIONS:

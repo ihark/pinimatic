@@ -378,7 +378,7 @@ function onLoadData(data, insert) {
 					html += '<div class="pin-options">';
 			//PIN OPTIONS BUTTON
 						html += '<div class="background-50 btn-lg">';
-							if (userPin){
+							if (userPin || authUserO.is_superuser){
 							html += '<div id="delete" title="Delete" class="inline">'
 								html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 								html += '<i class="icon-trash"></i>'
@@ -856,7 +856,7 @@ function insertComment(username, userid, cmntT, cmntId){
 	html += '<p class="pin-cmnt'
 		if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
 	html += ' data-cmnt='+cmntId+'>';
-	if (userid == authUserO.id){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
+	if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '<i class="icon cmnts"></i>';
 	html += '<a href="/user/'+username+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';

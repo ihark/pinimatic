@@ -129,11 +129,11 @@ def new_pin(request, pin_id=None):
         try:
             print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
-            form = PinForm(instance=pin, user=request.user)
+            form = PinForm(instance=pin, user=pin.submitter)
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
-            if pin.submitter != request.user:
-                messages.error(request, 'You can not edit other users pins.')  
+            if not request.user.is_superuser and pin.submitter != request.user:
+                messages.error(request, 'You can not edit other users pins x.')  
                 return HttpResponseRedirect(reverse('pins:recent-pins'))
         except Pin.DoesNotExist:
             messages.error(request, 'This pin does not exist.')
@@ -164,10 +164,11 @@ def new_pin(request, pin_id=None):
             print 'form is valid'
             pin = form.save(commit=False)
             pin.uImage = form.cleaned_data['uImage']
-            pin.submitter = request.user
             if pin_id:
                 print 'view - save mode - pin id exists'
                 pin.edit()
+            else:
+                pin.submitter = request.user
             pin.save()
             form.save_m2m()
             if pin_id:
@@ -205,7 +206,7 @@ def new_pin(request, pin_id=None):
 def delete_pin(request, pin_id=None):
     try:
         pin = Pin.objects.get(id=pin_id)
-        if pin.submitter == request.user:
+        if pin.submitter == request.user or request.user.is_superuser:
             default_storage.delete(pin.image.name)
             default_storage.delete(pin.thumbnail.name)
             pin.delete()
@@ -219,6 +220,7 @@ def delete_pin(request, pin_id=None):
     print request
     return HttpResponseRedirect(reverse('pins:recent-pins'))
 
+#TODO: This needs to be setup. Currently using api only.
 def comment(request, pk=1):
     pin = Pin.objects.get(pk__exact=pk)
     

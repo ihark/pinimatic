@@ -276,7 +276,7 @@ class PinResource(ModelResource):
                     bundle.obj = self.obj_get(bundle=bundle, **kwargs)
                 except ObjectDoesNotExist:
                     raise NotFound("A model instance matching the provided arguments could not be found.")
-            if bundle.request.user == bundle.obj.submitter:
+            if bundle.request.user == bundle.obj.submitter or bundle.request.user.is_superuser:
                 self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
                 bundle.obj.delete()
                 #delete the images
@@ -358,5 +358,13 @@ class CmntResource(ModelResource):
         print '----obj_create------'
         #content_type='/api/v1/contrib/contenttype/'+bundle.data['content_type_id']+'/'
         #content_object_url = '/api/v1/pin/'+bundle.data['object_pk']+'/'
-        bundle = super(CmntResource, self).obj_create(bundle, user=bundle.request.user)
+        
+        # if id make sure the orig submitter remains in case of admin edit.
+        id = bundle.data.get('id', None)
+        if id:
+            comment = Comment.objects.get(pk__exact=int(id))
+            user = comment.user
+        else:
+            user = bundle.request.user
+        bundle = super(CmntResource, self).obj_create(bundle, user=user)
         return bundle

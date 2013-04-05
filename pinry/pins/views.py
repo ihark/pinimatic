@@ -215,10 +215,10 @@ def delete_pin(request, pin_id=None):
             messages.error(request, 'You can not delete other users pins.')
     except Pin.DoesNotExist:
         messages.error(request, 'Pin with the given id does not exist.')
-        
+
     print request
     return HttpResponseRedirect(reverse('pins:recent-pins'))
-  
+
 def comment(request, pk=1):
     pin = Pin.objects.get(pk__exact=pk)
     

@@ -1,9 +1,22 @@
 from taggit.forms import TagField, TagWidget
-from django.forms.widgets import SelectMultiple
+from django.forms.widgets import SelectMultiple, Textarea, HiddenInput
 from django import forms
 from django.utils.translation import ugettext as _
 from taggit.utils import parse_tags, edit_string_for_tags
 import re
+
+from django import forms
+
+class ContactForm(forms.Form):
+    SUBJECTS = (
+        ('Feedback', 'Feedback'),
+        ('Bugs', 'Bugs'),
+        ('Support', 'Support'),
+    )
+    subject = forms.ChoiceField(choices=SUBJECTS)
+    message = forms.CharField(widget=Textarea())
+    sender = forms.EmailField()
+    cc_myself = forms.BooleanField(required=False)
 
 
 class CustomTagWidget(forms.TextInput):
@@ -35,7 +48,7 @@ class CustomTagField(forms.CharField):
                 raise forms.ValidationError("Provide one or more comma-separated tags.")
         else: 
             return value
-                
+
 class UserTagsWidget(forms.SelectMultiple):
     def render(self, name, value, attrs=None):
         print '----UserTagsWidget render exicuted'
@@ -44,7 +57,7 @@ class UserTagsWidget(forms.SelectMultiple):
         #for c in self.choices: print 'choices:', c
         
         return super(UserTagsWidget, self).render(name, value, attrs)
-                
+
 class UserTagsField(forms.ModelMultipleChoiceField):
     widget = UserTagsWidget
     def clean(self, value):

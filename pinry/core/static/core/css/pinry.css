@@ -1,4 +1,8 @@
 /* MODIFICATIONS TO BOOTSTRAP */
+input[type="radio"], input[type="checkbox"] {
+  margin: 0px 2px 2px 0px;
+}
+
 .modal {
   width: 498px;
   margin: -280px 0 0 -250px;
@@ -28,7 +32,11 @@
 	overflow: hidden;
 	margin-right: auto;
 	margin-left: auto;
+	webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
 }
+
 .form-container .form-actions{
   float: left;
   text-align: right;
@@ -70,8 +78,9 @@
   width: 200px;
   height: 100%;
 }
-
-
+h1, h2, h3, h4, h5, h6 {
+	margin: 5px 0;
+}
 .form .control-group.error > label {
   color: black;
   display: inline-block;
@@ -95,9 +104,43 @@
 .qq-upload-spinner {
 	background: url("/static/vendor/file-uploader/loading.gif");
 	}
+/* ALLAUTH FORMS*/
+.form-container.accounts {
+	width:220px;
+	background-color: transparent;
+	color: #AAA;
+}
+	.form-container.accounts h1{
+		color:#444;
+		font-size:24px;
+		line-height:24px;
+		width: 100%;
+		padding: 9px 15px;
+		margin: -15px 0px 15px -15px;
+		border-bottom: 1px solid #AAA;
+		background-color: White;
+	}
+	.form-container.accounts h2{
+		font-size:16px;
+		line-height:16px;
+		width: 100%;
+		padding: 9px 15px;
+		margin: 15px 0px 15px -15px;
+		border-bottom: 1px solid #AAA;
+		border-top: 1px solid #AAA;
+	}
+	.form-container.accounts  label{
 
-	/* PINIMATIC */
+	}
 
+.socialaccount_providers{
+	margin:0px -5px;
+}
+/* PINIMATIC */
+.errorlist {
+	margin: 0 0 10px 15px;
+	color: #B94A48
+}
 .error-page{
 	width:400px;
 	font-size: 12px;
@@ -118,14 +161,14 @@ margin: 0px 0px;
 }
 
 body {
-    margin-top: 70px;
+    margin-top: 60px;
 }
 .button-bm{
 	padding:0px 5px 0px 5px !important;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	line-height: 20px;
-	font-size: 14px;
-	color: #999;
+	font-size: 12px;
+	color: #999 !important;
 	text-shadow: none;
 	margin: 0px 5px 0px 5px;
 	cursor: pointer;
@@ -136,13 +179,12 @@ body {
 	background: white;
 	display: inline-block;
 	text-decoration: none;
+	font-family: 'Fugaz One';
 }
 .button-bm:hover{
 	color: #398F00 !important;
 	text-decoration:none !important;
 }
-
-
 
 .navbar .button-bm{
 		margin: 8px 10px 8px 10px !important;
@@ -151,19 +193,21 @@ body {
     background-image: none;
     background: white;
     filter: none;
-	height: 40px;
+	min-height: 30px;
+	height: 30px;
     border-bottom: 1px solid #999;
 	/*set to prevent nave bar overlap*/
-	min-width: 600px;
+	min-width: 540px;
 }
 	
 	.navbar .brand {
-		color: #999;
-		font-family: 'Monoton';
-		font-size: 26px;
-
+		color: #444;
+		font-family: 'Fugaz One';
+		font-size: 18px;
 		padding-left:0px;
 		margin-left:10px;
+		/*controll height & center*/
+		padding-top: 5px;
     }
 	.navbar .nav > li > a{
         color: #999;
@@ -171,7 +215,8 @@ body {
         border-left: 1px solid #ccc;
 		margin: 0px;
 		cursor: pointer;
-		
+		/*controll height & center*/
+		padding: 5px 8px;
     }
 
 	.navbar .nav > li > a:hover{
@@ -264,6 +309,9 @@ body {
 	padding:10px 20px 10px 20px;
 	background: White;
 	border-radius: 6px;
+}
+.help-page.container {
+	margin-top:40px;
 }
 
 .pin {

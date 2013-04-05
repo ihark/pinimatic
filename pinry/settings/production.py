@@ -4,7 +4,17 @@ import os
 
 print '--Production Settings Loading'
 
-ALLOW_NEW_REGISTRATIONS = False
+DEBUG = False
+#TEMPLATE_DEBUG = DEBUG
+
+ADMINS = [('admin', os.environ.get("EMAIL_HOST_USER"))]
+
+#LOGIN CONTROLL
+ALLOW_NEW_REGISTRATIONS = True
+INVITE_MODE = True
+INVITATIONS_PER_USER = 0
+
+SEND_TEST_EMAIL = True
 
 #HEROKU
 DATABASES = {
@@ -17,7 +27,7 @@ DATABASES = {
     'PASSWORD': os.environ.get("DB_PASSWORD"),
   }
 }
-SEND_TEST_EMAIL = True
+
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 

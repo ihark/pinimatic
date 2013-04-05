@@ -1,26 +1,16 @@
-# ![Pinry](https://github.com/overshard/pinry/raw/master/logo.png)
-
-[![Build Status](https://secure.travis-ci.org/overshard/pinry.png?branch=master)](http://travis-ci.org/overshard/pinry)
-
-Pinry is a private, self-hosted, [Pinterest][0] inspired by [Wookmark][1] and
-built on top of Django. Pinry is currently in Alpha/Development, some upgrades
-may be ugly/not work till I release v1.0.0.
-
-![Pinry Screenshot](https://github.com/overshard/pinry/raw/master/screenshot.png)
+# ![Pinimatic](https://github.com/arctelix/pinimatic/raw/master/logo.png)
 
 
-## Why?
+Pinimatic is a self-hosted, [Pinterest][0] inspired by [Wookmark][1] and
+built on top of Django. Originally started as [Pinry][2], I greatly expanded upon the basic
+Pinry it to make a fully functional, socially integrated, pinboard site.  Pinimatic is currently in 
+Alpha/Development, some upgrades may be ugly/not work till v1.0.0 is release.
 
-Mostly because I don't like sharing, I use pinup boards for personal inspiration
-boards. Also if I use a public platform like Pinterest or Wookmark then my pins
-run the risk of getting a DMCA take down notice. I might not even be able to
-pin something at all with websites now blocking tools like this. I rather
-bypass all these risks and just host it myself.
-
+![Pinry Screenshot](https://github.com/arctelix/pinimatic/master/screenshot.png)
 
 ## Getting Started
 
-Pinry has two different customizable configurations:
+Pinimatic has three different customizable configurations:
 
 ### Development
 
@@ -30,8 +20,8 @@ dependencies for PIL installed.
 Note: On Ubuntu you can get the build deps by running
 `sudo apt-get build-dep python-imaging`.
 
-    $ git clone git://github.com/overshard/pinry.git
-    $ cd pinry
+    $ git clone git://github.com/overshard/Pinimatic.git
+    $ cd Pinimatic
     $ virtualenv .
     $ pip install -r requirements.txt
     $ python manage.py syncdb
@@ -41,64 +31,79 @@ Note: On Ubuntu you can get the build deps by running
 
 ### Production
 
-If you want a production server [Google around][2] for more information on
-running Django in a production environment and edit the
-`pinry/settings/production.py` file. I don't cover this because there are
-hundreds of different ways to deploy a Django project and everyone has their own
-preference.
-
-### Heroku: production.py is now set up for deployment to heroku.  
+Pinimatic is configured to run on Heroku with Gunicorn in the production environment.
+You must configure heroku as follows:
 - Create a Heroku account and add postgreSQL to your account.
 - Create amazon S3 account and set up a bucket.
-- set Heroku env variables DB_USER, DB_PASSWORD, DB_NAME 
-acording to your postgreSQL database settings.
+- Set Heroku env variable RACK_ENV = production
+- Set Heroku env variable SECRET_KEY = any random string
+- Set Heroku env variables for the database: DB_USER, DB_PASSWORD, DB_NAME
+- Set Heroku env variables for email: EMAIL_HOST_PASSWORD,EMAIL_HOST_USER
+  acording to your email smtp server.
 - set Heroku env variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME
-acording to your amazon S3 bucket.
+  acording to your amazon S3 bucket.
+
+### Staging
+Pinimatic is configured to run on Heroku with the built in devlopment server in the 
+staging environment. You must configure heroku the same as above with the following changes:
+- Set Heroku env variable RACK_ENV = staging
+
+### Development
+Pinimatic is configured to run out of the box with the built in devlopment server in development 
+staging environment.
+- To enable sending email set local environment variables: EMAIL_HOST_PASSWORD,EMAIL_HOST_USER
+
 
 ### Quick Settings
 
-There are a few settings provided specific to Pinry that allow you to get some
-of the most requested functionality easily. (pinry/settings/__init__.py)
+There are a few settings provided specific to Pinimatic that allow you to get some
+of the most requested functionality easily. (Pinimatic/settings/__init__.py)
 
- + **SITE_NAME**: For quickly changing the name Pinry to something you prefer.
+ + **SITE_NAME**: For quickly changing the name Pinimatic to something you prefer.
  + **ALLOW_NEW_REGISTRATIONS**: Set to False to prevent people from registering.
  + **PUBLIC**: Set to False to require people to register before viewing pins.
    (Note: Setting PUBLIC to False does still allow registrations. Make sure
           both PUBLIC and the previous setting are set to False to prevent
           all public access.)
 
+ + **INVITE_MODE**: Set to true to allow new registraions by invitation only.
+   See https://github.com/arctelix/django-invitation.git for more information on invittation settings.
+ + **ALLAUTH**: Many settings agailable for customization of login and signup.
+   See https://github.com/arctelix/django-allauth.git for more information on allauth settings.
+ + **EAMIL**: Configure these settings as per your email smtp server.
+   
+   
 ## Current Features
  + Pin Tagging
- + User Boards / groups
- + Filter by tag & user
+ + User groups
+ + Filter pin views
  + User profiles
  + Add images via Bookmarklet
- + Upload Image Files
- + Add images via url
+ + Add images via Upload
+ + Add images via URL
  + Delete & Edit Pins
  + Favorite / Follow pins
  + Follow users
  + Re-Pin Pins
+ + Comment on pins
+ + User profile pages with stats
+ + Local User Accounts & Social Connections
+ + User Manageable Social Connections
+ + User Manageable Email Addresses
+ + Registration Invitation Only Mode
+ + Invitation Management
+ + Admin Email Users Interface
  
 ## Roadmap
- + Comment on pins
+ + User Boards
  + Non-image URL pinning
- + Statistics/analytics with pretty graphs
-
-
-## As Seen On
-
- + [USA Today](http://www.usatoday.com/tech/products/story/2012-04-27/pinterest-pinry-private-pinning/54584308/1)
- + [Hacker News](http://news.ycombinator.com/item?id=3895618)
- + [The Next Web](http://thenextweb.com/apps/2012/04/27/pinry-is-a-self-hosted-version-of-pinterest-that-gives-you-full-control-of-your-pins/)
- + [Python Weekly](http://us2.campaign-archive2.com/?u=e2e180baf855ac797ef407fc7&id=1f8c766c90&e=292d864a00)
- + [Pycoder's Weekly](http://us4.campaign-archive1.com/?u=9735795484d2e4c204da82a29&id=4f9b37c501)
 
 
 ## License (Simplified BSD)
 
+Copyright (c) Simplex Studio (arctelix)
 Copyright (c) Isaac Bythewood
-Copyright (c) Simplex Studio (arctelix) 
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -125,4 +130,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [0]: http://pinterest.com/
 [1]: http://www.wookmark.com/
-[2]: https://www.google.com/search?q=deploy+django+production
+[2]: https://github.com/overshard/pinry

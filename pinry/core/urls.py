@@ -13,5 +13,5 @@ urlpatterns = patterns('',
     url(r'^ajax/thumb/$', 'pinry.core.utils.ajax_upload', name='ajax_upload'),
     url(r'^ajax/submit/$', 'pinry.pins.views.AjaxSubmit', name='AjaxSubmit'),
     url(r'^ajax/thumb/(?P<fileName>.+)$', 'pinry.core.utils.delete_upload', name='delete_upload'),
-    url(r'^feedback/$', 'pinry.core.views.feedback'),
+    url(r'^contact/$', 'pinry.core.views.contact', name='contact'),
 )

@@ -2,7 +2,7 @@
 	console.warn('--start bookmarklet--');
 	{% load static %}
 	////test for EXISTING bookmarklet or pinry domain
-	pinry = /^https?:\/\/.*?((pinry)|(localhost)).*?\//
+	pinry = /^https?:\/\/.*?((pinimatic-t)|(pinimatic)|(localhost)).*?\//
 	inPinry = location.href.match(pinry);
 	console.warn('test for pinry host : '+inPinry)
 	if (document.getElementById("overlay") == undefined && inPinry == null) {

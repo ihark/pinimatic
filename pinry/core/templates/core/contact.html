@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% load bootstrap_field %}
+
+
+{% block title %}Contact{% endblock %}
+
+{% block yield %}
+    <div class="form-container">
+        <div class="form-header">
+			<h3>Contact {{site_name}}</h3>
+		</div>
+		<form action="{% url core:contact %}" method="post" class="form-horizontal">
+			{% csrf_token %}
+			{% for field in form %}
+				{% bootstrap_field field %}
+			{% endfor %}
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">Send</button>
+				<input type="hidden" name="next" value="{{ next }}" />
+				<a href="{% url core:home %}" class="btn">Cancel</a>
+			</div>
+		</form>
+    </div>
+{% endblock %}

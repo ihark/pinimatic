@@ -1,4 +1,4 @@
-Django==1.4.1
+Django==1.4.3
 South==0.7.6
 Pillow==1.7.7
 -e git://github.com/toastdriven/django-tastypie.git@58e47af6d5f90916a5dd431791f742d5cf431196#egg=django-tastypie
@@ -8,9 +8,11 @@ jsmin==2.0.2
 -e git://github.com/hcarvalhoalves/django-taggit.git@e0f9642d7b94c8e6c0feb520d96bb6ae4d78a4d0#egg=django-taggit
 simplejson==2.5.2
 psycopg2==2.4.5
--e hg+https://bitbucket.org/etienned/pil-2009-raclette/#egg=PIL
 dj-database-url==0.2.0
 django-storages==1.1.6
 boto==2.7.0
 django-follow==0.6.1
 gunicorn==0.17.2
+-e git://github.com/arctelix/django-allauth.git#egg=django-allauth
+-e git://github.com/arctelix/django-invitation.git#egg=django-invitation
+requests-oauthlib

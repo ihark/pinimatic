@@ -324,7 +324,7 @@ window.onpopstate = function(e) {
 };
 
 /**Receives data from the API, creates HTML for images and updates the layout
- * insert: set to "prepend" to prepend HTML  exclude appends data.
+ * insert: set to "prepend" to prepend existing HTML, "exclude" appends data to existing HTML.
  */
 function onLoadData(data, insert) {
 	data = data.objects;
@@ -524,7 +524,6 @@ function onLoadData(data, insert) {
 					//todo finish resize images for icon square, also change image ref to thumb.
 				}
 			}//end for
-			
 			applyLayout();
 		}//end tag/group view
 	}//end image for loop
@@ -558,6 +557,8 @@ function onLoadData(data, insert) {
 	}
 	isLoading = false;
 	$('#loader').hide();
+	//Apply layout to show any static pins in template
+	applyLayout();
 	//TOUCH: DEVICE SETUP
 	setUpTouch()
 };

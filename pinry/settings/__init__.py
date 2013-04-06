@@ -187,4 +187,3 @@ SOCIALACCOUNT_PROVIDERS ={
     'linkedin':
         { 'SCOPE': ['r_emailaddress', 'r_basicprofile'] }
     }
-

@@ -12,14 +12,14 @@ Alpha/Development, some upgrades may be ugly/not work till v1.0.0 is release.
 
 ### 1) Have virtualenv and pip installed. You may also need to have the build dependencies for PIL installed.
 
-Note: On windows you must install the apropriate windows binary version of PIllOW for your system.
+Note: On windows you must install the appropriate windows binary version of Pillow for your system.
 They can be found at: http://www.lfd.uci.edu/~gohlke/pythonlibs/
-*Remeber to change the install directory to your virtual environment. 
+*Remember to change the install directory to your virtual environment. 
 
 Note: On Ubuntu you can get the build deps by running
 `sudo apt-get build-dep python-imaging`.
 
-### 2) Instalation:
+### 2) Installation:
 
     $ git clone git://github.com/overshard/Pinimatic.git
     $ cd Pinimatic
@@ -48,12 +48,12 @@ You must configure heroku as follows:
 - Set Heroku env variable SECRET_KEY = any random string
 - Set Heroku env variables for the database: DB_USER, DB_PASSWORD, DB_NAME
 - Set Heroku env variables for email: EMAIL_HOST_PASSWORD,EMAIL_HOST_USER
-  acording to your email smtp server.
+  according to your email smtp server.
 - set Heroku env variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME
-  acording to your amazon S3 bucket.
+  according to your amazon S3 bucket.
 
 ### Staging
-Pinimatic is configured to run on Heroku with the built in devlopment server in the 
+Pinimatic is configured to run on Heroku with the built in development server in the 
 staging environment. You must configure heroku the same as above with the following changes:
 - Set Heroku env variable RACK_ENV = staging
 
@@ -70,15 +70,15 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
    (Note: Setting PUBLIC to False does still allow registrations. Make sure
           both PUBLIC and the previous setting are set to False to prevent
           all public access.)
-
- + **INVITE_MODE**: Set to true to allow new registraions by invitation only.
-   See https://github.com/arctelix/django-invitation.git for more information on invittation settings.
- + **ALLAUTH**: Many settings agailable for customization of login and signup.
+ + **INVITE_MODE**: Set to true to allow new registrations by invitation only.
+   See https://github.com/arctelix/django-invitation.git for more information on invitation settings.
+ + **ALLAUTH**: Many settings available for customization of login and signup.
    See https://github.com/arctelix/django-allauth.git for more information on allauth settings.
  + **EAMIL**: Configure these settings as per your email smtp server.
    
-   
 ## Current Pin Features
+  
+### Current Pin Features
  + Pin Tagging
  + User groups
  + Filter pin views
@@ -92,22 +92,22 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Re-Pining
  + Comment on pins
  
-## Current User Account Features
+### Current User Account Features
  + User contact form for feedback & support
  + User profile pages with stats
  + Support for multiple Social Connections 
  + Support for multiple Email Addresses with verification & primary setting 
 
-## Current Admin Features 
+### Current Admin Features 
  + Local User Accounts & Social Account Connections
  + Invitation Only Mode for new registrations
- + Block all new registrations even with valid inviations
+ + Block all new registrations even with valid invitations
  + Send Bulk email to users via admin actions in user model
- + Send Bulk invitations to a list of email addresses (specific to recpipiant)
+ + Send Bulk invitations to a list of email addresses (specific to recipient)
  + Generate Bulk invitation codes with specific number of uses
- + Superusers have full controll over all users pins for easy admin.
+ + Superusers have full control over all users pins for easy admin.
  
-## Roadmap
+### Roadmap
  + User Boards
  + Non-image URL pinning
 

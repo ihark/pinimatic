@@ -35,15 +35,15 @@ var au = {{ authUserJ|safe }}
 				<a id="user-fers"><div class="btn-hover"><span class="followers large display text">{{ folowersC }}</span><br>Followers</div></a>
 			</div>
 		</div>
-		<div class="section"> 
+		<div class="section catagories"> 
 			<h6>Tags</h6>
-			<div class="inline tags">
+			<div class="inline">
 				{% for tag in tags %}
 					<a id="user-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/{{ profile.username }}/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
 				{% endfor %}
 			</div>
 		</div>
-		<div class="section"> 
+		<div class="section sources"> 
 			<h6>Favorite sites</h6>
 			<div class="inline">
 			{% for srcDom in srcDoms %}

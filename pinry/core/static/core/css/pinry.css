@@ -504,6 +504,14 @@ body {
 		padding: 5px 15px 5px 15px;
 		line-height: 16px;
 	}
+	.catagories a{
+	float: left;
+	width: 50%;
+	overflow: hidden;
+	}
+	.sources .inline{
+		width: 100%;
+	}
 	.pin.item .section {
 		background-color: #f4f4f4
 	}
@@ -526,6 +534,8 @@ body {
 	}
 	.pin .btn-hover{
 		margin: 2px 0px 2px 0px;
+		white-space: nowrap;
+		overflow: hidden;
 	}
 		
 	.pin .btn.follow {
@@ -628,26 +638,28 @@ body {
 			left: 0px;
 			height: 30px;
 		}
-	form {
-		margin-bottom: 0;
+
+/* FORMS */
+form {
+	margin-bottom: 0;
+}
+form h1 {
+	font-family: 'Monoton';
+	text-align: center;
+	font-weight: normal;
+	margin-bottom: 0px;
+}
+	textarea {
+		height: 50px;
+		max-height: 100px;
+		resize: vertical;
 	}
-	form h1 {
-		font-family: 'Monoton';
-		text-align: center;
-		font-weight: normal;
-		margin-bottom: 0px;
+	
+	input[type="file"] {
+		height: 25px;
+		width: 200px;
+		line-height: 25px;
 	}
-		textarea {
-			height: 50px;
-			max-height: 100px;
-			resize: vertical;
-        }
-		
-		input[type="file"] {
-			height: 25px;
-			width: 200px;
-			line-height: 25px;
-		}
 
 
 /* GENERAL FORMATTING */
@@ -657,11 +669,7 @@ body {
 	text-align:left;
 
 }
-.inline.tags > a{
-	float: left;
-	width: 50%;
-	overflow: hidden;
-}
+
 .center {
 	text-align:center;
 }

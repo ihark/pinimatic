@@ -778,7 +778,6 @@ function cmntsSuccess(result, pin){
 	}else if (result){//new comment
 		pin.find('.pin-cmnts').append(insertComment(result.username , result.user_id ,result.comment, result.id))//append new comment to end of comments
 	}else{//on delete
-		console.log('del cmnt callback')
 		pin.find('#cmnts').attr('data-state',true)
 		pin.find('#cmnts i').toggleClass('icon-chat-empty');
 	}
@@ -839,6 +838,10 @@ $(document).on( 'click', '.pin-cmnt .delete', function(e){
 //Options > Comment: edit
 $(document).on('click', '.pin-cmnt .edit', function(e){
 	var pin = $($(this).closest(".pin"));
+	var button = pin.find("#cmnts");
+	button.attr('data-state', 'edit');
+	icon = button.find('i');
+	icon.toggleClass('icon-chat-empty');
 	var pinId = parseInt(pin.attr('id'));
 	cmnt = $(this).closest(".pin-cmnt")
 	cmntId = parseInt(cmnt.attr('data-cmnt'))//get comment id
@@ -893,16 +896,17 @@ function insertCommentForm(pinId, cmntT, cmntId){
 //TODO: add follow function into this
 
 /*Toggles Pin Status for options bar icos and for pin sats area, icons & counts: 
-*- xxx: is a unique name of the stat to toggle
-*- targetBtn: the HTML element acting as the toggle button
-*  must have: id="xxx" set staticly by onLoadData
-*  must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
-*- .pin #id-Pin: must have: data-xxx="qty of stat"
-*  must have: class="display text xxx" to dispay the current count
-*  must have: class="display icon-iconname xxx" to display's the icon (must be 11px X 11p)
-*- pin.profile: must have:data-xxx="qty of stat" 
-*  must have: class="display text xxx" to dispay the current count
-*- Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
+*  The following setup is required for this function to work properly.
+*  NOTE: xxx is a unique name of the stat to toggle.
+*  1) targetBtn: the HTML element acting as the toggle button
+*  -must have: id="xxx" set staticly by onLoadData
+*  -must have: data-state="true/false" current state of the toggle set dynamicly by onLoadData 
+*  2).pin #id-Pin: must have: data-xxx="qty of stat"
+*  -must have: class="display text xxx" to dispay the current count
+*  -must have: class="display icon-iconname xxx" to display's the icon (must be 11px X 11p)
+*  3) pin.profile: must have:data-xxx="qty of stat" 
+*  -must have: class="display text xxx" to dispay the current count
+*  4) Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
 */
 
 function togglePinStat(targetBtn, fIcon, type, url, id, data){
@@ -940,6 +944,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 	this.onSuccess = function(result, ajaxStutus, xhr) {
 		//console.log(result, ajaxStutus, xhr)
 		if (state == "true"){
+			console.log('state == "true"')
 			count--;
 			countP--;
 			button.attr('data-state', "false");
@@ -953,7 +958,12 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 				aProfile.attr('data-'+name, countP);
 				dispTextP.html(countP);
 			}
+		}else if (state == "edit"){
+			console.log('state == "edit"')
+			button.attr('data-state', "true");
+			icon.toggleClass(fIcon);
 		}else{
+			console.log('state == "else"')
 			count++;
 			countP++;
 			button.attr('data-state', "true");

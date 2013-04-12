@@ -54,9 +54,11 @@ def recent_pins(request):
     #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
     srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
     srcDoms = get_top_domains(srcUrls, 5)
-    
+    tags = pins.order_by('tags__name').values_list('tags__name').annotate(count=Count('tags__name')).order_by('-count')
+    tags = tags[:20]
     context = {
             'srcDoms': srcDoms,
+            'tags': tags,
         }
 
     return TemplateResponse(request, 'pins/recent_pins.html', context)

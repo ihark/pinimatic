@@ -1,11 +1,11 @@
 ﻿javascript : var baseurl = "{{ BASE_URL }}";(function () { 
 	console.warn('--start bookmarklet--');
 	{% load static %}
-	////test for EXISTING bookmarklet or pinry domain
-	pinry = /^https?:\/\/.*?((pinimatic-t)|(pinimatic)|(localhost)).*?\//
-	inPinry = location.href.match(pinry);
-	console.warn('test for pinry host : '+inPinry)
-	if (document.getElementById("overlay") == undefined && inPinry == null) {
+	////test for EXISTING bookmarklet or siteDom domain
+	siteDom = /^https?:\/\/.*?(({{site_name|lower}})|({{site_name|lower}}-t)|(localhost)).*?\//
+	insiteDom = location.href.match(siteDom);
+	console.warn('test for siteDom host : '+insiteDom)
+	if (document.getElementById("overlay") == undefined && insiteDom == null) {
 		var d = document;
 		var b = d.body;
 		var jq;
@@ -45,7 +45,7 @@
 		o.appendChild(jq);
 		
 		////create header
-		var hh = "48";
+		var hh = "30";
 		//hg eliminates possible jitter on fixed header
 		var hc = d.createElement("div")
 		hc.setAttribute("id", "header-bg");
@@ -57,30 +57,31 @@
 		var hs = "z-index: 10; min-width: 500px; width: 100%; height: "+hh+"px; position: fixed; left: 0; top: 0; background-color: white;";
 		setStyles(h, hs);
 		hc.appendChild(h);// append header to header container
-		var mh = d.createElement("p");
+		var mh = d.createElement("div");
 		mhs = "cursor: default; display: inline-block; float:left; background-color: transparent; padding: 0 0 0 20px; line-height: "+hh+"px;";
 		setStyles(mh, mhs);
 		h.appendChild(mh);//append message & logo to header
 		var l = d.createElement("span");
 		ls = "cursor: pointer; display: inline-block; float:left; background-color: transparent; text-indent: 0px; margin 0;";
-		ls += "font-size: 30px; color: #333; font-family: 'Monoton'!important; padding: 0 10px 0 0; cursor: pointer;";
+		ls += "font-size: 18px; color: #333; font-family: 'Fugaz One'!important; padding: 0 10px 0 0; cursor: pointer;";
 		setStyles(l, ls);
-		l.innerHTML = "Pinry";
+		l.innerHTML = "{{site_name}}";
 		l.onclick = delegate(onClickLogo, this);
 		mh.appendChild(l);//append logo to mh
 		var m = d.createElement("span");
 		ms = "display: inline-block; float:left; background-color: transparent; text-indent: 0px;";
-		ms += "font-size: 13px; color: #black; font-family: Helvetica, arial, sans-serif; font-weight: normal; padding: 7px 0 0 0;";
+		ms += "font-size: 13px; color: #black; font-family: Helvetica, arial, sans-serif; font-weight: normal; padding:0;";
 		setStyles(m, ms);
 		m.innerHTML = "Select an image to pin.";
 		mh.appendChild(m); //append message to mh
 		var nc = d.createElement("ul");
-		nc.setAttribute("class", "nav pull-right");
-		ncs = "border-left: 1px solid #CCC; color: #333; text-shadow: none; padding: 14px 20px 15px; display: block; font-size: 13px; list-style: none; cursor: pointer;";
+		ncs = "float:right; border-left: 1px solid #CCC; color: #333; text-shadow: none; padding: 0px 20px; display: block; font-size: 13px; list-style: none; cursor: pointer;";
 		setStyles(nc, ncs);
 		h.appendChild(nc);//append nav to header
 		var n1 = d.createElement("li");
+		ns = "line-height:"+hh+"px;"
 		n1.innerHTML = "Close"
+		setStyles(n1, ns);
 		n1.onclick = delegate(removeOverlay, this);
 		nc.appendChild(n1);//append nav 1 to header
 		
@@ -103,7 +104,7 @@
 		//check for jquery
 		checkLoad("window.$", jqReady, "jquery has loaded");
 	}else {
-		if (inPinry) {
+		if (insiteDom) {
 			alert("You have already pinned everything here!");
 		}else{
 			alert("You have an open bookmarklet already!");	
@@ -152,8 +153,8 @@
 	function cni(e) {
 		console.warn('cni for: '+e.src);
 		var t = false;
-		if (e.src.match(pinry)) {
-			console.warn('--image skiped: in pinry domain--');
+		if (e.src.match(siteDom)) {
+			console.warn('--image skiped: in siteDom domain--');
 			return t
 		} else {
 			if (e.width < 150 && e.height < 150 || e.width < 100 && e.height < 20) {

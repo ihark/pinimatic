@@ -29,10 +29,10 @@
 			<p><a id="Category-all" class="btn-hover" href="{% url core:home %}user/all/Categories{{ tag.0 }}/">Categories</a></p>
 		</div>
 		<div class="section catagories">
-			<h6>Top Categories</h6>
+			<h6>Top Categories:</h6>
 			<div class="inline">
 				{% for tag in tags %}
-					<a id="all-{{ tag.0 }}" class="expand btn-hover" href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
+					<a id="all-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
 				{% endfor %}
 			</div>
 		</div>

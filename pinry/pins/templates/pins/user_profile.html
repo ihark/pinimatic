@@ -36,7 +36,7 @@ var au = {{ authUserJ|safe }}
 			</div>
 		</div>
 		<div class="section catagories"> 
-			<h6>Tags</h6>
+			<h6>Top Catagories:</h6>
 			<div class="inline">
 				{% for tag in tags %}
 					<a id="user-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/{{ profile.username }}/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>

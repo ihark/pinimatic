@@ -271,6 +271,7 @@ function loadData(tag, user, reload) {
 	
 	//if current tag has a view setup ajax for view
 	console.log('active view set to:'+av);
+	
 	if (av == 'pop') {
 		loadURL += (page*30)+"&pop&sort=popularity"
 		//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
@@ -283,16 +284,18 @@ function loadData(tag, user, reload) {
 		tag = null
 	}else if (av == 'fing') {
 		loadURL += (page*30)+"&fing=" + user;
+		user = null
 		tag = null
 	}else if (av == 'fers') {
 		loadURL += (page*30)+"&fers=" + user;
+		user = null
 		tag = null
 	}else{
 		loadURL += (page*30)
 	}
 	console.log('final user: '+user);
 	console.log('final tag: '+tag);
-	if (user && user != 'all' && av != 'fing') loadURL += "&user=" + user;
+	if (user && user != 'all') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
 	
 	//prevent api request when not in apiPrefix domain
@@ -1011,12 +1014,15 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 
 // add event listeners for profile buttons
 $('#user-pins').live('click', function(event){
+	event.preventDefault();
 	loadData(null, aProfileO.username);
 });
 $('#user-tags').live('click', function(event){
+	event.preventDefault();
 	loadData(vn.tags, aProfileO.username);
 });
 $('#user-favs').live('click', function(event){
+	event.preventDefault();
 	loadData(vn.favs, aProfileO.username);
 });
 $('#user-fing').live('click', function(event){
@@ -1027,6 +1033,15 @@ $('#user-fing').live('click', function(event){
 		user = authUserO.username
 	}
 	loadData(vn.fing, user);
+});
+$('#user-fers').live('click', function(event){
+	event.preventDefault();
+	if (aProfileO.username) {
+		user = aProfileO.username
+	}else{
+		user = authUserO.username
+	}
+	loadData(vn.fers, user);
 });
 $('#follow').live('click', function(event){
 	follow(this, 'followers');

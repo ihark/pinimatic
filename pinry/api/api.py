@@ -261,9 +261,9 @@ class PinResource(ModelResource):
                 
         if 'fers' in filters:
             print 'fers'
-            followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__exact = filters['fers']).values_list('pk', flat=True)
+            followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__username__exact = filters['fers']).values_list('user__username', flat=True)
             print followers
-            orm_filters['submitter__pk__in'] = followers
+            orm_filters['submitter__username__in'] = followers
             
         if 'fing' in filters:
             print 'fing'

@@ -28,8 +28,8 @@ var vn = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
 	pins:"Pins",
-	fing:"Spying",
-	fers:"Stalked",
+	fing:"Following",
+	fers:"Followers",
 	cmnts:"Notes",
 	pop:"Popular"
 }
@@ -279,14 +279,20 @@ function loadData(tag, user, reload) {
 		loadURL += (page*30)+"&favs=" + user;
 		tag = null
 	}else if (av == 'tags') {
-		loadURL += (page*500)
+		loadURL += (page*30)
+		tag = null
+	}else if (av == 'fing') {
+		loadURL += (page*30)+"&fing=" + user;
+		tag = null
+	}else if (av == 'fers') {
+		loadURL += (page*30)+"&fers=" + user;
 		tag = null
 	}else{
 		loadURL += (page*30)
 	}
 	console.log('final user: '+user);
 	console.log('final tag: '+tag);
-	if (user && user != 'all') loadURL += "&user=" + user;
+	if (user && user != 'all' && av != 'fing') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
 	
 	//prevent api request when not in apiPrefix domain
@@ -731,7 +737,7 @@ function onRepinError(xhr, ajaxStatus, textStatus){
 	console.log(xhr.responseText);
 }
 
-//Options > Comment: open form
+//Options > Comment: on click open form
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
 	state = $(this).attr('data-state');
@@ -760,7 +766,7 @@ $('#cmnts').live('click', function(e){
 	}
 });
 
-//Options > Comment: submit form
+//Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
 	data = $(this).serializeObject()
@@ -770,7 +776,7 @@ $(document).on( 'submit', '.pin form', function(e){
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
 	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
 });
-//Options > Comment: toggel callback
+//Comment: toggel callback
 function cmntsSuccess(result, pin){
 	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
 	if(result && cmnt.length > 0){//edit comment
@@ -785,7 +791,7 @@ function cmntsSuccess(result, pin){
 	pin.find('form[name="pin-cmnt-form"]').remove()//remove form
 	applyLayout()
 }
-//Options > Comment: cancel form click handler
+//Comment: cancel form click handler
 $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	e.preventDefault();
 	console.log('click cancel');
@@ -793,7 +799,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	//pcfp = pcf.parent('.pin-cmnt')
 	//cmntp.replaceWith(insertComment(result.username , result.user_id ,result.comment))//relace edited comment div with new comment
 });
-//Options > Comment: cancel form (for post & edit)
+//Comment: cancel form (for post & edit)
 function cancelCmnt(target){
 	var pin = $(target).closest(".pin");
 	var button = pin.find("#cmnts");
@@ -817,7 +823,7 @@ function cancelCmnt(target){
 	applyLayout();
 }
 
-//Options > Comment: delete
+//Comment: delete
 $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	e.preventDefault();
 	console.log('click delete');
@@ -835,7 +841,7 @@ $(document).on( 'click', '.pin-cmnt .delete', function(e){
 	applyLayout();
 });
 
-//Options > Comment: edit
+//Comment: edit
 $(document).on('click', '.pin-cmnt .edit', function(e){
 	var pin = $($(this).closest(".pin"));
 	var button = pin.find("#cmnts");
@@ -852,7 +858,7 @@ $(document).on('click', '.pin-cmnt .edit', function(e){
 	pin.css('z-index', 1000);
 });
 
-//Options > Comment: insert comment
+//Comment: insert comment
 function insertComment(username, userid, cmntT, cmntId){
 	var html = ""
 	if (!cmntId){cmntId=""};
@@ -866,7 +872,7 @@ function insertComment(username, userid, cmntT, cmntId){
 	html += '</p> ';
 	return html
 }
-//Options > Comment: insert comment form
+//Comment: insert comment form
 function insertCommentForm(pinId, cmntT, cmntId){
 	var html = ""
 	html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">';
@@ -1012,6 +1018,15 @@ $('#user-tags').live('click', function(event){
 });
 $('#user-favs').live('click', function(event){
 	loadData(vn.favs, aProfileO.username);
+});
+$('#user-fing').live('click', function(event){
+	event.preventDefault();
+	if (aProfileO.username) {
+		user = aProfileO.username
+	}else{
+		user = authUserO.username
+	}
+	loadData(vn.fing, user);
 });
 $('#follow').live('click', function(event){
 	follow(this, 'followers');

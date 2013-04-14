@@ -20,7 +20,7 @@
 		<div class="section browse">
 			{% if user.is_authenticated %}
 			<h6>Browse by:</h6>
-			<a id="ollowing" class="hover btn-hover" href="{% url core:home %}user/{{user}}/Following{{ tag.0 }}/"><p>Following</p></a>
+			<a id="user-fing" class="hover btn-hover" href="{% url core:home %}user/all/Following{{ tag.0 }}/"><p>Following</p></a>
 			{% else %}
 			<h6>In the mean time check this out:</h6>
 			{% endif %}

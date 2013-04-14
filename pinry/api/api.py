@@ -69,7 +69,7 @@ class UserResource(ModelResource):
         return result
     '''
 class FavsResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user', full=True, null=True)
+    user = fields.ForeignKey(UserResource, 'user', null=True)
     favid = fields.CharField(attribute='favorite_id', null=True)
     folid = fields.CharField(attribute='folowing_id', null=True)
     
@@ -103,7 +103,7 @@ class FavsResource(ModelResource):
         if 'folid' in filters:
             orm_filters['folowing__id__exact'] = filters['folid']
         if 'user' in filters:
-            orm_filters['user__username__exact'] = filters['user']
+            orm_filters['user__id__exact'] = filters['user']
 
         return orm_filters
     '''
@@ -112,7 +112,43 @@ class FavsResource(ModelResource):
         #.filter(user=request.user)
     '''
 
+class FollowsResource(ModelResource):
+    user = fields.ForeignKey(UserResource, 'user', null=True)
+    folowing = fields.ForeignKey(UserResource, 'folowing', null=True)
+
+    class Meta:
+        always_return_data = True
+        queryset = Follow.objects.filter(favorite__isnull=True)
+        resource_name = 'follows'
+        include_resource_uri = False
+        excludes = ['id']
+        allowed_methods = ['get']
+        filtering = {
+            'folowing': ALL_WITH_RELATIONS,
+            'user': ALL_WITH_RELATIONS,
+        }
         
+        #authentication = BasicAuthentication()
+        authorization = DjangoAuthorization()
+        
+    def build_filters(self, filters=None):
+        if filters is None:
+            filters = {}
+
+        orm_filters = super(FollowsResource, self).build_filters(filters)
+        
+        if 'fing' in filters:
+            orm_filters['user__id__exact'] = filters['fing']
+        if 'fers' in filters:
+            orm_filters['folowing__id__exact'] = filters['fers']
+
+        return orm_filters
+    '''
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.exclude(favorite__exact=None)
+        #.filter(user=request.user)
+    '''
+
 class ContentTypeResource(ModelResource):
     #model = fields.CharField(attribute = 'model', null=True)
     
@@ -217,12 +253,23 @@ class PinResource(ModelResource):
         if 'user' in filters:
             orm_filters['submitter__username__exact'] = filters['user']
             
-        
         if 'favs' in filters:
             if filters['favs'] == 'all':
                 orm_filters['f_pin__folowing__isnull'] = 'true'
             else:
                 orm_filters['f_pin__user__username__exact'] = filters['favs']
+                
+        if 'fers' in filters:
+            print 'fers'
+            followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__exact = filters['fers']).values_list('pk', flat=True)
+            print followers
+            orm_filters['submitter__pk__in'] = followers
+            
+        if 'fing' in filters:
+            print 'fing'
+            following = Follow.objects.filter(favorite__isnull=True).filter(user__username__exact = filters['fing']).values_list('folowing__username', flat=True)
+            print following
+            orm_filters['submitter__username__in'] = following
 
         if 'pop' in filters:
                 #print self.obj_get(None, pk=1)

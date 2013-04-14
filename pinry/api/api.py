@@ -280,6 +280,9 @@ class PinResource(ModelResource):
         if 'tag' in filters:
             orm_filters['tags__name__in'] = filters['tag'].split(',')
         
+        if 'cmnts' in filters:
+            orm_filters['comments__user__username__exact'] = filters['cmnts']
+        
 
         return orm_filters
     

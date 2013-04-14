@@ -30,7 +30,7 @@ var vn = { //viewname:"displayname"
 	pins:"Pins",
 	fing:"Following",
 	fers:"Followers",
-	cmnts:"Notes",
+	cmnts:"Comments",
 	pop:"Popular"
 }
 //TOUCH: USER AGENT DETECTION 
@@ -280,7 +280,9 @@ function loadData(tag, user, reload) {
 		loadURL += (page*30)+"&favs=" + user;
 		tag = null
 	}else if (av == 'tags') {
-		loadURL += (page*30)
+		//TODO: Rework group display so that the server returns groups with pins alredy assigned.
+		//temp increased pins to 1000 to insure all groups are made.
+		loadURL += (page*1000)
 		tag = null
 	}else if (av == 'fing') {
 		loadURL += (page*30)+"&fing=" + user;
@@ -288,6 +290,10 @@ function loadData(tag, user, reload) {
 		tag = null
 	}else if (av == 'fers') {
 		loadURL += (page*30)+"&fers=" + user;
+		user = null
+		tag = null
+	}else if (av == 'cmnts') {
+		loadURL += (page*30)+"&cmnts=" + user;
 		user = null
 		tag = null
 	}else{
@@ -1033,6 +1039,15 @@ $('#user-fing').live('click', function(event){
 		user = authUserO.username
 	}
 	loadData(vn.fing, user);
+});
+$('#user-cmnts').live('click', function(event){
+	event.preventDefault();
+	if (aProfileO.username) {
+		user = aProfileO.username
+	}else{
+		user = authUserO.username
+	}
+	loadData(vn.cmnts, user);
 });
 $('#user-fers').live('click', function(event){
 	event.preventDefault();

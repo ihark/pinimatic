@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 
 admin.autodiscover()
+handler500 = 'pinry.core.views.custom_500'
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
@@ -21,10 +22,11 @@ urlpatterns = patterns('',
     (r'^accounts/', include('allauth.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
 #provide url for testing error pages
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^500/$', 'django.views.generic.simple.direct_to_template', {'template': '500.html'}),
+        (r'^500/$', 'pinry.core.views.custom_500'),
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
     )
 
@@ -35,5 +37,9 @@ if settings.SITE_IP.split('.')[0] == '192':
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-
-#handler500 = TemplateView.as_view(template_name="500.html")
+if settings.SITE_IP.split('.')[0] == '192' and settings.DEBUG == False:
+    urlpatterns += patterns('',
+        url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.STATIC_ROOT,
+        }),
+    )    

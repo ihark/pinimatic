@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.template import RequestContext
+from django.template import RequestContext, loader
 from django.contrib.auth.models import Group
 from django.views.generic.simple import direct_to_template
 from django.core.mail import send_mail
@@ -84,3 +84,8 @@ def contact(request):
         form = ContactForm()
 
     return TemplateResponse(request, 'core/contact.html', {'form': form})
+
+def custom_500(request):
+    t = loader.get_template('500.html')
+    c = RequestContext(request, {'foo': 'bar'})
+    return HttpResponse(t.render(c))

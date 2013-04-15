@@ -171,7 +171,9 @@ def new_pin(request, pin_id=None):
                 pin.edit()
             else:
                 pin.submitter = request.user
+            print 'view - pin.save()'
             pin.save()
+            print 'view - form.save_m2m()'
             form.save_m2m()
             if pin_id:
                 messages.success(request, 'Pin successfully modified.')

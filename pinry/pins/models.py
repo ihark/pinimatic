@@ -42,22 +42,21 @@ class Pin(models.Model):
         exPin = Pin.objects.get(pk=self.pk)
         if self.uImage:
             print 'model - new image detected'
-            self.image.delete()
-            self.thumbnail.delete()
+            self.image = None
+            self.thumbnail = None
             default_storage.delete(exPin.image.url)
             default_storage.delete(exPin.thumbnail.url)
-            self.imgUrl = 'Uploaded'
+            self.imgUrl = None
             self.srcUrl = None
         elif not self.imgUrl:
             self.imgUrl = exPin.imgUrl
-        if exPin.imgUrl != self.imgUrl and self.imgUrl != 'Uploaded':
+        if exPin.imgUrl != self.imgUrl and self.imgUrl:
             print 'model - new URL detected'
-            self.image.delete()
-            self.thumbnail.delete()
+            self.image = None
+            self.thumbnail = None
             default_storage.delete(exPin.image.url)
             default_storage.delete(exPin.thumbnail.url)
             self.srcUrl = self.imgUrl
-
     def save(self, *args, **kwargs):
         hash_name = os.urandom(32).encode('hex')
         #create image
@@ -79,7 +78,6 @@ class Pin(models.Model):
                 image = image.convert("RGB")
             image.save(temp_img.name, 'JPEG')
             self.image.save(''.join([hash_name, '.jpg']), File(temp_img))
-            super(Pin, self).save()
             #create image thumbnail
             print 'model - starting thumbnail'
             temp_thumb = NamedTemporaryFile()
@@ -89,19 +87,14 @@ class Pin(models.Model):
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(temp_thumb.name, 'JPEG')
             self.thumbnail.save(''.join([hash_name, '.jpg']), File(temp_thumb))
-            print 'model - self.thumbnail saved: ', self.thumbnail
-            print 'model - delete_uplaod called'
+            #super(Pin, self).save()
             if self.uImage:
+                print 'model - delete_uplaod called'
                 delete_upload(None, self.uImage)
         if not self.srcUrl:
-            print 'if not srcUrl'
-            print self.image.name
-            print self.image.url
-            print self.srcUrl
+            print 'model - if not srcUrl'
             self.srcUrl = settings.MEDIA_URL+self.image.name
-        #TODO: srcUrl gets http://domain but imgUrl does not?
         self.imgUrl = settings.MEDIA_URL+self.image.name
-            
         super(Pin, self).save(*args, **kwargs)
     
     class Meta:

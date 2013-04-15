@@ -43,8 +43,8 @@ def ajax_upload( request ):
         raise Http404( "Bad Upload" )
       filename = upload.name
       
-    hash_name = os.urandom(32).encode('hex')
-    tmpName = hash_name+filename
+    #removed for file name preservation: hash_name = os.urandom(32).encode('hex')
+    tmpName = request.user.username+filename
     tmpPath = settings.TMP_ROOT
     tmpUrl = settings.TMP_URL+tmpName
     savePath = tmpPath+tmpName

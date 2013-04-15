@@ -12,7 +12,7 @@ from django.template.loader import render_to_string, get_template
 from django.contrib.sites.models import Site
 
 class PinAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'id', 'submitter', 'published', 'description']
+    list_display = ['pk', 'id', 'submitter', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
 
 admin.site.register(Pin, PinAdmin)
 

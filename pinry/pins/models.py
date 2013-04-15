@@ -17,6 +17,7 @@ from follow import utils
 
 class Pin(models.Model):
     submitter = models.ForeignKey(User)
+    imgName = models.TextField(blank=True, null=True)
     imgUrl = models.TextField(blank=True, null=True)
     srcUrl = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -31,8 +32,11 @@ class Pin(models.Model):
 
 
     def __unicode__(self):
-        return self.imgUrl
-
+        if self.imgName:
+            return self.imgName
+        else:
+            return self.imgUrl
+        
     def edit(self, *args, **kwargs):
         print 'model - pin.edit()'
         exPin = Pin.objects.get(pk=self.pk)
@@ -63,19 +67,21 @@ class Pin(models.Model):
             if self.uImage:
                 print 'model - self.uImage'
                 image = Image.open(settings.TMP_ROOT+self.uImage)
+                self.imgName = self.uImage
             if self.imgUrl:
                 print 'model - self.image'
                 temp_img.write(urllib2.urlopen(self.imgUrl).read())
                 temp_img.flush()
                 image = Image.open(temp_img.name)
+                self.imgName = self.imgUrl
             if image.mode != "RGB":
                 print 'model - image.mode'
                 image = image.convert("RGB")
             image.save(temp_img.name, 'JPEG')
             self.image.save(''.join([hash_name, '.jpg']), File(temp_img))
+            super(Pin, self).save()
             #create image thumbnail
             print 'model - starting thumbnail'
-            super(Pin, self).save()
             temp_thumb = NamedTemporaryFile()
             size = image.size
             prop = 200.0 / float(image.size[0])
@@ -83,11 +89,10 @@ class Pin(models.Model):
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(temp_thumb.name, 'JPEG')
             self.thumbnail.save(''.join([hash_name, '.jpg']), File(temp_thumb))
+            print 'model - self.thumbnail saved: ', self.thumbnail
             print 'model - delete_uplaod called'
             if self.uImage:
                 delete_upload(None, self.uImage)
-            print 'model - thumbnail complete'
-        
         if not self.srcUrl:
             print 'if not srcUrl'
             print self.image.name

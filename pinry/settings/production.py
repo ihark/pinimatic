@@ -49,7 +49,8 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 print 'AWS_STORAGE_BUCKET_NAME: ', AWS_STORAGE_BUCKET_NAME
 S3_URL = 'http://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
 #TODO: temp measure to stop static files from expiring. How to controll the expiration date...
-AWS_QUERYSTRING_AUTH = False
+AWS_QUERYSTRING_EXPIRE = 1396396800
+AWS_QUERYSTRING_AUTH = True
 
 MEDIA_URL = S3_URL+'media/'
 MEDIA_ROOT = S3_URL+'media/'

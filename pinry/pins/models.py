@@ -54,8 +54,9 @@ class Pin(models.Model):
             print 'model - new URL detected'
             self.image = None
             self.thumbnail = None
-            default_storage.delete(exPin.image.url)
-            default_storage.delete(exPin.thumbnail.url)
+            print 'exPin.image.path: ', exPin.image
+            default_storage.delete(exPin.image.name)
+            default_storage.delete(exPin.thumbnail.name)
             self.srcUrl = self.imgUrl
     def save(self, *args, **kwargs):
         hash_name = os.urandom(32).encode('hex')

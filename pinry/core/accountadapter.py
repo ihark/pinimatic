@@ -36,10 +36,10 @@ class AccountAdapter(DefaultAccountAdapter):
             return False
 
     @receiver (user_signed_up)
-    def complete_social_signup(sender, **kwargs):
+    def complete_signup(sender, **kwargs):
         user = kwargs.pop('user')
         request = kwargs.pop('request')
-        sociallogin = request.session['socialaccount_sociallogin']
+        sociallogin = request.session.get('socialaccount_sociallogin', None)
 
         user.groups.add(Group.objects.get(name=settings.DEFAULT_USER_GROUP))
         user.save()

@@ -16,7 +16,7 @@ var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
 var apiPrefixA = ["user", "profile"];//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
 var aProfile = $('.pin.profile');
-var aProfileO = {username:aProfile.attr('data-profile')};
+var aProfileO = {username:aProfile.attr('data-profile'), id:parseInt(aProfile.attr('id'))};
 //var aProfileU = aProfile.attr('data-profile');
 var pinA = [];
 var origin = window.location.origin;
@@ -95,7 +95,7 @@ function ajax(self, reload, url, async, reqType, cbS, cbE, data){
 			console.log(rData)
 		}
 		//TODO: im not sure what the below if was for but everyting seems to be ok without it.
-		//if (authUserO && authUserO.username == aProfileO.username || !aProfileO.username){
+		//if (authUserO && authUserO.id == aProfileO.id || !aProfileO.id){
 		if (reload){
 			console.log('--TODO:eliminate need for this--reloading data after ajax')
 			loadData(undefined, undefined, true)//reloads data
@@ -443,7 +443,7 @@ function onLoadData(data, insert) {
 			//INFO - STATS
 				html += '<div class="pin-info">';
 					html += '<l><span class="">By: </span>'
-					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.username+'/">'+image.submitter.username+'</a></l>';
+					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.id+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
 				html +='<div class="pin-stats pull-right">'
 						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
@@ -877,7 +877,7 @@ function insertComment(username, userid, cmntT, cmntId){
 	html += ' data-cmnt='+cmntId+'>';
 	if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '<i class="icon cmnts"></i>';
-	html += '<a href="/user/'+username+'">' +username+': </a>';
+	html += '<a href="/user/'+userid+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';
 	html += '</p> ';
 	return html
@@ -953,7 +953,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 	var countP = aProfile.attr('data-'+name);
 	var dispTextP = aProfile.find('.display.text.'+name);
 	
-	if (authUserO && authUserO.username == aProfileO.username) {
+	if (authUserO && authUserO.id == aProfileO.id) {
 		var updateProfile = true;
 	}
 
@@ -1018,44 +1018,43 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 /**
  * Profile Functions.
  */
-
 // add event listeners for profile buttons
 $('#user-pins').live('click', function(event){
 	event.preventDefault();
-	loadData(null, aProfileO.username);
+	loadData(null, aProfileO.id);
 });
 $('#user-tags').live('click', function(event){
 	event.preventDefault();
-	loadData(vn.tags, aProfileO.username);
+	loadData(vn.tags, aProfileO.id);
 });
 $('#user-favs').live('click', function(event){
 	event.preventDefault();
-	loadData(vn.favs, aProfileO.username);
+	loadData(vn.favs, aProfileO.id);
 });
 $('#user-fing').live('click', function(event){
 	event.preventDefault();
-	if (aProfileO.username) {
-		user = aProfileO.username
+	if (aProfileO.id) {
+		user = aProfileO.id
 	}else{
-		user = authUserO.username
+		user = authUserO.id
 	}
 	loadData(vn.fing, user);
 });
 $('#user-cmnts').live('click', function(event){
 	event.preventDefault();
-	if (aProfileO.username) {
-		user = aProfileO.username
+	if (aProfileO.id) {
+		user = aProfileO.id
 	}else{
-		user = authUserO.username
+		user = authUserO.id
 	}
 	loadData(vn.cmnts, user);
 });
 $('#user-fers').live('click', function(event){
 	event.preventDefault();
-	if (aProfileO.username) {
-		user = aProfileO.username
+	if (aProfileO.id) {
+		user = aProfileO.id
 	}else{
-		user = authUserO.username
+		user = authUserO.id
 	}
 	loadData(vn.fers, user);
 });
@@ -1134,7 +1133,7 @@ function follow(targetBtn, display) {
 $(document).on( 'click', '.pin.group .thumbs', function(event){
 	target = $(event.target).closest('.pin.group')
 	id = target[0].id
-	loadData(id, aProfileO.username);
+	loadData(id, aProfileO.id);
 });
 
 /**

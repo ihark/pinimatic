@@ -7,7 +7,7 @@
 	<div class="pin welcome" id="welcome-profile" data-profile="welcome">
 		<div class="header">
 			{% if user.is_authenticated %}
-			<h4>Welcome <a href="{% url core:home %}user/{{ user }}">{{ user }}:</a>
+			<h4>Welcome <a href="{% url core:home %}user/{{ user.id }}">{{ user }}:</a>
 			{% else %}
 			<h5 class="dark">Welcome to {{ site_name }}:</h5>
 			<h6><a style="color:#5BA300" href="{% url account_signup %}">Sign up</a> & start collecting your favorite images from the web.</h6>

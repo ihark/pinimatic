@@ -251,25 +251,25 @@ class PinResource(ModelResource):
         #test for fields# orm_filters['tagged_items'] = 'true'
             
         if 'user' in filters:
-            orm_filters['submitter__username__exact'] = filters['user']
+            orm_filters['submitter__id__exact'] = filters['user']
             
         if 'favs' in filters:
             if filters['favs'] == 'all':
                 orm_filters['f_pin__folowing__isnull'] = 'true'
             else:
-                orm_filters['f_pin__user__username__exact'] = filters['favs']
+                orm_filters['f_pin__user__id__exact'] = filters['favs']
                 
         if 'fers' in filters:
             print 'fers'
-            followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__username__exact = filters['fers']).values_list('user__username', flat=True)
+            followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__id__exact = filters['fers']).values_list('user__id', flat=True)
             print followers
-            orm_filters['submitter__username__in'] = followers
+            orm_filters['submitter__id__in'] = followers
             
         if 'fing' in filters:
             print 'fing'
-            following = Follow.objects.filter(favorite__isnull=True).filter(user__username__exact = filters['fing']).values_list('folowing__username', flat=True)
+            following = Follow.objects.filter(favorite__isnull=True).filter(user__id__exact = filters['fing']).values_list('folowing__id', flat=True)
             print following
-            orm_filters['submitter__username__in'] = following
+            orm_filters['submitter__id__in'] = following
 
         if 'pop' in filters:
                 #print self.obj_get(None, pk=1)
@@ -281,7 +281,7 @@ class PinResource(ModelResource):
             orm_filters['tags__name__in'] = filters['tag'].split(',')
         
         if 'cmnts' in filters:
-            orm_filters['comments__user__username__exact'] = filters['cmnts']
+            orm_filters['comments__user__id__exact'] = filters['cmnts']
         
 
         return orm_filters

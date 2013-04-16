@@ -65,11 +65,11 @@ def recent_pins(request):
   
 from django.core.serializers.json import DjangoJSONEncoder
     
-def user_profile(request, profileName=None, tag=None):
+def user_profile(request, profileId=None, tag=None):
     authUser = User.objects.values('id','username','first_name','last_name','date_joined','last_login').filter(username__exact=request.user)
     authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)#not used keeping for tests
 
-    profile = User.objects.get(username__exact=profileName)
+    profile = User.objects.get(id__exact=profileId)
     pins = Pin.objects.filter(submitter=profile)
     pinsC = pins.count()
     tags = pins.order_by('tags__name').filter(submitter=profile).values_list('tags__name').annotate(count=Count('tags__name'))

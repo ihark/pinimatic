@@ -278,6 +278,7 @@ function loadData(tag, user, reload) {
 		tag = null
 	}else if (av == 'favs') {
 		loadURL += (page*30)+"&favs=" + user;
+		user = null
 		tag = null
 	}else if (av == 'tags') {
 		//TODO: Rework group display so that the server returns groups with pins alredy assigned.

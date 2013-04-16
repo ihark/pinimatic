@@ -69,7 +69,7 @@ class UserResource(ModelResource):
         return result
     '''
 class FavsResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user', null=True)
+    user = fields.ForeignKey(UserResource, 'user', null=True, full=True)
     favid = fields.CharField(attribute='favorite_id', null=True)
     folid = fields.CharField(attribute='folowing_id', null=True)
     

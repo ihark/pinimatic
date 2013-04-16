@@ -10,10 +10,14 @@ TEMPLATE_DEBUG = DEBUG
 HTTPS=1#was used to test https but not used now?
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(SITE_ROOT, 'development.db'),
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'pinimatic',
+    'HOST': 'localhost',
+    'PORT': 5432,
+    'USER': 'postgres',
+    'PASSWORD': os.environ.get("DB_PASSWORD"),
+  }
 }
 
 

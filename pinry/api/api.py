@@ -155,7 +155,6 @@ class ContentTypeResource(ModelResource):
     class Meta:
         queryset = ContentType.objects.all()
         resource_name = "contrib/contenttype"
-        fields = ['model']
         allowed_methods = ['get']
         include_resource_uri = False
         
@@ -248,7 +247,6 @@ class PinResource(ModelResource):
             filters = {}
 
         orm_filters = super(PinResource, self).build_filters(filters)
-        #test for fields# orm_filters['tagged_items'] = 'true'
             
         if 'user' in filters:
             orm_filters['submitter__id__exact'] = filters['user']
@@ -260,28 +258,24 @@ class PinResource(ModelResource):
                 orm_filters['f_pin__user__id__exact'] = filters['favs']
                 
         if 'fers' in filters:
-            print 'fers'
             followers = Follow.objects.filter(favorite__isnull=True).filter(folowing__id__exact = filters['fers']).values_list('user__id', flat=True)
-            print followers
             orm_filters['submitter__id__in'] = followers
             
         if 'fing' in filters:
-            print 'fing'
             following = Follow.objects.filter(favorite__isnull=True).filter(user__id__exact = filters['fing']).values_list('folowing__id', flat=True)
-            print following
             orm_filters['submitter__id__in'] = following
 
         if 'pop' in filters:
-                #print self.obj_get(None, pk=1)
                 orm_filters['f_pin__folowing__isnull'] = 'true'
-                #orm_filters['order_by__fav_count']
-                
 
         if 'tag' in filters:
             orm_filters['tags__name__in'] = filters['tag'].split(',')
         
         if 'cmnts' in filters:
-            orm_filters['comments__user__id__exact'] = filters['cmnts']
+            comments = Comment.objects.filter(user__id=filters['cmnts'], content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('object_pk', flat=True)
+            comments = [int(c) for c in comments]
+            orm_filters['pk__in'] = comments
+
         
 
         return orm_filters
@@ -347,15 +341,12 @@ class PinResource(ModelResource):
         
 class CmntResource(ModelResource):
     user = fields.ToOneField('pinry.api.api.UserResource', 'user', full=True)
-    #content_type_id = fields.CharField(attribute = 'content_type_id')
-    #content_type = fields.ForeignKey('pinry.api.api.ContentTypeResource', 'content_type', null=True)
-    #object_pk = fields.IntegerField(attribute = 'object_pk')
     site_id = fields.CharField(attribute = 'site_id')
     content_object = GenericForeignKeyField({
         Pin: PinResource,
     }, 'content_object')
     username = fields.CharField(attribute = 'user__username', null=True)
-    user_id = fields.CharField(attribute = 'user__id', null=True)
+    user_id = fields.IntegerField(attribute = 'user__id', null=True)
     
     class Meta:
         always_return_data = True

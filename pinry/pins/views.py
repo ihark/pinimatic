@@ -82,7 +82,7 @@ def user_profile(request, profileId=None, tag=None):
     #TODO: get folowing pins
     favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
     favsC = favs.count()
-    cmnts = Comment.objects.filter(user=profile, content_type_id = 10, site_id=settings.SITE_ID ).values_list('pk', flat=True)
+    cmnts = Comment.objects.filter(user=profile, content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('pk', flat=True)
     cmntsC = cmnts.count()
 
     

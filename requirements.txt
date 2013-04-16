@@ -7,7 +7,7 @@ cssmin==0.1.4
 jsmin==2.0.2
 -e git://github.com/hcarvalhoalves/django-taggit.git@e0f9642d7b94c8e6c0feb520d96bb6ae4d78a4d0#egg=django-taggit
 simplejson==2.5.2
-psycopg2==2.4.5
+psycopg2==2.5
 dj-database-url==0.2.0
 django-storages==1.1.6
 boto==2.7.0
@@ -16,3 +16,4 @@ gunicorn==0.17.2
 -e git://github.com/arctelix/django-allauth.git#egg=django-allauth
 -e git://github.com/arctelix/django-invitation.git#egg=django-invitation
 requests-oauthlib
+django-generic-aggregation

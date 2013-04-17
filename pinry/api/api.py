@@ -346,7 +346,7 @@ class CmntResource(ModelResource):
         Pin: PinResource,
     }, 'content_object')
     username = fields.CharField(attribute = 'user__username', null=True)
-    user_id = fields.IntegerField(attribute = 'user__id', null=True)
+    user_id = fields.CharField(attribute = 'user__id', null=True)
     
     class Meta:
         always_return_data = True

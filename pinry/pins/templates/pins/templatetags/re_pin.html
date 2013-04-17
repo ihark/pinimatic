@@ -7,9 +7,6 @@
     </div>
     <form enctype="multipart/form-data" id="re-pin-form" action="" method="post" class="form">
         <div class="modal-body">
-			<div id="thumb_div">
-				<img id="thumb_id" src="{{ STATIC_URL }}core/img/thumb-default.png" alt="Invlaid Image"/>
-			</div>
 			<div id="fields_div">
 				{% csrf_token %}
 				{% for field in form %}
@@ -17,11 +14,15 @@
 						<div id="div_{{ field.id_for_label }}" class="control-group" style="display:none;">
 						{{ field.as_hidden }}
 						</div>
-					{% else %}
+					{% elif field.name != "tagsUser" %}
 						{% bootstrap_field field %}
 					{% endif %}
 				{% endfor %}
 			</div>
+			<div id="thumb_div">
+				<img id="thumb_id" src="{{ STATIC_URL }}core/img/thumb-default.png" alt="Invlaid Image"/>
+			</div>
+			<div id="usertags_div">{% bootstrap_field form.tagsUser %}</div>
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-primary">Post</button>

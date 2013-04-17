@@ -45,13 +45,12 @@ class PinForm(forms.ModelForm):
             'id',
             'srcUrl',
             'imgUrl',
-            #'thumbnail',
             'image',
             'description',
+            'tags',
+            'tagsUser',
             'uImage',
             'repin',
-            'tagsUser',
-            'tags',
         )
 
         print "--form end init"

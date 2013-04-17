@@ -65,19 +65,59 @@ input[type="radio"], input[type="checkbox"] {
 }
 
 .form #fields_div{
+  vertical-align: bottom;
   text-align: left;
   display: inline-block;
   width: 220px;
 }
+.form #usertags_div{
+  width: 100%;
+}
 .form #thumb_div{
   vertical-align: top;
-  text-align: center;
-  display: inline-block;
-  margin-right: 25px;
+  margin-left: 25px;
   margin-top: 5px;
-  width: 200px;
-  height: 100%;
+  margin-bottom: 10px;
+  display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
+  text-align: center;
 }
+.form #thumb_div img{
+	max-width: 100%;
+	max-height: 100%;
+}
+.form #div_id_tagsUser_0{
+  display: inline-block;
+  text-align: left;
+  width: 450px;
+}
+.form #div_id_tagsUser_0 .controls{
+	padding:2px 2px 0px 8px;
+	width:auto%;
+	max-height: 75px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	background-color: #FFF;
+	border: 1px solid #CCC;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+.form #div_id_tagsUser_0 ul{
+	list-style-type: none;
+	margin: 0px;
+}
+.form #div_id_tagsUser_0 li{
+  overflow: hidden;
+  float:left;
+  width:105px;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
 	margin: 5px 0;
 }

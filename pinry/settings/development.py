@@ -8,7 +8,14 @@ print '--Development Settings Loading'
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 HTTPS=1#was used to test https but not used now?
-
+'''
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(SITE_ROOT, 'development.db'),
+  }
+}
+'''
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',

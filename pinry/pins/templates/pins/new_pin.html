@@ -13,14 +13,14 @@
 		</div>
 		{{ form.non_field_errors }}
 		<form enctype="multipart/form-data" action="" id="edit-pin-form" method="post" class="form">
-			<div id="thumb_div">
-				<img id="thumb_id" src="{{thumb}}" alt="Invlaid Image"/>
-			</div>
 			<div id="fields_div">
 				{% csrf_token %}
 				{% for field in form %}
 					{% bootstrap_field field %}
 				{% endfor %}
+			</div>
+			<div id="thumb_div">
+				<img id="thumb_id" src="{{thumb}}" alt="Invlaid Image"/>
 			</div>
 			<div class="form-actions">
                 <button id="submit-btn" type="submit" class="btn btn-primary">Post</button>

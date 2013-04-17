@@ -49,7 +49,7 @@ class CustomTagField(forms.CharField):
         else: 
             return value
 
-class UserTagsWidget(forms.SelectMultiple):
+class UserTagsWidget(forms.CheckboxSelectMultiple):
     def render(self, name, value, attrs=None):
         print '----UserTagsWidget render exicuted'
         self.choices = set(self.choices)

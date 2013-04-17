@@ -7,14 +7,14 @@
     </div>
     <form enctype="multipart/form-data" id="new-pin-form" action="{% url pins:new-pin %}" method="post" class="form">
         <div class="modal-body">
-			<div id="thumb_div">
-				<img id="thumb_id" src="{{ STATIC_URL }}core/img/thumb-default.png" alt="Invlaid Image"/>
-			</div>
 			<div id="fields_div">
 				{% csrf_token %}
 				{% for field in form %}
 					{% bootstrap_field field %}
 				{% endfor %}
+			</div>
+			<div id="thumb_div">
+				<img id="thumb_id" src="{{ STATIC_URL }}core/img/thumb-default.png" alt="Invlaid Image"/>
 			</div>
         </div>
         <div class="modal-footer">

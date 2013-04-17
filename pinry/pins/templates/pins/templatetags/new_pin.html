@@ -8,6 +8,7 @@
     <form enctype="multipart/form-data" id="new-pin-form" action="{% url pins:new-pin %}" method="post" class="form">
         <div class="modal-body">
 			<div id="fields_div">
+				{{ form.non_field_errors }}
 				{% csrf_token %}
 				{% for field in form %}
 					{% bootstrap_field field %}

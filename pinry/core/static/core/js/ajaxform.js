@@ -134,6 +134,10 @@ function addMessage(html_id, text, extra_tags) {
     // }, 10000);
 }
 function apply_form_field_error(targetForm, fieldname, error, tags) {
+	if ($("#div_id_"+fieldname).length == 0){
+		//check for fieldnames appeded with _0 (Multiselect)
+		fieldname = fieldname+"_0";
+	}
 	var input = targetForm.find( "#id_"+fieldname+"_label");
     var container = targetForm.find( "#div_id_"+fieldname);
     var error_msg = $("<span />").addClass("help-inline ajax-error").text(error);

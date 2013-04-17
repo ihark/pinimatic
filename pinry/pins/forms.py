@@ -21,12 +21,12 @@ class PinForm(forms.ModelForm):
     image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
     repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}),required=False, initial=None)
-    tags = CustomTagField(label='*New Tag ?', help_text='You can enter multiple tags seperated by spaces, commas, or quotes: '
+    tags = CustomTagField(label='*Add New Tag', help_text='You can enter multiple tags seperated by spaces, commas, or quotes: '
                                                       'tagone  tagtwo =(Tagone) (Tagtwo) / '
                                                       'tag one,  tag two = (Tag one) (Tag two) / '
                                                       'one  two  "tag, three" = (One) (Two) (tag, three)', 
                                                       required=False)
-    tagsUser = UserTagsField(queryset=Pin.tags.all(), help_text='Use CONTROLL + CLICK to add or remove tags', label='*Your Tags ?', required=False)
+    tagsUser = UserTagsField(queryset=Pin.tags.all(), help_text='*Or select from your previously used tags below', label='*AND/OR Select from Your Tags', required=False)
     #tagsTest = ComboField(queryset=Pin.tags.all(), label='*Your Tags', required=False)
 
     #NOTE: passing in user breaks tags validation, why?????
@@ -81,7 +81,7 @@ class PinForm(forms.ModelForm):
             data = Pin.objects.get(id = data)
         return data
 
-    def clean_tags(self):
+    def clean_tagsUser(self):
         print '--form clean_tags'
         tags_new = self.cleaned_data['tags']
         for tag in tags_new:
@@ -103,6 +103,7 @@ class PinForm(forms.ModelForm):
             tags_keep = [str(item) for item in self.cleaned_data['tagsUser'].values_list('name', flat=True)]
             print 'tags_keep: ', tags_keep
         except:
+            print '---exception', self.cleaned_data
             tags_keep = None
         try:#find original selected tag names in list of all user tags
             tags_orig = [str(item) for item in self.instance.tags.all().values_list('name', flat=True)]
@@ -111,23 +112,27 @@ class PinForm(forms.ModelForm):
         if tags_keep and tags_orig: 
             #TODO: delete these tags if not used by other users.
             tags_diff = [item for item in tags_orig if not item in tags_keep]
+        else:
+            tags_diff = None
         if tags_keep:    
             data = tags_keep + tags_new
+            self
         else:
             data = tags_new
-        '''DEBUG
-        print '-tags psot format:', tags_new 
+
+        print '-tags post format:', tags_new 
         print '-tags_all_list:', tags_all_list
         print '-tags_keep:', tags_keep 
         print '-tags_orig:', tags_orig 
         print '-tags_diff:', tags_diff 
         print 'returned data:', data
-        '''
+
         #Make sure there is at least one tag
         if len(data)>0:
-            return data
+            #if tags is cleaned after userTags you can "return data" instead of below.
+            self.cleaned_data['tags'] = data
         else:
-            raise forms.ValidationError("Form: You must provide at least one tag.  Select from list above or enter new comma seperated tags below.")
+            raise forms.ValidationError("You must provide at least one tag.  Enter new tags above and/or choose from your previously used tags below.")
 
     def clean(self):
         print '--form clean'

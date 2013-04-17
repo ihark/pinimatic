@@ -8,6 +8,7 @@
     <form enctype="multipart/form-data" id="re-pin-form" action="" method="post" class="form">
         <div class="modal-body">
 			<div id="fields_div">
+				{{ form.non_field_errors }}
 				{% csrf_token %}
 				{% for field in form %}
 					{% if field.name == "imgUrl" or field.name == "image" %}

@@ -11,8 +11,9 @@ from django.contrib.admin import helpers
 from django.template.loader import render_to_string, get_template
 from django.contrib.sites.models import Site
 
+
 class PinAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'id', 'submitter', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
+    list_display = ['pk', 'admin_thumb', 'submitter', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
 
 admin.site.register(Pin, PinAdmin)
 

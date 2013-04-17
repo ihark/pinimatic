@@ -37,6 +37,10 @@ class Pin(models.Model):
         else:
             return self.imgUrl
         
+    def admin_thumb(self):
+        return '<img height="50px" src="%s"/>' % self.thumbnail.url
+    admin_thumb.allow_tags = True
+    
     def edit(self, *args, **kwargs):
         print 'model - pin.edit()'
         exPin = Pin.objects.get(pk=self.pk)

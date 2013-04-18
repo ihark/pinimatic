@@ -52,7 +52,11 @@ class CustomTagField(forms.CharField):
 class UserTagsWidget(forms.CheckboxSelectMultiple):
     def render(self, name, value, attrs=None):
         print '----UserTagsWidget render exicuted'
-        self.choices = set(self.choices)
+        #make sure there is only one of each tag in choices
+        seen = set()
+        seen_add = seen.add
+        choices = [ x for x in self.choices if x not in seen and not seen_add(x)]
+        self.choices = choices
         #print self.choices
         #for c in self.choices: print 'choices:', c
         

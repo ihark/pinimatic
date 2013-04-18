@@ -1,5 +1,5 @@
 from django import forms
-
+from django.db.models import Count
 from taggit.forms import TagField, TagWidget
 from pinry.core.forms import CustomTagField, UserTagsField
 print '-import pinry.core.forms'
@@ -26,18 +26,25 @@ class PinForm(forms.ModelForm):
                                                       'tag one,  tag two = (Tag one) (Tag two) / '
                                                       'one  two  "tag, three" = (One) (Two) (tag, three)', 
                                                       required=False)
-    tagsUser = UserTagsField(queryset=Pin.tags.all(), help_text='*Or select from your previously used tags below', label='*AND/OR Select from Your Tags', required=False)
-    #tagsTest = ComboField(queryset=Pin.tags.all(), label='*Your Tags', required=False)
+    tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*AND/OR Select from Your Tags', required=False)
+    '''
+    inorder to limit tags list to the user's tags 
+    pass a user kwarg when calling: PinForm(user=request.user)
+    '''
 
-    #NOTE: passing in user breaks tags validation, why?????
     def __init__(self, *args, **kwargs):
-        print '--form init'
         user = kwargs.pop('user', None)
         super(forms.ModelForm, self).__init__(*args, **kwargs)
-        print '--form super ini'
-        if user:
-            qs = Pin.tags.most_common().filter(pin__submitter__exact=user).order_by('name')#num_times
-            self.fields['tagsUser'].queryset = qs #TODO: need to convert to set in UserTagsWidget
+        if user.id != None:
+            #get auth users pins
+                #must used#
+            #qs = Pin.tags.most_common().filter(pin__submitter__exact=user).order_by('-num_times', 'name')
+                #last used#
+            #qs = Pin.tags.all().filter(pin__submitter__exact=user).order_by('-pin__published')
+                #alphabetical#
+            qs = Pin.tags.all().filter(pin__submitter__exact=user).order_by('name')
+            self.fields['tagsUser'].queryset = qs
+            #get current tags for pin
             self.fields['tagsUser'].initial = Pin.tags.all().filter(pin__exact=self.instance)
             tags_initial = self.fields['tagsUser'].initial
         
@@ -119,14 +126,14 @@ class PinForm(forms.ModelForm):
             self
         else:
             data = tags_new
-
+        '''DEBUG
         print '-tags post format:', tags_new 
         print '-tags_all_list:', tags_all_list
         print '-tags_keep:', tags_keep 
         print '-tags_orig:', tags_orig 
         print '-tags_diff:', tags_diff 
         print 'returned data:', data
-
+        '''
         #Make sure there is at least one tag
         if len(data)>0:
             #if tags is cleaned after userTags you can "return data" instead of below.

@@ -131,7 +131,7 @@ def new_pin(request, pin_id=None):
         try:
             print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
-            form = PinForm(instance=pin, user=pin.submitter)
+            form = PinForm(instance=pin, user=request.user)
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
             if not request.user.is_superuser and pin.submitter != request.user:
@@ -142,7 +142,7 @@ def new_pin(request, pin_id=None):
     else:
         print 'view - new pin - no pin id'
         pin = Pin()
-        form = PinForm()
+        form = PinForm(user=request.user)
         thumb = '/static/core/img/thumb-default.png'
         
     if request.method == 'POST' or save:
@@ -197,7 +197,7 @@ def new_pin(request, pin_id=None):
                     thumb = request.REQUEST['imgUrl']
                     print 'view - edit invalid form'
     else:
-        print 'not POST or Save'
+        print 'view - not POST or Save'
         
     context = {
             #'tempImg': tempImg

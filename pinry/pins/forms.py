@@ -32,7 +32,9 @@ class PinForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(forms.ModelForm, self).__init__(*args, **kwargs)
-        print 'pinform() - user passed:', user
+
+        print 'pinform() - user passed:', user, 'only needed for tag checkboxes'
+
         if user and user.id:
             #get auth users pins
                 #must used#

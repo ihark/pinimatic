@@ -7,9 +7,6 @@
 	<div class="modal-body">
 		<!-- change to post once ssl is enabled with csrf -->
         <form action="" enctype="multipart/form-data" method="get" id="ajaxform" name="pin_form" class="form">
-			<div id="thumb_div">
-				<img id="thumb_id">
-			</div>
 			<div id="fields_div">
 				<!-- need xcsrf token needed but issue with single quote used instead of double -->
 				{% for field in form %}
@@ -22,6 +19,9 @@
 						{% bootstrap_field field %}
 					{% endif %}
 				{% endfor %}
+			</div>
+			<div id="thumb_div">
+				<img id="thumb_id">
 			</div>
 			<div class="modal-footer form-actions">
 				<div class="messageContainer"></div>

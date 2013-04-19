@@ -21,11 +21,8 @@ class PinForm(forms.ModelForm):
     image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
     repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}),required=False, initial=None)
-    tags = CustomTagField(label='*Add New Tag', help_text='You can enter multiple tags seperated by spaces, commas, or quotes: '
-                                                      'tagone  tagtwo =(Tagone) (Tagtwo) / '
-                                                      'tag one,  tag two = (Tag one) (Tag two) / '
-                                                      'one  two  "tag, three" = (One) (Two) (tag, three)', 
-                                                      required=False)
+    tags = CustomTagField(label='Tags*', help_text='Tags are like folders, except one taged objects can be in many folders / '
+                                                          'for multiword tags use quotes: "multiword tag"', required=False)
     tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*AND/OR Select from Your Tags', required=False)
     '''
     inorder to limit tags list to the user's tags 
@@ -56,7 +53,6 @@ class PinForm(forms.ModelForm):
             'image',
             'description',
             'tags',
-            'tagsUser',
             'uImage',
             'repin',
         )

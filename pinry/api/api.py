@@ -409,3 +409,37 @@ class CmntResource(ModelResource):
             user = bundle.request.user
         bundle = super(CmntResource, self).obj_create(bundle, user=user)
         return bundle
+        
+class PinTagResource(ModelResource):
+
+    class Meta:
+        always_return_data = True
+        queryset = Pin.tags.all()
+        resource_name = 'pintags'
+        include_resource_uri = False
+        allowed_methods = ['get']#TODO: I should be using put for comment edits....
+        fields = ['id', 'name']
+
+        filtering = {
+            'user': ALL_WITH_RELATIONS,
+            'tags': ALL_WITH_RELATIONS,
+        }
+        authorization = DjangoAuthorization()
+    
+    def build_filters(self, filters=None):
+        print '---build filters---'
+        if filters is None:
+            filters = {}
+
+        orm_filters = super(PinTagResource, self).build_filters(filters)
+            
+        if 'user' in filters and filters['user'] != 'null':
+            orm_filters['pin__submitter__id__exact'] = filters['user']
+            
+        return orm_filters
+
+    def determine_format(self, request): 
+        return "application/json" 
+
+    def dehydrate_tags(self, bundle):
+        return map(str, bundle.obj.tags.all())

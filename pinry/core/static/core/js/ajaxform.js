@@ -57,6 +57,58 @@ $(document).ready(function () {
 		});
 		return false;
 	});
+//tagit settings
+	$('input[name="tags"]').tagit({
+		availableTags: getTags(authUserO.id),
+		placeholderText: 'new tags..',
+	});
+	//integrate focus css to ul box
+	$('.tagit input').focus(function(event) {
+		target = $(event.target).closest('ul');
+		target.addClass('active');
+	});
+	$('.tagit input').focusout(function(event) {
+		target = $(event.target).closest('ul');
+		target.removeClass('active');
+	});
+//textext
+	/*
+	$('input[name="tags"]').textext({
+        plugins : 'tags prompt autocomplete arrow',
+        tagsItems : [ 'Basic', 'JavaScript', 'PHP', 'Scala' ],
+        prompt : 'Add one...',
+    })
+	.bind('getSuggestions', function(e, data){
+		var list = [
+				'Basic',
+				'Closure',
+				'Cobol',
+				'Delphi',
+				'Erlang',
+				'Fortran',
+				'Go',
+				'Groovy',
+				'Haskel',
+				'Java',
+				'JavaScript',
+				'OCAML',
+				'PHP',
+				'Perl',
+				'Python',
+				'Ruby',
+				'Scala'
+			],
+			textext = $(e.target).textext()[0],
+			query = (data ? data.query : '') || '';
+
+		$(this).trigger(
+			'setSuggestions',
+			{ result : textext.itemManager().filter(list, query) }
+		);
+	});
+	*/
+	
+	
 });
 ////this method requires default submit function which is broken in chrome due to injection of from after dom loaded
 // function popForm(form) {
@@ -147,4 +199,39 @@ function apply_form_field_error(targetForm, fieldname, error, tags) {
 function clear_form_field_errors(form) {
     $(".ajax-error", $(form)).remove();
     $(".error", $(form)).removeClass("error");
+}
+//taggit
+function getTags(user) {
+	if (!user){ user = null };
+	isLoading = true
+	$('#loader').show();
+	var tags = []
+	onSuccess = function( data, ajaxStatus, xhr) {
+		if (data.objects){
+			for (t in data.objects){
+				tags.push(data.objects[t].name)
+			}
+		}
+		console.log(tags)
+		isLoading = false
+		$('#loader').hide();
+	}
+	$.ajax({
+		url: apiURL+'pintags/?user='+user,
+		contentType: 'application/json',
+		withCredentials: true,
+		/* headers:  {
+			'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
+		},
+		beforeSend: function(jqXHR, settings) {
+			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+		}, */
+		success: onSuccess,
+		error: function(jqXHR, settings) {
+			console.warn('getTags - ajax error');
+			isLoading = false
+			$('#loader').hide();
+		},
+	});
+	return tags
 }

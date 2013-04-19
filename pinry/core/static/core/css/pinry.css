@@ -17,7 +17,7 @@ input[type="radio"], input[type="checkbox"] {
   padding: 10px 15px;
 }
 .modal-body {
-  max-height: 440px;
+  max-height: 400px;
 }
 .modal-header h3{
   display:inline-block;
@@ -73,6 +73,7 @@ input[type="radio"], input[type="checkbox"] {
 .form #usertags_div{
   width: 100%;
 }
+
 .form #repin_div{
   width: 100%;
   height: 102px;
@@ -95,6 +96,12 @@ input[type="radio"], input[type="checkbox"] {
   text-align: left;
   width: 450px;
 }
+.form #div_id_tags{
+  display: inline-block;
+  text-align: left;
+  width: 450px;
+}
+
 .form #div_id_tagsUser_0 .controls{
 	padding:2px 2px 0px 8px;
 	width:auto%;
@@ -303,9 +310,16 @@ body {
     padding-bottom: 5px;
 }
 
-	.tag {
+	.tag:hover {
+		color: #398F00;
+		background-color: #FFF;
+    }
+	
+	.tagit.ui-widget .ui-state-default.tagit-choice,
+	.tag{
 		cursor: pointer;
 		display: inline-block;
+		margin: 1px 0px;
 		padding: 2px 4px;
 		font-size: 11px;
 		font-weight: Bold;
@@ -315,12 +329,38 @@ body {
 		white-space: nowrap;
 		vertical-align: baseline;
 		border: 1px solid #ccc;
-		background-color: #f4f4f4;
+		background: #f4f4f4;
+		border-radius:3px;
     }
-	.tag:hover {
-		color: #398F00;
-		background-color: #FFF;
-    }
+	.tagit.ui-widget .ui-state-default.tagit-choice{
+		padding: 2px 20px 2px 4px;
+		margin: 2px 4px 2px 0px;
+	}
+	ul.tagit {
+		padding:3px 5px;
+		max-height:50px;
+	}
+	ul.tagit li.tagit-new{
+		margin:2px 0 0 2px;
+		padding:0;
+		line-height: 12px;
+		width:100px;
+	}
+	.ui-widget input, 
+	.ui-widget select, 
+	.ui-widget textarea, 
+	.ui-widget button{
+		font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+		
+	}
+	.tagit.ui-widget.active{
+		border-color: rgba(82, 168, 236, 0.8);
+		outline: 0;
+		outline: thin dotted 9;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+		-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	}
 
 #pins-container {
     top: 70px;
@@ -775,4 +815,8 @@ form h1 {
 }
 .touch-off{
 
+}
+/*jquery-ui*/
+.ui-autocomplete {
+  z-index:1100;
 }

@@ -29,8 +29,8 @@ class CustomTagWidget(forms.TextInput):
         if value is not None and not isinstance(value, basestring):
             value = edit_string_for_tags([o.tag for o in value.select_related("tag")])
             #remove all quotes from tag values when rendered on form
-            #value = re.sub(r'"', '', value)
-            value = ""#remove exising values from form
+            value = re.sub(r'"', '', value)
+            #value = ""#remove exising values from form
         return super(CustomTagWidget, self).render(name, value, attrs)
 
 from pinry.core.utils import format_tags, format_tags_list

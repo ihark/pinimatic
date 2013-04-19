@@ -4,6 +4,7 @@ var apiURL = '/api/v1/'
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
+
 //var favsURL = apiURL+'favs/?format=json&'
 var userURL = apiURL+'auth/user/?format=json'
 var page = 0;
@@ -459,7 +460,7 @@ function onLoadData(data, insert) {
 					html += '<l>';
 					html += '<span>Groups: </span>'
 					for (tag in image.tags) {
-						html += '<span class="tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
+						html += '<span class="tag" onclick="loadData(' + image.tags[tag] + ')">' + image.tags[tag] + '</span> ';
 					}
 					html += '</l>';
 				}
@@ -1126,15 +1127,15 @@ function follow(targetBtn, display) {
 }
 
 /**
- * Tag/Group view functions
+ * Group view functions
  */
-//add click handler for pin functions
-//tag/groups
+//add click handler for group image
 $(document).on( 'click', '.pin.group .thumbs', function(event){
 	target = $(event.target).closest('.pin.group')
 	id = target[0].id
 	loadData(id, aProfileO.id);
 });
+
 
 /**
  * Edit pin functions.

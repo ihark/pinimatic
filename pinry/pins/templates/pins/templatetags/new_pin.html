@@ -8,10 +8,13 @@
     <form enctype="multipart/form-data" id="new-pin-form" action="{% url pins:new-pin %}" method="post" class="form">
         <div class="modal-body">
 			<div id="fields_div">
+				<div id="tags_div">{% bootstrap_field form.tags%}</div>
 				{{ form.non_field_errors }}
 				{% csrf_token %}
 				{% for field in form %}
-					{% bootstrap_field field %}
+					{% if field.name != "tags" %}
+						{% bootstrap_field field %}
+					{% endif %}
 				{% endfor %}
 			</div>
 			<div id="thumb_div">

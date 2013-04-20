@@ -32,6 +32,7 @@ print 'HOST = '+str(HOST)
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
+API_NAME = 'v1'
 # Set to False to force users to login before seeing any pins. 
 PUBLIC = True
 
@@ -123,6 +124,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "pinry.core.context_processors.template_settings",
     "pinry.core.context_processors.baseUrl",
     "pinry.core.context_processors.staticPrefix",
+    "pinry.core.context_processors.apiUrl",
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
     "invitation.context_processors.remaining_invitations",

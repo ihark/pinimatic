@@ -1,4 +1,8 @@
-﻿javascript : var baseurl = "{{ BASE_URL }}";(function () { 
+﻿javascript :var baseurl = "{{ BASE_URL }}";
+			var authUserO = {{ auth_user_o|safe }};
+			var apiURL = "{{ API_URL }}";
+			var viud="{{ csrftoken }}";
+			(function () { 
 	console.warn('--start bookmarklet--');
 	{% load static %}
 	////test for EXISTING bookmarklet or siteDom domain
@@ -8,7 +12,6 @@
 	if (document.getElementById("overlay") == undefined && insiteDom == null) {
 		var d = document;
 		var b = d.body;
-		var jq;
 		////find all images on page and create golbal variables
 		var images = d.getElementsByTagName("img");
 		var iq = images.length;
@@ -24,7 +27,7 @@
 		////create overlay div
 		var o = d.createElement("div");
 		o.setAttribute("id", "overlay");
-		os = "position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; z-index:900000000000000000000000000;"
+		os = "position:absolute; top:0px; left:0px; right:0px; bottom:0px; z-index:900000000000000000000000000;"
 		setStyles(o, os)
 		o.innerHTML += '{% spaceless %}{% include "pins/bmbase.html" %}{% endspaceless %}';
 		b.appendChild(o);// append overlay to document body
@@ -33,16 +36,14 @@
 		mbd = d.createElement("div");
 		mbd.setAttribute("id", "backdrop");
 		//mbd.setAttribute("class", "modal-backdrop");
-		mbds = "z-index: -1; position: fixed; top: 0; right: 0; bottom: 0; left: 0; margin: 0;";
-		mbds += "background-color: rgba(0, 0, 0, 0.9);";
+		mbds = "z-index: -1; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px;";
+		mbds += "background-color: rgba(0, 0, 0, 0.9);"
 		setStyles(mbd, mbds)
 		o.appendChild(mbd);// append background to overlay
 		console.warn('modal-backdrop added');
-		////add jquery to overlay
-		jq = d.createElement("script");
-		jq.type = "text/javascript";
-		jq.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/jquery/1.7.2/jquery.js";
-		o.appendChild(jq);
+
+		//load jquery
+		loadScript("vendor/jquery/1.7.2/jquery.js", "jQuery.fn.jquery>='1.7.2'", jqReady);
 		
 		////create header
 		var hh = "30";
@@ -58,18 +59,21 @@
 		setStyles(h, hs);
 		hc.appendChild(h);// append header to header container
 		var mh = d.createElement("div");
-		mhs = "cursor: default; display: inline-block; float:left; background-color: transparent; padding: 0 0 0 20px; line-height: "+hh+"px;";
+		mhs = "line-height:"+hh+"px; cursor: default; display: inline-block; float:left; background-color: transparent; padding: 0 0 0 20px; line-height: "+hh+"px;";
 		setStyles(mh, mhs);
 		h.appendChild(mh);//append message & logo to header
 		var l = d.createElement("span");
-		ls = "cursor: pointer; display: inline-block; float:left; background-color: transparent; text-indent: 0px; margin 0;";
-		ls += "font-size: 18px; color: #333; font-family: 'Fugaz One'!important; padding: 0 10px 0 0; cursor: pointer;";
+		l.setAttribute("class", "brand")
+		l.setAttribute("id", "header-b");
+		ls = "line-height:"+hh+"px; cursor: pointer; display: inline-block; float:left; background-color: transparent; text-indent: 0px; margin 0;";
+		ls += "font-size: 18px; color: #333; font-family: 'Fugaz One'; padding: 0 10px 0 0; cursor: pointer;";
 		setStyles(l, ls);
 		l.innerHTML = "{{site_name}}";
 		l.onclick = delegate(onClickLogo, this);
 		mh.appendChild(l);//append logo to mh
 		var m = d.createElement("span");
-		ms = "display: inline-block; float:left; background-color: transparent; text-indent: 0px;";
+		m.setAttribute("id", "header-m");
+		ms = "line-height:"+hh+"px; display: inline-block; float:left; background-color: transparent; text-indent: 0px;";
 		ms += "font-size: 13px; color: #black; font-family: Helvetica, arial, sans-serif; font-weight: normal; padding:0;";
 		setStyles(m, ms);
 		m.innerHTML = "Select an image to pin.";
@@ -93,36 +97,39 @@
 		// h.appendChild(cb);//append cancil button to header
 
 		////create image grid container
+		var igs = d.createElement("div");
+		igs.setAttribute("id", "image-grid-scroller");
+		igss = "overflow-x:scroll; position:fixed; left:0px; right:0px; bottom:5px; top:"+hh+"px;"
+		setStyles(igs, igss);
+		o.appendChild(igs);// append image grid container to overlay
 		var igc = d.createElement("div");
 		igc.setAttribute("id", "image-grid-container");
-		igcs = "text-align: center; z-index: 0; margin: 0 0 25px 0px; position: relative; clear:both; top: "+hh+"px;";
+		igcs = "z-index:0; text-align: center; margin: 0 0 25px 0px; position: relative; clear:both; top: "+hh+"px;";
 		setStyles(igc, igcs);
-		o.appendChild(igc);// append image grid container to overlay
+		igs.appendChild(igc);// append image grid container to overlay
+		
 
 		////find images
 		fni();
-		//check for jquery
-		checkLoad("window.$", jqReady, "jquery has loaded");
 	}else {
 		if (insiteDom) {
-			alert("You have already pinned everything here!");
-		}else{
-			alert("You have an open bookmarklet already!");	
-		}			
+			alert("You have already added everything here to {{site_name}}.  Try going to a page outside {{site_name}} to find new pins!");
+		}
 	}
-	//exicute when jquery is ready
+	//load other scripts
 	function jqReady() {
-        console.warn('--jqReady');
-		bs = d.createElement("script");
-		bs.type = "text/javascript";
-		bs.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/bootstrap/2.0.3/js/bootstrap.js";
-		d.getElementById("overlay").appendChild(bs);
-        console.warn('bootstrap.js added');
-		s4 = d.createElement("script");
-		s4.type = "text/javascript";
-		s4.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}core/js/ajaxform.js";
-		d.getElementById("overlay").appendChild(s4);
-		console.warn('ajaxform.js added');
+		loadScript("vendor/bootstrap/2.0.3/js/bootstrap.js", "jQuery.fn.alert", bootstrapReady);
+	}
+	function bootstrapReady() {
+		loadScript("vendor/jquery-ui/1.10.2.custom/js/jquery-ui-1.10.2.custom.js", "jQuery.ui", jqueryuiReady);
+	}
+	function jqueryuiReady() {
+		loadScript("vendor/jquery-ui-tag-it/js/tag-it.js", "jQuery.ui.tagit", tagitReady);
+	}
+	function tagitReady() {
+		loadScript("core/js/ajaxform.js", "$.fn.exists", ajaxformReady);
+	}
+	function ajaxformReady() {
 		////set form action url to ajaxsubmit view
 		d.getElementById("ajaxform").setAttribute("action", baseurl+"/ajax/submit/");
 		////scroll to top of page
@@ -131,10 +138,15 @@
 		//$('#form-container').modal('toggle');    //works chrome not ie10
 		//d.getElementById("form-container").setAttribute("class", "modal fade in"); //works all browsers
 		console.warn('--end bookmarklet--');
+		/* $('document').jScrollPane(
+			{autoReinitialise: true}
+		); */
 	}
+	
+	
 	//image grid functions
 	function fni() {
-			console.warn('fni entered');
+			//console.warn('fni entered');
 			if (ii < iq) {
 				var e = cni(images[ii]);
 				if (e) {
@@ -147,22 +159,27 @@
 				removeOverlay()
 			}
 			else { //do when no images remain
-				//d.getElementById("form-container").setAttribute("class", "modal fade"); // activate modal fade
+				//prevent base page from scrolling
+				$('body').css('overflow', 'hidden')
+				//IOS fix overflow:scroll errors
+				var scrollable = document.getElementById("image-grid-scroller");
+				new ScrollFix(scrollable);
+				
 			}
 		};
 	function cni(e) {
-		console.warn('cni for: '+e.src);
+		//console.warn('cni for: '+e.src);
 		var t = false;
 		if (e.src.match(siteDom)) {
-			console.warn('--image skiped: in siteDom domain--');
+			//console.warn('--image skiped: in siteDom domain--');
 			return t
 		} else {
 			if (e.width < 150 && e.height < 150 || e.width < 100 && e.height < 20) {
-				console.warn('--image skiped: too small--');
+				//console.warn('--image skiped: too small--');
 				return t
 			}
 			if (e.src.match(/\.(tif|tiff|bmp)$/i)) {
-				console.warn('--image skiped: wrong img type--');
+				//console.warn('--image skiped: wrong img type--');
 				return t
 			}
 			t = true;
@@ -171,7 +188,7 @@
 		return t
 	};
 	function ani(e) {
-		console.warn('ani entered');
+		//console.warn('ani entered');
 		var gi = d.createElement("div");
 		var gis = "display: inline-block; width: 200px; height: 200px; margin: 15px; position: relative; overflow: hidden;";
 		gi.className = "imageGrid";
@@ -217,22 +234,34 @@
 		gi.onmouseover = delegate(onMouseOverImage, this);
 		gi.onmouseout = delegate(onMouseOutImage, this);
 		data[gi.id] = e;
-		console.warn('ani: append data'+data[gi.id]);
+		//console.warn('ani: append data'+data[gi.id]);
 		buttons[gi.id] = ib;
 		io.push(gi)
-		console.warn('--ani complete added to grid:'+data[gi.id].src);
+		//console.warn('--ani complete added to grid:'+data[gi.id].src);
 	};
 	//Check script load Tool
-	function checkLoad(test, callback, msg) {
-		console.warn("--load test--"+test)
-		if(eval(test)) {
-			console.warn("--load pass--");
-			callback();
-		} else {
-			console.warn("--load retest--")
-			window.setTimeout(function(){checkLoad(test, callback, msg)}, 15 );
+	function loadScript(src, test, callback) {
+		s = d.createElement("script");
+		s.type = "text/javascript";
+		s.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}"+src;
+		o.appendChild(s);
+		console.warn('*Added: '+src);
+		var i = 0
+		checkLoad = function (src, test, callback, msg) {
+			if(eval(test)) {
+				console.warn("**LOADED:", src);
+				callback();
+			} else if (i<1000){
+				i++
+				console.warn("--test--", eval(test), ' '+i)
+				window.setTimeout(function(){checkLoad(src, test, callback)}, 15 );
+			} else { 
+				alert('{{site_name}}: The bookmarklet did not load properly.  Please refresh the page and try again.')
+			}
 		}
+		checkLoad(src, test, callback)
 	}
+
 	//utils
 	function setStyles(e, t) {
 			e.setAttribute("style", t);
@@ -283,9 +312,11 @@
 		ts = "-moz-box-shadow: 0 2px 12px rgba(0,0,0,.75); -webkit-box-shadow: 0 2px 12px rgba(0,0,0,.75); box-shadow: 0 2px 12px rgba(0,0,0,.75); display: inline-block;";
 		setStyles(t, ts);
 		////display form
-		o.removeChild(igc);
+		o.removeChild(igs);
+		//$('#form-container').modal('toggle')
 		d.getElementById("form-container").setAttribute("class", "modal fade in");
-		console.warn('clicked image = '+i.src);
+		//prevent autocomplete list from moving on scroll
+		$('.ui-autocomplete').css('position', 'fixed')
 	};
 	function onMouseOverImage(e) {
 		var t = normalizeEventTarget(e);
@@ -321,4 +352,36 @@ function removeOverlay() {
 	document.body.removeChild(t);
 	document.body.setAttribute("class", "");
 	window.scrollTo(lsp.x, lsp.y);
+	$('body').css('overflow', 'auto')
 }
+/**
+ * ScrollFix v0.1
+ * http://www.joelambert.co.uk
+ *
+ * Copyright 2011, Joe Lambert.
+ * Free to use under the MIT license.
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+
+var ScrollFix = function(elem) {
+	// Variables to track inputs
+	var startY, startTopScroll;
+
+	elem = elem || document.querySelector(elem);
+
+	// If there is no element, then do nothing	
+	if(!elem)
+		return;
+
+	// Handle the start of interactions
+	elem.addEventListener('touchstart', function(event){
+		startY = event.touches[0].pageY;
+		startTopScroll = elem.scrollTop;
+
+		if(startTopScroll <= 0)
+			elem.scrollTop = 1;
+
+		if(startTopScroll + elem.offsetHeight >= elem.scrollHeight)
+			elem.scrollTop = elem.scrollHeight - elem.offsetHeight - 1;
+	}, false);
+};

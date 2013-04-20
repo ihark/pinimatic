@@ -1,7 +1,61 @@
-﻿console.warn('ajaxform.js has exicuted: waiting for doc ready');
+﻿
+console.warn('ajaxform.js has exicuted: waiting for doc ready');
 var messageDivId = 'messageList';
 $(document).ready(function () {
 	console.warn('ajax form document ready');
+	//ajax setup
+	var _super = $.ajaxSettings.xhr;
+	$.ajaxSetup({
+		// Required for reading Location header of ajax POST responses in firefox.
+		xhr: function () {
+			console.log('-------------xhr setup xhr--');
+			var xhr = _super();
+			var getAllResponseHeaders = xhr.getAllResponseHeaders;
+			xhr.getAllResponseHeaders = function () {
+				var allHeaders = getAllResponseHeaders.call(xhr);
+				if (allHeaders) {
+					return allHeaders;
+				}
+				allHeaders = "";
+				$(["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma", "Location"]).each(function (i, header_name) {
+					if (xhr.getResponseHeader(header_name)) {
+						allHeaders += header_name + ": " + xhr.getResponseHeader(header_name) + "\n";
+					}
+				});
+				return allHeaders;
+			};
+			return xhr;
+		},
+		headers: { "cache-control": "no-cache" },//to prevent ios safari from caching.
+		//TODO: temp added for X-CSRFToken header
+		beforeSend: function(xhr, settings) {
+			console.log('-------------before send--');
+			function getCookie(name) {
+				var cookieValue = null;
+				console.warn(document.cookie)
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) == (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+			}
+			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+				// Only send the token to relative URLs i.e. locally.
+				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+			}else{
+				xhr.setRequestHeader("X-CSRFToken", viud);
+			}
+			//testing...
+			
+		} 
+	}); 
 	////ajax submit
 	$('#ajaxform').submit(function () { //// catch the form's submit event
 		var csrfToken = 'placeholder';
@@ -57,10 +111,12 @@ $(document).ready(function () {
 		});
 		return false;
 	});
+
+if (authUserO){tu = authUserO.id}else{tu = null};
 //tagit settings
 	$('input[name="tags"]').tagit({
-		availableTags: getTags(authUserO.id),
-		placeholderText: 'new tags..',
+		availableTags: getTags(tu),
+		placeholderText: 'add..',
 	});
 	//integrate focus css to ul box
 	$('.tagit input').focus(function(event) {
@@ -71,44 +127,7 @@ $(document).ready(function () {
 		target = $(event.target).closest('ul');
 		target.removeClass('active');
 	});
-//textext
-	/*
-	$('input[name="tags"]').textext({
-        plugins : 'tags prompt autocomplete arrow',
-        tagsItems : [ 'Basic', 'JavaScript', 'PHP', 'Scala' ],
-        prompt : 'Add one...',
-    })
-	.bind('getSuggestions', function(e, data){
-		var list = [
-				'Basic',
-				'Closure',
-				'Cobol',
-				'Delphi',
-				'Erlang',
-				'Fortran',
-				'Go',
-				'Groovy',
-				'Haskel',
-				'Java',
-				'JavaScript',
-				'OCAML',
-				'PHP',
-				'Perl',
-				'Python',
-				'Ruby',
-				'Scala'
-			],
-			textext = $(e.target).textext()[0],
-			query = (data ? data.query : '') || '';
 
-		$(this).trigger(
-			'setSuggestions',
-			{ result : textext.itemManager().filter(list, query) }
-		);
-	});
-	*/
-	
-	
 });
 ////this method requires default submit function which is broken in chrome due to injection of from after dom loaded
 // function popForm(form) {
@@ -200,7 +219,7 @@ function clear_form_field_errors(form) {
     $(".ajax-error", $(form)).remove();
     $(".error", $(form)).removeClass("error");
 }
-//taggit
+//jquery ui & taggit
 function getTags(user) {
 	if (!user){ user = null };
 	isLoading = true
@@ -235,3 +254,19 @@ function getTags(user) {
 	});
 	return tags
 }
+//things to do when modal is activated
+$('.modal').live('shown', function(e){
+   console.warn('modal shown')
+   //$('.ui-autocomplete').css('position', 'fixed')
+   $('body').css('overflow', 'hidden')
+});
+//things to do when modal is activated
+$('.modal').live('hide', function(e){
+   console.warn('modal hidden')
+   //$('.ui-autocomplete').css('position', 'absolute')
+   $('body').css('overflow', 'auto')
+});
+//util for checking if an element existis: return bool
+$.fn.exists = function(){
+    return jQuery(this).length > 0;
+};

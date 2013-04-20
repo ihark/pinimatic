@@ -8,19 +8,25 @@ body {
 #overlay{
 	background-color: transparent !important;
 }
+
 #overlay *, ::after, ::before {
-	-webkit-box-sizing: content-box !important;
-	-moz-box-sizing: content-box !important;
-	box-sizing: content-box !important;
+	-webkit-box-sizing: border-box !important;
+	-moz-box-sizing: border-box !important;
+	box-sizing: border-box !important;
 
 }
+
 #overlay  *{
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-	font-size: 13px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
 	font-weight: normal;
 	font-style: normal;
 	text-rendering: optimizelegibility;
 }
+#overlay .brand {
+	font-family: 'Fugaz One';
+}
+
 #overlay  h1, h2, h3, h4, h5, h6 {
 margin: 0;
 font-family: inherit;
@@ -31,23 +37,43 @@ text-rendering: optimizelegibility;
 text-align: left;
 }
 #overlay  h3{
-	font-size: 18px
+	font-size: 18px;
+	line-height: 20px;
 }
 
 #overlay div{
     width: auto;
 	margin: 0;
 }
-
+	#overlay input, 
+	#overlay textarea, 
+	#overlay select, 
+	#overlay .uneditable-input {
+		display: inline-block;
+		width: 215px;
+		padding: 4px;
+		margin-bottom: 9px;
+		font-size: 14px;
+		line-height: 18px;
+		color: #555;
+		background-color: #FFF;
+		border: 1px solid #CCC;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		box-sizing: border-box !important;
+	}
     #ajaxform textarea {
-            height: 50px !important;
+            height: 50px;
 			resize: vertical !important;
+			max-height:150px !important;
+			vertical-align:middle !important;
     }
 		
 
-	#ajaxform input [type="text"]{
-			width: 210px !important; 
-            height: 25px !important;
+	#ajaxform input[type="text"]{
+			width: 100%;
+			height: 20px !important;
 			padding: 1px 1px 1px 4px !important;
     }
 
@@ -64,10 +90,12 @@ text-align: left;
   padding-top: 5px;
   text-align: right;
 }
-
+#image-grid-scroller{
+	-webkit-overflow-scroll:touch;
+}
 #overlay .modal {
   width: 450px !important;
-  margin: -115px 0 0 -225px  !important;
+  margin: -150px 0 0 -225px  !important;
   overflow: auto !important;
   max-height: 400px !important;
   z-index: 10 !important;
@@ -157,16 +185,26 @@ text-align: left;
 }
 
 #form-container #fields_div{
-  vertical-align: bottom;
+  vertical-align: top;
   text-align: left;
   display: inline-block;
-  width: 220px;
+  width: 215px;
 }
-#form-container #usertags_div{
-  width: 100%;
+#form-container #div_id_description textarea{
+  height:70px;
+
 }
+#form-container #tags_div{
+	text-align:left;
+	width:100%;
+}
+#form-container #tags_div ul{
+	text-align:left;
+	width:100%;
+}
+
 #form-container #thumb_div{
-  vertical-align: top;
+  vertical-align: bottom;
   margin-left: 20px;
   margin-top: 5px;
   margin-bottom: 10px;
@@ -224,17 +262,88 @@ text-align: left;
   border-bottom: 1px solid #CCC;
 }
 
-.control-group.error > label {
+#overlay .control-group.error > label {
   color: black;
   display: inline-block;
 }
-.help-inline.control-label {
+#overlay .help-inline.control-label {
   vertical-align: inherit;
   padding-left: 0px;
   cursor: default;
 }
 
-
+/*jquery-ui*/
+.ui-autocomplete {
+  z-index:900000000000000000000000001;
+  text-align:left;
+}
+	#overlay .tagit.ui-widget .ui-state-default.tagit-choice,
+	#overlay .tag{
+		cursor: pointer;
+		display: inline-block;
+		margin: 1px 0px;
+		padding: 2px 4px;
+		font-size: 12px;
+		font-weight: Bold;
+		line-height: 13px;
+		color: #777;
+		text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.97);
+		white-space: nowrap;
+		vertical-align: baseline;
+		border: 1px solid #ccc;
+		background: #f4f4f4;
+		border-radius:3px;
+    }
+	#overlay .tagit-label{
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-weight: Bold;
+		font-size: 12px;
+	}
+	#overlay .ui-widget {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size: 14px;
+	}
+	#overlay .tagit.ui-widget .ui-state-default.tagit-choice{
+		padding: 2px 20px 2px 4px;
+		margin: 1px 2px 2px 0px;
+	}
+	#overlay ul.tagit {
+		padding:3px 5px;
+		max-height:50px;
+		text-align:left;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		box-sizing: border-box !important;
+	}
+	#overlay .tagit-new input {
+		border: none;
+		padding: 0px 0px 0px 0px !important;
+		margin: 0px 0px 0px 0px !important;
+		width:75px !important;
+		
+	}
+	#overlay ul.tagit li.tagit-new{
+		margin:0;
+		padding:0;
+		line-height: 12px;
+		width:100px;
+	}
+	#overlay .ui-widget input, 
+	#overlay .ui-widget select, 
+	#overlay .ui-widget textarea, 
+	#overlay .ui-widget button{
+		font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+		
+	}
+	#overlay .tagit.ui-widget.active{
+		border-color: rgba(82, 168, 236, 0.8);
+		outline: 0;
+		outline: thin dotted 9;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+		-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	}
 
 
 

@@ -16,14 +16,14 @@ class PinForm(forms.ModelForm):
     
     id = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='id', required=False)
     srcUrl = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), label='srcUrl', required=False)
-    imgUrl = forms.CharField(widget=TextInput(attrs={'placeholder':'http://www.xxx.com/image.ext'}), label='Image URL', required=False)
+    imgUrl = forms.CharField(widget=TextInput(attrs={'placeholder':'http://www.xxx.com/image.ext'}), label='Image url or upload*', required=False)
     #thumbnail = forms.ImageField(widget=CustomThumbnail(), label='Current', required=False)
-    image = forms.ImageField(widget=FileInput(),label='or Upload', required=False)
+    image = forms.ImageField(widget=FileInput(),label='', required=False)
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
     repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}),required=False, initial=None)
-    tags = CustomTagField(label='Tags*', help_text='Tags are like folders, except one taged objects can be in many folders / '
-                                                          'for multiword tags use quotes: "multiword tag"', required=False)
-    tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*AND/OR Select from Your Tags', required=False)
+    tags = CustomTagField(label='Tags*', help_text='Tags are like folders, except that a taged item can exist in many folders simultaniously. / '
+                                                          'To create a tag with more than one word use quotation marks: "multiword tag"', required=False)
+    tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*Select from Your Tags', required=False)
     '''
     inorder to limit tags list to the user's tags 
     pass a user kwarg when calling: PinForm(user=request.user)
@@ -32,7 +32,7 @@ class PinForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(forms.ModelForm, self).__init__(*args, **kwargs)
-        print user
+        print 'pinform() - user passed:', user
         if user and user.id:
             #get auth users pins
                 #must used#

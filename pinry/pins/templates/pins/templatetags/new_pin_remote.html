@@ -7,6 +7,7 @@
 	<div class="modal-body">
 		<!-- change to post once ssl is enabled with csrf -->
         <form action="" enctype="multipart/form-data" method="get" id="ajaxform" name="pin_form" class="form">
+			<div id="tags_div">{% bootstrap_field form.tags%}</div>
 			<div id="fields_div">
 				<!-- need xcsrf token needed but issue with single quote used instead of double -->
 				{% for field in form %}
@@ -15,7 +16,7 @@
 						{{ field.as_hidden }}
 						</div>
 					{% elif field.name == "repin"%}
-					{% else %}
+					{% elif field.name != "tags" %}
 						{% bootstrap_field field %}
 					{% endif %}
 				{% endfor %}

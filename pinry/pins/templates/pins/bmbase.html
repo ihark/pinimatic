@@ -2,10 +2,12 @@
 {% load compress %}
 {% load bootstrap_field %}
 
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Monoton">
+	<link name="cssf1" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Fugaz One">
 
 {% compress css %}
-    <link name="cssbs" rel="stylesheet" href="{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/bootstrap/2.0.3/css/bootstrap.css">
+	<link name="cssui" rel="stylesheet" href="{{ STATIC_PREFIX }}{{STATIC_URL}}vendor/jquery-ui/1.10.2.custom/css/pinimatic/jquery-ui-1.10.2.custom.css">
+	<link name="cssti" rel="stylesheet" href="{{ STATIC_PREFIX }}{{STATIC_URL}}vendor/jquery-ui-tag-it/css/jquery.tagit.css">
+	<link name="cssbs" rel="stylesheet" href="{{ STATIC_PREFIX }}{{ STATIC_URL }}vendor/bootstrap/2.0.3/css/bootstrap.css">
     <link name="csspo" rel="stylesheet" href="{{ STATIC_PREFIX }}{{ STATIC_URL }}core/css/pinryOverlay.css">
 {% endcompress %}
 
@@ -17,5 +19,5 @@
 
 
 {% compress js %}
-    <script name="jq" src="{{ STATIC_PREFIX }}{{ STATIC_URL }}core/js/pinry.js"></script>
+   
 {% endcompress %}

@@ -13,6 +13,8 @@ from django.contrib.auth.models import Group
 from django.views.generic.simple import direct_to_template
 from django.core.mail import send_mail
 from .forms import ContactForm
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import requires_csrf_token
 #from django.contrib.admin.views.decorators import staff_member_required
 
 
@@ -54,13 +56,33 @@ def logout_user(request):
     logout(request)
     messages.success(request, 'You have successfully logged out.')
     return HttpResponseRedirect(reverse('core:home'))
-
+    
+from pinry.api.api import UserResource
+import HTMLParser
+@requires_csrf_token 
 def bookmarklet(request):
     srcUrl = request.GET.get('srcUrl','')
+    ur = UserResource()
+    user = request.user
+    #return user object for javascript (ID does not authenticate)
+    if request.user.is_authenticated():
+        user = ur.obj_get(id=user.id, bundle=ur.build_bundle(request=request)) 
+        ur_bundle = ur.build_bundle(obj=user, request=request)
+        auth_user_o = ur.full_dehydrate(ur_bundle)
+        auth_user_o = ur.serialize(None, auth_user_o, 'application/json')
+    else:
+        auth_user_o = "null"
+    #TODO: this is a way to get csrf token into IE via bookmarklet
+    #TODO: need to authenticate IE users by token???
+    #csrftoken = get_token(request)
+    csrftoken = "null"
+    #print 'request: ', request
     resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {
                                                                                 "srcUrl": srcUrl,
+                                                                                "auth_user_o": auth_user_o,
+                                                                                "csrftoken" : csrftoken,
                                                                                 }))
-    return HttpResponse(resp, mimetype="text/javascript")
+    return HttpResponse(resp, mimetype="text/javascript")#.set_cookie(settings.SECRET_KEY, value='csrftoken', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
 @login_required
 def contact(request):

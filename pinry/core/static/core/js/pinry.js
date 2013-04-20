@@ -460,7 +460,7 @@ function onLoadData(data, insert) {
 					html += '<l>';
 					html += '<span>Groups: </span>'
 					for (tag in image.tags) {
-						html += '<span class="tag" onclick="loadData(' + image.tags[tag] + ')">' + image.tags[tag] + '</span> ';
+						html += '<span class="tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
 					}
 					html += '</l>';
 				}

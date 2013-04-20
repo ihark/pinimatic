@@ -10,6 +10,12 @@ def baseUrl(request):
     """     
     return {'BASE_URL': '//' + request.get_host(),}
     
+def apiUrl(request):
+    """
+    API_URL
+    """
+    return {'API_URL': '//' + request.get_host() + '/api/' + settings.API_NAME + '/',}
+    
 def staticPrefix(request):
     """
     STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.

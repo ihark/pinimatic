@@ -5,7 +5,7 @@ input[type="radio"], input[type="checkbox"] {
 
 .modal {
   width: 498px;
-  margin: -280px 0 0 -250px;
+  margin: -230px 0 0 -250px;
 }
 .modal.fade {
   top: -100%;
@@ -17,7 +17,9 @@ input[type="radio"], input[type="checkbox"] {
   padding: 10px 15px;
 }
 .modal-body {
+  height: auto;
   max-height: 400px;
+  padding: 15px 15px 0px 15px;
 }
 .modal-header h3{
   display:inline-block;
@@ -65,7 +67,7 @@ input[type="radio"], input[type="checkbox"] {
 }
 
 .form #fields_div{
-  vertical-align: bottom;
+  vertical-align: top;
   text-align: left;
   display: inline-block;
   width: 220px;
@@ -79,17 +81,18 @@ input[type="radio"], input[type="checkbox"] {
   height: 102px;
 }
 .form #thumb_div{
-  vertical-align: top;
+  vertical-align: bottom;
   margin-left: 25px;
   margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   display: inline-block;
-  width: 200px;
   text-align: center;
+  width:200px;
 }
 .form #thumb_div img{
-	max-width: 100%;
+	max-width: 200px;
 	max-height: 200px;
+	vertical-align: bottom;
 }
 .form #div_id_tagsUser_0{
   display: inline-block;
@@ -101,7 +104,11 @@ input[type="radio"], input[type="checkbox"] {
   text-align: left;
   width: 450px;
 }
-
+#re-pin-form textarea {
+		height: auto;
+		max-height: 170px;
+		resize: vertical;
+	}
 .form #div_id_tagsUser_0 .controls{
 	padding:2px 2px 0px 8px;
 	width:auto%;
@@ -126,7 +133,11 @@ input[type="radio"], input[type="checkbox"] {
   float:left;
   width:105px;
 }
-
+	#re-pin-form textarea {
+		height: auto;
+		max-height: 170px;
+		resize: vertical;
+	}
 
 h1, h2, h3, h4, h5, h6 {
 	margin: 5px 0;
@@ -185,6 +196,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .socialaccount_providers{
 	margin:0px -5px;
+}
+/*jquery-ui*/
+.ui-autocomplete {
+  z-index:1100;
 }
 /* PINIMATIC */
 .errorlist {
@@ -305,7 +320,17 @@ body {
 	bottom: 100px;
 }
 
-
+.ui-widget {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+}
+	.ui-widget input, 
+	.ui-widget select, 
+	.ui-widget textarea, 
+	.ui-widget button{
+		font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+	}
+	
 #tags {
     padding-bottom: 5px;
 }
@@ -314,7 +339,7 @@ body {
 		color: #398F00;
 		background-color: #FFF;
     }
-	
+
 	.tagit.ui-widget .ui-state-default.tagit-choice,
 	.tag{
 		cursor: pointer;
@@ -334,11 +359,17 @@ body {
     }
 	.tagit.ui-widget .ui-state-default.tagit-choice{
 		padding: 2px 20px 2px 4px;
-		margin: 2px 4px 2px 0px;
+		margin: 1px 2px 1px 0px;
 	}
+	
 	ul.tagit {
 		padding:3px 5px;
 		max-height:50px;
+		text-align:left;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		box-sizing: border-box;
 	}
 	ul.tagit li.tagit-new{
 		margin:2px 0 0 2px;
@@ -346,12 +377,10 @@ body {
 		line-height: 12px;
 		width:100px;
 	}
-	.ui-widget input, 
-	.ui-widget select, 
-	.ui-widget textarea, 
-	.ui-widget button{
-		font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
-		
+	.tagit-label{
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-weight: Bold;
+		font-size: 12px;
 	}
 	.tagit.ui-widget.active{
 		border-color: rgba(82, 168, 236, 0.8);
@@ -681,7 +710,9 @@ body {
 		text-align: left;
 		float: left;
 		resize: vertical;
+		max-height: 100px;
 	}
+
 	.pin form button{
 		float: right;
 		line-height: 18px;
@@ -733,7 +764,7 @@ form h1 {
 	margin-bottom: 0px;
 }
 	textarea {
-		height: 50px;
+		height:50px;
 		max-height: 100px;
 		resize: vertical;
 	}
@@ -815,8 +846,4 @@ form h1 {
 }
 .touch-off{
 
-}
-/*jquery-ui*/
-.ui-autocomplete {
-  z-index:1100;
 }

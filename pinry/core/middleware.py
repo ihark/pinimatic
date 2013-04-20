@@ -35,7 +35,7 @@ class AllowOriginMiddleware(object):
         if origin:
             response['Access-Control-Allow-Origin'] = origin
             response['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS, DELETE, PUT'
-            response['Access-Control-Allow-Headers'] = 'Content-Type, X-CSRFToken, x-requested-with, authorization'
+            response['Access-Control-Allow-Headers'] = 'Content-Type, X-CSRFToken, x-requested-with, authorization, cache-control'
             response['Access-Control-Allow-Credentials'] = 'true'
         return response
 

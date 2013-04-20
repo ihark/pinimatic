@@ -28,6 +28,7 @@ from django import forms
 from tastypie.validation import CleanedDataFormValidation
 
 from django.core.files.storage import default_storage
+from tastypie.serializers import Serializer
 
 
 #resource path = pinry.api.api.SomeResource
@@ -42,6 +43,7 @@ class UserResource(ModelResource):
         include_resource_uri = True
         allowed_methods = ['get']
         excludes = ['password']
+        serializer = Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
 
         #authentication = BasicAuthentication()
         authorization = DjangoAuthorization()
@@ -60,7 +62,7 @@ class UserResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         result =  object_list.filter(id=bundle.request.user.id)
         return result
-    
+
     ''' depreciated in 0.9.12-alpha
     def apply_authorization_limits(self, request, object_list):
         print '--apply_authorization_limits--'

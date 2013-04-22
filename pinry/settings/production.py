@@ -28,15 +28,24 @@ DATABASES = {
   }
 }
 
-
+#Security
+HTTPS_SUPPORT = True
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-#Set SITE_PORT='' when port is :80
-SITE_PORT = ''
-SITE_URL = 'http://'+SITE_IP+SITE_PORT
+#HOST
+HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
+SITE_URL = 'http://'+HOST_NAME
 
-HOST_NAME = os.environ.get('HOST_NAME')
-print 'HOST_NAME: ', HOST_NAME
+#RDIRECTS
+LOGIN_REDIRECT_URL = SITE_URL+LOGIN_REDIRECT_URL
+
+'''STATIC_PREFIX
+Static url can not be full url on local dev server so 
+this adds it to the bookmarklet. MUST BE = '' on production.
+'''
+STATIC_PREFIX = SITE_URL
+
+print 'SITE_URL: ', SITE_URL
 print 'DB_NAME: ', os.environ.get("DB_NAME")
 
 DEFAULT_FILE_STORAGE = 'pinry.settings.s3utils.MediaRootS3BotoStorage'

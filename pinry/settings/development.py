@@ -7,7 +7,12 @@ print '--Development Settings Loading'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-HTTPS=1#was used to test https but not used now?
+PUBLIC = False
+
+#HTTPS
+HTTPS_SUPPORT = True
+LOGIN_REDIRECT_URL = SITE_URL+LOGIN_REDIRECT_URL
+
 '''
 DATABASES = {
   'default': {

@@ -4,31 +4,29 @@ from django.contrib.messages import constants as messages
 
 print '--General Settings Loading'
 
+#SITE & HOST
 SITE_ID = 1
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 
 import socket
 try:
-    HOST = socket.gethostname()#not used
     SITE_IP = socket.gethostbyname(socket.gethostname())
 except:
-    HOST = 'localhost'
     SITE_IP = 'localhost'
-
-# You must run server with the port specified below
-# ie: python manage.py runserver 0.0.0.0:5000
-# forman start uses 5000 by default.
-SITE_PORT = ':5000'
-SITE_URL = 'http://'+SITE_IP+SITE_PORT
-
+''' HTTPS_DEV_PORT & HTTP_DEV_PORT
+# You must run the development server with the ports specified below
+# to handle http & https redirects. They are not needed in a production env.
+# ie: python manage.py runserver 0.0.0.0:5000, forman uses 5000 by default.
+'''
+HTTPS_DEV_PORT='5443'
+HTTP_DEV_PORT = ':5000'
+HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
+SITE_URL = 'http://'+HOST_NAME+HTTP_DEV_PORT
 '''STATIC_PREFIX
 Static url can not be full url on local dev server so 
 this adds it to the bookmarklet. MUST BE = '' on production.
 '''
 STATIC_PREFIX = SITE_URL
-
-print 'SITE_IP = '+str(SITE_IP)
-print 'HOST = '+str(HOST)
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
@@ -37,8 +35,8 @@ API_NAME = 'v1'
 PUBLIC = True
 
 #LOGIN IN (keep above allauth)
-LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
 ALLOW_NEW_REGISTRATIONS = True
 
 #ALLAUTH
@@ -72,6 +70,13 @@ USE_TZ = True
 #URLS
 ROOT_URLCONF = 'pinry.urls'
 INTERNAL_IPS = ['127.0.0.1']
+
+#HTTPS
+SECURE_REQUIRED_PATHS = (
+    '/admin/',
+    '/accounts/',
+    '/management/'
+)
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
 MEDIA_URL = SITE_URL+'/media/'
@@ -111,6 +116,8 @@ MIDDLEWARE_CLASSES = (
     'pinry.core.middleware.Public',
     'pinry.core.middleware.AllowOriginMiddleware', 
     'pinry.core.middleware.AjaxMessaging',
+    'pinry.core.middleware.P3PHeaderMiddleware',
+    'pinry.core.middleware.SecureRequiredMiddleware',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",

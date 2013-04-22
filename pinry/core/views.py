@@ -21,7 +21,7 @@ from django.views.decorators.csrf import requires_csrf_token
 
 def home(request):
     user = 'all'
-    return HttpResponseRedirect(reverse('pins:recent-pins'))
+    return HttpResponseRedirect(settings.SITE_URL+reverse('pins:recent-pins'))
     
 def help(request):
     return TemplateResponse(request, 'core/help-bm.html')
@@ -58,7 +58,6 @@ def logout_user(request):
     return HttpResponseRedirect(reverse('core:home'))
     
 from pinry.api.api import UserResource
-import HTMLParser
 @requires_csrf_token 
 def bookmarklet(request):
     srcUrl = request.GET.get('srcUrl','')
@@ -72,18 +71,19 @@ def bookmarklet(request):
         auth_user_o = ur.serialize(None, auth_user_o, 'application/json')
     else:
         auth_user_o = "null"
-    #TODO: this is a way to get csrf token into IE via bookmarklet
-    #TODO: need to authenticate IE users by token???
+    #this is a way to get csrf token into IE via bookmarklet
     #csrftoken = get_token(request)
     csrftoken = "null"
     #print 'request: ', request
+
     resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {
                                                                                 "srcUrl": srcUrl,
                                                                                 "auth_user_o": auth_user_o,
                                                                                 "csrftoken" : csrftoken,
                                                                                 }))
+    
     return HttpResponse(resp, mimetype="text/javascript")#.set_cookie(settings.SECRET_KEY, value='csrftoken', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
-
+    
 @login_required
 def contact(request):
     if request.method == 'POST':

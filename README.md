@@ -32,17 +32,18 @@ Note: On Ubuntu you can get the build deps by running
 
 ### 3) Pinimatic has three different customizable configurations:
 
-### Development
+#### Development
 
 Pinimatic is configured out of the box to run on django's built in development server on port 5000.
 You may change the port in the settings.  The database is set up for PostgreSQL, but settings for sqLite
 are there as well.
-- local environment variables must be set in settings/env.py (you will need to create this file)
+- The following settings must be configured in settings/env.py (you will need to create this file)
  - To use PostressSQL set: DB_PASSWORD
  - To enable sending email set: EMAIL_HOST_PASSWORD, EMAIL_HOST_USER
-- If HTTPS_SUPPORT = True you must configure [stunnel][3] or similar to simulate SSL on your dev server.
-  Install the version suitable for your OS and in stunnel.conf make sure all previous settings are commented 
-  out and add the following settings to the bottom of the file:
+- For SSL support in the developemnt environment set HTTPS_SUPPORT = True.  For this to work you must configure 
+[stunnel][3] or similar to handle SSL for your development server.
+
+Stunnel: Setup your stunnel.conf (all other settings must be commented out):
 
     ;DJANGO
     fips = no
@@ -53,7 +54,7 @@ are there as well.
     connect=5000
     TIMEOUTclose=1
 
-### Production
+#### Production
 
 Pinimatic is configured to run on Heroku with Gunicorn in the production environment.
 You must configure heroku as follows:
@@ -67,31 +68,29 @@ You must configure heroku as follows:
 - set Heroku env variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME
   according to your amazon S3 bucket.
 
-### Staging
+#### Staging
 Pinimatic is configured to run on Heroku with the built in development server in the 
 staging environment. You must configure heroku the same as above with the following changes:
 - Set Heroku env variable RACK_ENV = staging
 
 
 
-### Quick Settings
+### 4) Quick Settings
 
 There are a few settings provided specific to Pinimatic that allow you to get some
 of the most requested functionality easily. (Pinimatic/settings/__init__.py)
 
- + **SITE_NAME**: For quickly changing the name Pinimatic to something you prefer.
- + **ALLOW_NEW_REGISTRATIONS**: Set to False to prevent people from registering.
- + **PUBLIC**: Set to False to require people to register before viewing pins.
-   (Note: Setting PUBLIC to False does still allow registrations. Make sure
-          both PUBLIC and the previous setting are set to False to prevent
-          all public access.)
- + **INVITE_MODE**: Set to true to allow new registrations by invitation only.
-   See https://github.com/arctelix/django-invitation.git for more information on invitation settings.
- + **ALLAUTH**: Many settings available for customization of login and signup.
-   See https://github.com/arctelix/django-allauth.git for more information on allauth settings.
- + **EAMIL**: Configure these settings as per your email smtp server.
- + **P3P_COMPACT**: Set acording to your privacy policy
- + **HTTPS_SUPPORT**: Set True if your server has SSL support
+ + **SITE_NAME=**: For quickly changing the name Pinimatic to something you prefer.
+ + **ALLOW_NEW_REGISTRATIONS=**: Set to False to prevent people from registering.
+ + **PUBLIC=**: Set False to require people to register before viewing pins.
+  - (Note: Setting PUBLIC to False allows new registrations and login. 
+ + **INVITE_MODE=**: Set to true to allow new registrations by invitation only.
+  - See [https://github.com/arctelix/django-invitation.git] for more information on invitation settings.
+ + **ALLAUTH:**: Many settings available for customization of login and signup.
+  - See [https://github.com/arctelix/django-allauth.git] for more information on allauth settings.
+ + **EAMIL:**: Several settings as per your email smtp server requirements.
+ + **P3P_COMPACT=**: Set acording to your privacy policy
+ + **HTTPS_SUPPORT=**: Set True if your server has SSL support
 
  
 ## Current Features
@@ -116,19 +115,19 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + User contact form for feedback & support
  + User profile pages with stats
  + Support for multiple Social Connections 
- + Support for multiple Email Addresses with verification & primary setting 
+ + Support for multiple Email Addresses with verification & primary setting
+ + Local User Accounts & Social Account Connections
 
 ### Current Admin Features 
- + Local User Accounts & Social Account Connections
  + Invitation Only Mode for new registrations
  + Block all new registrations even with valid invitations
  + Send Bulk email to users via admin actions in user model
  + Send Bulk invitations to a list of email addresses (specific to recipient)
  + Generate Bulk invitation codes with specific number of uses
- + Superusers have full control over all users pins for easy admin.
+ + Superusers have control over all users pins while browsing the site.
  
 ### Current Security & Compatability Features
- + SSL implimented with development simulation for testing
+ + SSL implimented in all environments, including development for testing.
  + P3P implimented (please edit the policy acording to your privacy policy)
  
 ### Roadmap

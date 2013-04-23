@@ -6,6 +6,10 @@
 
 {% block content %}
 <h1>{% trans "Signed Out" %}</h1>
-
-<p>{% trans "You have signed out." %}</p>
+{% blocktrans %}
+<p>Don't forget to install the {{site_name}}
+bookmarklet so you can post new
+things from any webpage.</p>
+<p>Check back often for more great features.</p>
+{% endblocktrans %}
 {% endblock %}

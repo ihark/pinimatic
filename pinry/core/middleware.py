@@ -99,7 +99,7 @@ class AjaxMessaging(object):
 #Required for ie to send our cookies via the bookmarklet
 class P3PHeaderMiddleware(object):
     def process_response(self, request, response):
-        response['P3P'] = 'CP="NOI OUR NID PSA"'#getattr(settings, 'P3P_COMPACT', None)
+        response['P3P'] = getattr(settings, 'P3P_COMPACT', None)
         return response
 
 #Require SSL for SECURE_REQUIRED_PATHS if HTTPS_SUPPORT=true

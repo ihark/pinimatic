@@ -24,7 +24,7 @@ Note: On Ubuntu you can get the build deps by running
     $ git clone git://github.com/overshard/Pinimatic.git
     $ cd Pinimatic
     $ virtualenv .
-	$ Scripts\activate (activate your virtual env)
+    $ Scripts\activate (activate your virtual env)
     $ pip install -r requirements.txt
     $ python manage.py syncdb
     $ python manage.py migrate
@@ -37,6 +37,18 @@ Note: On Ubuntu you can get the build deps by running
 Pinimatic is configured out of the box to run on django's built in development server on port 5000.
 You may change the port in the settings.
 - To enable sending email set local environment variables: EMAIL_HOST_PASSWORD,EMAIL_HOST_USER
+- If HTTPS_SUPPORT = True you must configure [stunnel][3] or similar to simulate SSL on your dev server.
+  Install the version suitable for your OS and in stunnel.conf make sure all previous settings are commented 
+  out and add the following settings to the bottom of the file:
+    ;DJANGO
+    fips = no
+    cert = stunnel.pem
+    sslVersion = SSLv3
+    [https]
+    accept=5443
+    connect=5000
+    TIMEOUTclose=1
+
 
 ### Production
 
@@ -75,8 +87,10 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + **ALLAUTH**: Many settings available for customization of login and signup.
    See https://github.com/arctelix/django-allauth.git for more information on allauth settings.
  + **EAMIL**: Configure these settings as per your email smtp server.
-   
-## Current Pin Features
+ + **P3P_COMPACT**: Set acording to your privacy policy
+
+ 
+## Current Features
   
 ### Current Pin Features
  + Pin Tagging
@@ -91,6 +105,8 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Follow users
  + Re-Pining
  + Comment on pins
+ + Tag auto recognition
+ + Tag auto suggest
  
 ### Current User Account Features
  + User contact form for feedback & support
@@ -106,6 +122,10 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Send Bulk invitations to a list of email addresses (specific to recipient)
  + Generate Bulk invitation codes with specific number of uses
  + Superusers have full control over all users pins for easy admin.
+ 
+### Current Security & Compatability Features
+ + SSL implimented with development simulation for testing
+ + P3P implimented (please edit the policy acording to your privacy policy)
  
 ### Roadmap
  + User Boards
@@ -144,3 +164,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 [0]: http://pinterest.com/
 [1]: http://www.wookmark.com/
 [2]: https://github.com/overshard/pinry
+[3]: https://www.stunnel.org/index.html

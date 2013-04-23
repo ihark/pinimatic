@@ -13,30 +13,34 @@ try:
     SITE_IP = socket.gethostbyname(socket.gethostname())
 except:
     SITE_IP = 'localhost'
-''' HTTPS_DEV_PORT & HTTP_DEV_PORT
+
+''' HTTPS_DEV_PORT & HTTP_DEV_PORT (required for development server only)
 # You must run the development server with the ports specified below
 # to handle http & https redirects. They are not needed in a production env.
 # ie: python manage.py runserver 0.0.0.0:5000, forman uses 5000 by default.
+# set stunnel or similar SSL proxy to handle the SSL requestes on the port specified
 '''
 HTTPS_DEV_PORT='5443'
 HTTP_DEV_PORT = ':5000'
 HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
 SITE_URL = 'http://'+HOST_NAME+HTTP_DEV_PORT
-'''STATIC_PREFIX
-Static url can not be full url on local dev server so 
-this adds it to the bookmarklet. MUST BE = '' on production.
-'''
-STATIC_PREFIX = SITE_URL
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
+
+# Infroms javaScript of current api name.
 API_NAME = 'v1'
+
+# Set acording to your privacy policy. 
+P3P_COMPACT = 'CP="NOI OUR NID PSA"'
+
 # Set to False to force users to login before seeing any pins. 
 PUBLIC = True
 
-#LOGIN IN (keep above allauth)
+#LOGIN LOGOUT (keep above allauth)
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
+#TODO: Not working possible version issue: ACCOUNT_LOGOUT_REDIRECT_URL ='/login/'
 ALLOW_NEW_REGISTRATIONS = True
 
 #ALLAUTH
@@ -77,6 +81,14 @@ SECURE_REQUIRED_PATHS = (
     '/accounts/',
     '/management/'
 )
+
+'''STATIC_PREFIX
+The STATIC_URL may not be a full URL on the devserver when files are local.  
+The STATIC_PREFIX prepends the STATIC_URL to complete a full URL in templates
+css & bookmarklet.
+STATIC_PREFIX MUST BE = '' on production.
+'''
+STATIC_PREFIX = SITE_URL
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
 MEDIA_URL = SITE_URL+'/media/'

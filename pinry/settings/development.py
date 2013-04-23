@@ -1,6 +1,7 @@
 #manage.py uses RACK_ENV to determine the settings file to use
 #from pinry.settings.settings import *
 from pinry.settings import *
+from pinry.settings.env import *
 import os
 
 print '--Development Settings Loading'
@@ -28,7 +29,7 @@ DATABASES = {
     'HOST': 'localhost',
     'PORT': 5432,
     'USER': 'postgres',
-    'PASSWORD': os.environ.get("DB_PASSWORD"),
+    'PASSWORD': DB_PASSWORD,
   }
 }
 

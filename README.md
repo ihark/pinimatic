@@ -35,11 +35,15 @@ Note: On Ubuntu you can get the build deps by running
 ### Development
 
 Pinimatic is configured out of the box to run on django's built in development server on port 5000.
-You may change the port in the settings.
-- To enable sending email set local environment variables: EMAIL_HOST_PASSWORD,EMAIL_HOST_USER
+You may change the port in the settings.  The database is set up for PostgreSQL, but settings for sqLite
+are there as well.
+- local environment variables must be set in settings/env.py (you will need to create this file)
+ - To use PostressSQL set: DB_PASSWORD
+ - To enable sending email set: EMAIL_HOST_PASSWORD, EMAIL_HOST_USER
 - If HTTPS_SUPPORT = True you must configure [stunnel][3] or similar to simulate SSL on your dev server.
   Install the version suitable for your OS and in stunnel.conf make sure all previous settings are commented 
   out and add the following settings to the bottom of the file:
+
     ;DJANGO
     fips = no
     cert = stunnel.pem
@@ -48,7 +52,6 @@ You may change the port in the settings.
     accept=5443
     connect=5000
     TIMEOUTclose=1
-
 
 ### Production
 
@@ -88,6 +91,7 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
    See https://github.com/arctelix/django-allauth.git for more information on allauth settings.
  + **EAMIL**: Configure these settings as per your email smtp server.
  + **P3P_COMPACT**: Set acording to your privacy policy
+ + **HTTPS_SUPPORT**: Set True if your server has SSL support
 
  
 ## Current Features

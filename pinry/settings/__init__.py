@@ -103,8 +103,6 @@ IMAGES_PATH = 'pins/pin/originals/'
 EMAIL_USE_TLS = True
 EMAIL_PORT = '587'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 #TEST EMAIL ON SERVER START
 SEND_TEST_EMAIL = False
 

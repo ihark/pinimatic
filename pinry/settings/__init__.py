@@ -21,9 +21,10 @@ except:
 # set stunnel or similar SSL proxy to handle the SSL requestes on the port specified
 '''
 HTTPS_DEV_PORT='5443'
-HTTP_DEV_PORT = ':5000'
+HTTP_DEV_PORT = '5000'
 HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
-SITE_URL = 'http://'+HOST_NAME+HTTP_DEV_PORT
+SITE_URL = 'http://'+HOST_NAME+':'+HTTP_DEV_PORT
+SSL_SITE_URL = 'https://'+HOST_NAME+':'+HTTPS_DEV_PORT
 
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
@@ -79,7 +80,8 @@ INTERNAL_IPS = ['127.0.0.1']
 SECURE_REQUIRED_PATHS = (
     '/admin/',
     '/accounts/',
-    '/management/'
+    '/management/',
+    '/contact/',
 )
 
 '''STATIC_PREFIX

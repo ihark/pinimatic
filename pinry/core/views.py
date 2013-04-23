@@ -63,26 +63,31 @@ def bookmarklet(request):
     srcUrl = request.GET.get('srcUrl','')
     ur = UserResource()
     user = request.user
-    #return user object for javascript (ID does not authenticate)
-    if request.user.is_authenticated():
-        user = ur.obj_get(id=user.id, bundle=ur.build_bundle(request=request)) 
-        ur_bundle = ur.build_bundle(obj=user, request=request)
-        auth_user_o = ur.full_dehydrate(ur_bundle)
-        auth_user_o = ur.serialize(None, auth_user_o, 'application/json')
-    else:
-        auth_user_o = "null"
-    #this is a way to get csrf token into IE via bookmarklet
-    #csrftoken = get_token(request)
-    csrftoken = "null"
-    #print 'request: ', request
+    if request.is_secure():
+        #return user object for javascript (ID does not authenticate)
+        if request.user.is_authenticated():
+            user = ur.obj_get(id=user.id, bundle=ur.build_bundle(request=request)) 
+            ur_bundle = ur.build_bundle(obj=user, request=request)
+            auth_user_o = ur.full_dehydrate(ur_bundle)
+            auth_user_o = ur.serialize(None, auth_user_o, 'application/json')
+        else:
+            auth_user_o = "null"
+        #this is a way to get csrf token into IE via bookmarklet
+        #csrftoken = get_token(request)
+        csrftoken = "null"
+        #print 'request: ', request
 
-    resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {
-                                                                                "srcUrl": srcUrl,
-                                                                                "auth_user_o": auth_user_o,
-                                                                                "csrftoken" : csrftoken,
-                                                                                }))
+        resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {
+                                                                                    "srcUrl": srcUrl,
+                                                                                    "auth_user_o": auth_user_o,
+                                                                                    "csrftoken" : csrftoken,
+                                                                                    }))
+        #.set_cookie(settings.SECRET_KEY, value='csrftoken', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)   
+        return HttpResponse(resp, mimetype="text/javascript")
+    else:
+        return HttpResponse("<script>alert('Please go to pinimatic.herokuapp.com and install the new bookmarlet.  We have made some security improovements!');</script>")
     
-    return HttpResponse(resp, mimetype="text/javascript")#.set_cookie(settings.SECRET_KEY, value='csrftoken', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+        
     
 @login_required
 def contact(request):
@@ -103,7 +108,7 @@ def contact(request):
                                                                 'sender': sender,
                                                                 }) 
     else:
-        form = ContactForm()
+        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True })
 
     return TemplateResponse(request, 'core/contact.html', {'form': form})
 

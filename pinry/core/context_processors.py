@@ -8,11 +8,11 @@ def baseUrl(request):
     """
     BASE_URL always refers to base site url.
     """     
-    return {'BASE_URL': '//' + request.get_host(),}
+    return {'BASE_URL': settings.SITE_URL,'SSL_SITE_URL': settings.SSL_SITE_URL,}
     
 def apiUrl(request):
     """
-    API_URL
+    API_URL: http/https must be same as origin so use get_host
     """
     return {'API_URL': '//' + request.get_host() + '/api/' + settings.API_NAME + '/',}
     

@@ -1,6 +1,5 @@
 //Global Variables
 //STATIC_URL passed from base.html template context
-var apiURL = '/api/v1/'
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'

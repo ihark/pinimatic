@@ -50,6 +50,7 @@ $(document).ready(function () {
 				// Only send the token to relative URLs i.e. locally.
 				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 			}else{
+				if (typeof viud === 'undefined'){viud=null}
 				xhr.setRequestHeader("X-CSRFToken", viud);
 			}
 			//testing...

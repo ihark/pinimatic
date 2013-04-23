@@ -22,6 +22,7 @@ class Public(object):
             ]
         self.acceptable_domains = (
                 '/accounts/',
+
             )
     
     def is_acceptable_domain(self, request):
@@ -35,6 +36,7 @@ class Public(object):
         if settings.PUBLIC == False and not request.user.is_authenticated():
             if request.path not in self.acceptable_paths:
                 if not self.is_acceptable_domain(request):
+                    print '----redirected to private----',request.path 
                     return HttpResponseRedirect(settings.SITE_URL+reverse('core:private'))
                 
 # used for cors, sets allowed orign to request orign because * not allowed
@@ -136,7 +138,8 @@ class SecureRequiredMiddleware(object):
         return secure
 
     def process_request(self, request):
-        if self.enabled:
+        #ajax requests must be excluded from redirects.
+        if self.enabled and not request.is_ajax():
             print 'middleware: SecureRequired'
             request_path = request.get_full_path()
             request_url = request.build_absolute_uri(request_path)
@@ -145,6 +148,7 @@ class SecureRequiredMiddleware(object):
             print 'middleware: --cheking request url: ', request_url
             print 'middleware: --is_secure_path: ', self.is_secure_path(request)
             print 'middleware: --request_is_secure: ', self._is_secure(request)
+            #Redirect to https if designated as a secure path
             if self.is_secure_path(request) and not self._is_secure(request):
                 secure_url = request_url.replace('http://', 'https://')
                 #DEVELOPMENT SEVER: Change port to dev_https_port
@@ -152,6 +156,7 @@ class SecureRequiredMiddleware(object):
                     secure_url = secure_url.replace(server_port, self.dev_https_port)
                 print 'middleware: --redirecting to https'
                 return HttpResponsePermanentRedirect(secure_url)
+            #Redirect to http if NOT designated as a secure path
             if not self.is_secure_path(request) and self._is_secure(request):
                 unsecure_url = request_url.replace('https://', 'http://')
                 #DEVELOPMENT SEVER: Change port to serverport

@@ -87,7 +87,7 @@ class PinForm(forms.ModelForm):
             data = Pin.objects.get(id = data)
         return data
 
-    def clean_tagsUser(self):
+    def clean_tags(self):
         print '--form clean_tags'
         tags_new = self.cleaned_data['tags']
         for tag in tags_new:
@@ -96,7 +96,7 @@ class PinForm(forms.ModelForm):
             print url
             if url: raise forms.ValidationError("Form: Tags can not be url's")
             length = len(tag)
-            if length>20: raise forms.ValidationError("Form: Max tag length is 10 charicters")
+            if length>20: raise forms.ValidationError("Form: Max tag length is 20 charicters")
             
         tags_new = format_tags_list(tags_new) #new formatted tags to be assigned to pin
         try:#find tag names in list of all user tags
@@ -135,10 +135,12 @@ class PinForm(forms.ModelForm):
         '''
         #Make sure there is at least one tag
         if len(data)>0:
-            #if tags is cleaned after userTags you can "return data" instead of below.
-            self.cleaned_data['tags'] = data
+            #when tags is cleaned before userTags:
+            #self.cleaned_data['tags'] = data
+            #when tags is cleaned after userTags:
+            return data
         else:
-            raise forms.ValidationError("You must provide at least one tag.  Enter new tags above and/or choose from your previously used tags below.")
+            raise forms.ValidationError("You must provide at least one tag.")
 
     def clean(self):
         print '--form clean'

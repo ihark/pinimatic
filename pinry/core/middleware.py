@@ -18,6 +18,7 @@ class Public(object):
         self.acceptable_paths = [
                 #'/accounts/login/',
                 '/private/',
+                '/ajax/submit/'
             ]
         self.acceptable_domains = (
                 '/accounts/',

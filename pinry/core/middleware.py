@@ -120,8 +120,6 @@ class SecureRequiredMiddleware(object):
             return request.META['HTTP_X_FORWARDED_SSL'] == 'on'
         #Handle the Heroku case until this gets resolved in the request.is_secure() 
         if 'HTTP_X_FORWARDED_PROTO' in request.META:
-            print request
-            print '-----------'+request.META['HTTP_X_FORWARDED_PROTO']
             return request.META['HTTP_X_FORWARDED_PROTO'] == 'https'
         #Development server case
         if self.dev_https_port:

@@ -52,8 +52,9 @@ STATIC_PREFIX = SITE_URL
 print 'SITE_URL: ', SITE_URL
 print 'DB_NAME: ', os.environ.get("DB_NAME")
 
-DEFAULT_FILE_STORAGE = 'pinry.settings.s3utils.MediaRootS3BotoStorage'
-STATICFILES_STORAGE = 'pinry.settings.s3utils.StaticRootS3BotoStorage'
+DEFAULT_FILE_STORAGE = 'pinry.settings.s3utils.MediaS3BotoStorage'
+STATICFILES_STORAGE = 'pinry.settings.s3utils.StaticS3BotoStorage'
+COMPRESS_STORAGE = STATICFILES_STORAGE 
 #STATICFILES_STORAGE = 'pinry.settings.s3utils.CachedS3BotoStorage'
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
@@ -71,14 +72,15 @@ STATIC_URL = S3_URL+'static/'
 STATIC_ROOT = S3_URL+'static/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = 'http://%s/media/tmp/' % HOST_NAME
-'''STATIC_PREFIX
-Static url can not be full url on local dev server so STATIC_PREFIX 
-adds URL prefix to the bookmarklet. MUST BE = '' with remote static files.
+
+'''
+STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.
+- use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
+- STATIC_PREFIX MUST BE = '' on production.
 '''
 STATIC_PREFIX = ''
 
 COMPRESS_ENABLED = True
-COMPRESS_STORAGE = STATICFILES_STORAGE 
 COMPRESS_URL = STATIC_URL
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_OFFLINE = False

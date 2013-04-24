@@ -84,11 +84,10 @@ SECURE_REQUIRED_PATHS = (
     '/contact/',
 )
 
-'''STATIC_PREFIX
-The STATIC_URL may not be a full URL on the devserver when files are local.  
-The STATIC_PREFIX prepends the STATIC_URL to complete a full URL in templates
-css & bookmarklet.
-STATIC_PREFIX MUST BE = '' on production.
+'''
+STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.
+- use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
+- STATIC_PREFIX MUST BE = '' on production.
 '''
 STATIC_PREFIX = SITE_URL
 
@@ -97,7 +96,7 @@ MEDIA_URL = SITE_URL+'/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = SITE_URL+'/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
-STATIC_URL = '/static/'
+STATIC_URL = SITE_URL+'/static/'
 #Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
 

@@ -5,6 +5,7 @@ StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
 MediaS3BotoStorage = lambda: S3BotoStorage(location='media')
 MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
 
+
 '''
 from django.core.files.storage import get_storage_class
 

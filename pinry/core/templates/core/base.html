@@ -14,15 +14,12 @@
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Fugaz One">
 		
         {% compress css %}
-			<link rel="stylesheet" href="{{STATIC_URL}}vendor/jquery-ui-tag-it/css/jquery.tagit.css">
-			<link rel="stylesheet" href="{{STATIC_URL}}vendor/jquery-ui/1.10.2.custom/css/pinimatic/jquery-ui-1.10.2.custom.css">
-            <link rel="stylesheet" href="{{STATIC_URL}}vendor/bootstrap/2.2.2/css/bootstrap.css">
-            <link rel="stylesheet" href="{{STATIC_URL}}vendor/fancybox/2.0.6/jquery.fancybox.css">
-            <link rel="stylesheet" href="{{STATIC_URL}}vendor/file-uploader/fileuploader.css">
-			<!-- 
-			<link rel="stylesheet" href="{{STATIC_URL}}vendor/jquery-ui-tag-it/css/tagit.ui-zendesk.css">
-			-->
-			<link rel="stylesheet" href="{{STATIC_URL}}core/css/pinry.css">
+			<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}vendor/jquery-ui-tag-it/css/jquery.tagit.css">
+			<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}vendor/jquery-ui/1.10.2.custom/css/jquery-ui-1.10.2.pinimatic.css">
+            <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}vendor/bootstrap/2.2.2/css/bootstrap.css">
+            <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}vendor/fancybox/2.0.6/jquery.fancybox.css">
+            <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}vendor/file-uploader/fileuploader.css">
+			<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}core/css/pinry.css">
         {% endcompress %}
 		
 		{% block extra_head %}{% endblock %}

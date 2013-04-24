@@ -6,7 +6,7 @@ import os
 print '--Staging Settings Loading'
 
 #DEBUG
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 SEND_TEST_EMAIL = True
 

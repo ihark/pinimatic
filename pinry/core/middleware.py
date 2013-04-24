@@ -8,6 +8,8 @@ import simplejson as json
 from django.contrib import messages
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.http import HttpResponsePermanentRedirect
+from pinry.core.utils import safe_reverse
+import re
 
 #used to change default headder for remote user middleware
 class CustomHeaderMiddleware(RemoteUserMiddleware):
@@ -18,12 +20,14 @@ class Public(object):
         self.acceptable_paths = [
                 #'/accounts/login/',
                 '/private/',
-                '/ajax/submit/'
+                '/ajax/submit/',
             ]
         self.acceptable_domains = (
                 '/accounts/',
                 '/bookmarklet/',
-
+                '/api/',
+                '/static/',
+                r'/favicon',
             )
     
     def is_acceptable_domain(self, request):
@@ -37,8 +41,8 @@ class Public(object):
         if settings.PUBLIC == False and not request.user.is_authenticated():
             if request.path not in self.acceptable_paths:
                 if not self.is_acceptable_domain(request):
-                    print '----redirected to private----',request.path 
-                    return HttpResponseRedirect(settings.SITE_URL+reverse('core:private'))
+                    print '+++++++middleware+++++++  redirected to private: ',request.path 
+                    return HttpResponseRedirect(safe_reverse(request,'core:private'))
                 
 # used for cors, sets allowed orign to request orign because * not allowed
 class AllowOriginMiddleware(object):
@@ -110,23 +114,26 @@ class P3PHeaderMiddleware(object):
 class SecureRequiredMiddleware(object):
     def __init__(self):
         self.paths = getattr(settings, 'SECURE_REQUIRED_PATHS', False)
+        self.paths_ignored = getattr(settings, 'SECURE_IGNORED_PATHS', False)
         self.enabled = self.paths and getattr(settings, 'HTTPS_SUPPORT', False)
         self.dev_https_port = getattr(settings, 'HTTPS_DEV_PORT', False)
 
     def _is_secure(self, request):
+        #Detect SSL on Development server & add header
+        if self.dev_https_port:
+            secure = request.META['HTTP_HOST'].split(':')[-1] == self.dev_https_port
+            if secure:
+                request.META['HTTP_X_FORWARDED_PROTO'] = 'https'
+        '''
+        # Handle the Heroku case until this gets resolved in the request.is_secure()
+        # This is now added to request.is_secure() validation by setting:
+        # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+        '''
+        if 'HTTP_X_FORWARDED_PROTO' in request.META:
+            pass
+            #return request.META['HTTP_X_FORWARDED_PROTO'] == 'https'
         if request.is_secure():
             return True
-        #Handle the Webfaction case until this gets resolved in the request.is_secure() 
-        if 'HTTP_X_FORWARDED_SSL' in request.META:
-            return request.META['HTTP_X_FORWARDED_SSL'] == 'on'
-        #Handle the Heroku case until this gets resolved in the request.is_secure() 
-        if 'HTTP_X_FORWARDED_PROTO' in request.META:
-            return request.META['HTTP_X_FORWARDED_PROTO'] == 'https'
-        #Development server case
-        if self.dev_https_port:
-            eval = request.META['HTTP_HOST'].split(':')[-1] == self.dev_https_port
-            print 'middleware:  is_secture test: ', eval
-            return eval
         return False
         
     def is_secure_path(self, request):
@@ -135,25 +142,33 @@ class SecureRequiredMiddleware(object):
             if request.get_full_path().startswith(path):
                 secure =  True
         return secure
-
+    
+    def is_ignored_path(self, request):
+        ignored =  False
+        for path in self.paths_ignored:
+            if request.get_full_path().startswith(path):
+                ignored =  True
+        return ignored
+    
+    
     def process_request(self, request):
         #ajax requests must be excluded from redirects.
-        if self.enabled and not request.is_ajax():
-            print 'middleware: SecureRequired'
+        if self.enabled and not request.is_ajax() and not self.is_ignored_path(request):
+            #print '----middleware: SecureRequired----'
             request_path = request.get_full_path()
             request_url = request.build_absolute_uri(request_path)
             server_port = request.META['SERVER_PORT']
             request_port = request.META['HTTP_HOST'].split(':')[-1]
-            print 'middleware: --cheking request url: ', request_url
-            print 'middleware: --is_secure_path: ', self.is_secure_path(request)
-            print 'middleware: --request_is_secure: ', self._is_secure(request)
+            #print 'middleware: --cheking request url: ', request_url
+            #print 'middleware: --secure_required: ', self.is_secure_path(request)
+            #print 'middleware: --request_is_secure: ', self._is_secure(request)
             #Redirect to https if designated as a secure path
             if self.is_secure_path(request) and not self._is_secure(request):
                 secure_url = request_url.replace('http://', 'https://')
                 #DEVELOPMENT SEVER: Change port to dev_https_port
                 if self.dev_https_port:
                     secure_url = secure_url.replace(server_port, self.dev_https_port)
-                print 'middleware: --redirecting to https'
+                print '+++++++middleware+++++++ redirecting to https: ', secure_url
                 return HttpResponsePermanentRedirect(secure_url)
             #Redirect to http if NOT designated as a secure path
             if not self.is_secure_path(request) and self._is_secure(request):
@@ -161,7 +176,7 @@ class SecureRequiredMiddleware(object):
                 #DEVELOPMENT SEVER: Change port to serverport
                 if self.dev_https_port:
                     unsecure_url = unsecure_url.replace(self.dev_https_port, server_port)
-                print 'middleware: --redirecting to http'
+                print '+++++++middleware+++++++ redirecting to http: ', unsecure_url
                 return HttpResponsePermanentRedirect(unsecure_url)
-            print 'middleware: --no redirect required'
+            #print 'middleware: --no redirect required'
         return None

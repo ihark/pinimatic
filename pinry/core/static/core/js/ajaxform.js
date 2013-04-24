@@ -124,7 +124,7 @@ function getMessages(xhr, targetForm){
 }
 function popLoc(data) {
 	//&save=True tells view to save pin without "POST"
-	nw = window.open("http:"+baseurl+"/new-pin/?"+data+"&save=True", 'popup', 'width=800, height=400, resizeable=true, scrollbars');
+	nw = window.open(baseurl+"/new-pin/?"+data+"&save=True", 'popup', 'width=800, height=400, resizeable=true, scrollbars');
 	if (window.focus) {
 		nw.focus()
 	}	

@@ -4,15 +4,67 @@ from django.core.files import File
 from PIL import Image
 import StringIO
 import json
+import os
+import re
 import tempfile
 from django.utils import simplejson
 from django.http import HttpResponse, Http404
 from django.conf import settings
-import os
-import re
 from django.core.files.storage import default_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.files.images import ImageFile
+from django.core.urlresolvers import reverse
+
+def safe_path_prefix(request):
+    path_prefix = ''
+    if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
+        path_prefix = safe_base_url(request)
+    return path_prefix
+
+def safe_base_url(request):
+    """
+    Ensures that proper secure or unsecure url's are given when on the development server.
+    Returns generic url '//' unless HTTPS_SUPPORT=True and RACK_ENV=False, then it will return
+    either a secure 'https//' or unsecure 'http//' URL depending on the request source host.
+    """
+    host = request.get_host()
+    base_url = '//'+host
+    if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
+        #print request
+        http_port = getattr(settings, 'HTTP_DEV_PORT', False)
+        https_port = getattr(settings, 'HTTPS_DEV_PORT', False)
+        #print 'host.find(http_port): ', host.find(http_port)+1
+        #print 'host.find(https_port): ', host.find(https_port)+1
+        if host.find(http_port)+1:
+            base_url = 'http://'+host
+        if host.find(https_port)+1:
+            base_url = 'https://'+host
+    return base_url
+
+def safe_usbase_url(request):
+    host = request.get_host()
+    if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
+        http_port = getattr(settings, 'HTTP_DEV_PORT', False)
+        https_port = getattr(settings, 'HTTPS_DEV_PORT', False)
+        host = host.replace(https_port, http_port)
+    return 'http://'+host
+
+def safe_sbase_url(request):
+    host = request.get_host()
+    if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
+        http_port = getattr(settings, 'HTTP_DEV_PORT', False)
+        https_port = getattr(settings, 'HTTPS_DEV_PORT', False)
+        https_host = host.replace(http_port, https_port)
+        sbase_url = 'https://'+https_host
+    else:
+        sbase_url = 'https://'+host
+    return sbase_url
+
+def safe_reverse(request, rev_path):
+    """
+    Use safe_base_url(request)+reverse() to insure the correct port on the dev server
+    """ 
+    return safe_path_prefix(request)+reverse(rev_path)
 
 #ajax thumbnail uplaod
 #get uploaded image and pass to save    

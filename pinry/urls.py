@@ -22,7 +22,6 @@ urlpatterns = patterns('',
     (r'^accounts/', include('allauth.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
 #provide url for testing error pages
 if settings.DEBUG:
     urlpatterns += patterns('',
@@ -31,14 +30,14 @@ if settings.DEBUG:
     )
 
 #url patters for local static and media files
-if settings.SITE_IP.split('.')[0] == '192':
+if not settings.RACK_ENV:
     urlpatterns += patterns('',
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.MEDIA_ROOT,
         }),
     )
 #enables dev server to serve static files with compressor & collect static
-if settings.SITE_IP.split('.')[0] == '192':
+if not settings.RACK_ENV:
     urlpatterns += patterns('',
         url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.STATIC_ROOT,

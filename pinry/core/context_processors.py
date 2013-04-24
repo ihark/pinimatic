@@ -1,4 +1,5 @@
 from django.conf import settings
+from pinry.core.utils import safe_base_url, safe_sbase_url, safe_usbase_url
 
 
 def template_settings(request):
@@ -6,23 +7,41 @@ def template_settings(request):
 
 def urls(request):
     """
-    BASE_URL always refers to base site url.
-    API_URL: http/https must be same as origin so use get_host
-    """     
-    return {'BASE_URL': settings.SITE_URL,
-            'SSL_SITE_URL': settings.SSL_SITE_URL, 
-            'API_URL': '//' + request.get_host() + '/api/' + settings.API_NAME + '/',
+    SITE_URL = base site url with automatic http/https.
+    US_SITE_URL = http base site url
+    SSL_SITE_URL = https base site url
+    API_URL: http for now to avoid cross site requests if that is fixed
+    then we can use auto http/https.
+    """
+    SITE_URL = safe_base_url(request)
+    US_SITE_URL = safe_usbase_url(request)
+    SSL_SITE_URL = safe_sbase_url(request)
+  
+    return {'BASE_URL': SITE_URL,
+            'US_SITE_URL': US_SITE_URL, 
+            'SSL_SITE_URL': SSL_SITE_URL, 
+            'API_URL': US_SITE_URL + '/api/' + settings.API_NAME + '/',
            }
     
 def staticPrefix(request):
     """
-    STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.
-    use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
-    """     
-    return {'STATIC_PREFIX': settings.STATIC_PREFIX,}
+    STATIC_PREFIX prepends base url to STATIC_URL when in the development environment only!
+    This must be use for all static files that will be rendered by the bookmarklet.
+    Useage: {{STATIC_PREFIX}}{{STATIC_URL}}
+    For Development server do not use full static url.
+    Set STATIC_URL = '/static/'
+    Set COMPRESS_URL = STATIC_URL
+    """ 
+    sp =  ''
+    if not settings.RACK_ENV:
+        sp = safe_base_url(request)
+    return {'STATIC_PREFIX': sp,}
 
 from urlparse import urlsplit
 def redirects(request):
+    """
+    HTTP_REFERER: redirects to refering page
+    """ 
     referer = request.META.get('HTTP_REFERER', None)
     if referer:
         try:

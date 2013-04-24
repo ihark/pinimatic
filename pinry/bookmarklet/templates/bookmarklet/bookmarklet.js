@@ -1,6 +1,6 @@
-﻿javascript :var baseurl = "{{ SSL_SITE_URL }}";
+﻿javascript :var baseurl = "{{ US_SITE_URL }}";
 			var authUserO = {{ auth_user_o|safe }};
-			var apiURL = "https:{{ API_URL }}";
+			var apiURL = "{{ API_URL }}";
 			var viud="{{ csrftoken }}";
 			(function () { 
 	console.warn('--start bookmarklet--');
@@ -30,6 +30,8 @@
 		os = "position:absolute; top:0px; left:0px; right:0px; bottom:0px; z-index:900000000000000000000000000;"
 		setStyles(o, os)
 		o.innerHTML += '{% spaceless %}{% include "pins/bmbase.html" %}{% endspaceless %}';
+		//apped /static/CACHE with static prefix
+		o.innerHTML = o.innerHTML.replace("/static/CACHE/","{{ STATIC_PREFIX }}/static/CACHE/")
 		b.appendChild(o);// append overlay to document body
 		console.warn('overlay added');
 		////create modal backdrop

@@ -4,47 +4,59 @@ from django.contrib.messages import constants as messages
 
 print '--General Settings Loading'
 
-#SITE & HOST
-SITE_ID = 1
-SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
-
-import socket
-try:
-    SITE_IP = socket.gethostbyname(socket.gethostname())
-except:
-    SITE_IP = 'localhost'
-
-''' HTTPS_DEV_PORT & HTTP_DEV_PORT (required for development server only)
-# You must run the development server with the ports specified below
-# to handle http & https redirects. They are not needed in a production env.
-# ie: python manage.py runserver 0.0.0.0:5000, forman uses 5000 by default.
-# set stunnel or similar SSL proxy to handle the SSL requestes on the port specified
 '''
-HTTPS_DEV_PORT='5443'
-HTTP_DEV_PORT = '5000'
-HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
-SITE_URL = 'http://'+HOST_NAME+':'+HTTP_DEV_PORT
-SSL_SITE_URL = 'https://'+HOST_NAME+':'+HTTPS_DEV_PORT
-
+BASIC SETTINGS
+'''
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 # Changes the naming on the front-end of the website.
 SITE_NAME = 'Pinimatic'
-
 # Infroms javaScript of current api name.
 API_NAME = 'v1'
-
+# Set acording to django-sites config
+SITE_ID = 1
+# Set to False to force users to login before seeing any pins. 
+PUBLIC = True
 # Set acording to your privacy policy. 
 P3P_COMPACT = 'CP="NOI OUR NID PSA"'
 
-# Set to False to force users to login before seeing any pins. 
-PUBLIC = True
-
-#LOGIN LOGOUT (keep above allauth)
+''' 
+HTTPS & PORTS 
+required for development server only
+- You must run the development server with the ports specified below
+- to handle http & https redirects. They are not needed in a production env.
+- ie: python manage.py runserver 0.0.0.0:5000, forman uses 5000 by default.
+- set stunnel or similar SSL proxy to handle the SSL requestes on the port specified
+'''
+HTTP_DEV_PORT = '5000'
+HTTPS_DEV_PORT= '5443'
+HTTPS_SUPPORT = True
+#For request.is_secure() with heroku & dev server
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_REQUIRED_PATHS = (
+    '/admin/',
+    '/accounts/',
+    '/management/',
+    '/contact/',
+    '/ajax/submit/',
+)
+SECURE_IGNORED_PATHS = (
+    '/api/',
+    '/bookmarklet/',
+    '/static/',
+)
+'''
+LOGIN & LOGOUT
+'''
+# Set true to allow new registratoins / false will block even with valid invitation
+ALLOW_NEW_REGISTRATIONS = True
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
-#TODO: Not working possible version issue: ACCOUNT_LOGOUT_REDIRECT_URL ='/login/'
-ALLOW_NEW_REGISTRATIONS = True
-
-#ALLAUTH
+# TODO: Not working possible version issue: 
+ACCOUNT_LOGOUT_REDIRECT_URL ='/login/'
+''' 
+ALLAUTH
+'''
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
@@ -54,59 +66,77 @@ ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH =6
 ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
 SOCIALACCOUNT_ADAPTER ="pinry.core.accountadapter.SocialAccountAdapter"
-
-#INVITATIONS
+'''
+INVITATIONS
+'''
 INVITE_MODE = True
 ACCOUNT_INVITATION_DAYS = 30
 ACCOUNT_ACTIVATION_DAYS = 20
 INVITATIONS_PER_USER = 5
 INVITATION_USE_ALLAUTH = True
-
-#USERS
+''' 
+USERS
+'''
 DEFAULT_USER_GROUP = 'Basic'
-
-#LOCATION
+''' 
+LOCATION
+'''
 TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-#URLS
-ROOT_URLCONF = 'pinry.urls'
-INTERNAL_IPS = ['127.0.0.1']
-
-#HTTPS
-SECURE_REQUIRED_PATHS = (
-    '/admin/',
-    '/accounts/',
-    '/management/',
-    '/contact/',
-    '/bookmarklet/',
-    '/ajax/submit/',
-)
-
-'''
-STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.
+"""
+STATIC_PREFIX = SITE_URL: used to prepend full url to STATIC_URL when static files are hosted locally.
 - use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
 - STATIC_PREFIX MUST BE = '' on production.
+"""
 '''
-STATIC_PREFIX = SITE_URL
-
+ PATHS & URLS
+'''
+RACK_ENV = os.environ.get("RACK_ENV", False)
+"""
+import socket
+try:
+    SITE_IP = socket.gethostbyname(socket.gethostname())
+except:
+    SITE_IP = '192.168'
+MOVED TO: core.context_processors.py
+HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
+SITE_URL = 'http://'+HOST_NAME+':'+HTTP_DEV_PORT
+SSL_SITE_URL = 'https://'+HOST_NAME+':'+HTTPS_DEV_PORT
+"""
+ROOT_URLCONF = 'pinry.urls'
+INTERNAL_IPS = ['127.0.0.1']
+SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-MEDIA_URL = SITE_URL+'/media/'
+MEDIA_URL = '/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
-TMP_URL = SITE_URL+'/media/tmp/'
+TMP_URL = '/media/tmp/'
+from pinry.core.utils import safe_base_url
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
 STATIC_URL = '/static/'
 #Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
-
-# EMAIL
+'''
+Django Compressor Settings
+'''
+COMPRESS_ENABLED = True
+COMPRESS_URL = STATIC_URL
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_OFFLINE = False
+#COMPRESS_STORAGE = STATICFILES_STORAGE
+'''
+API
+'''
+API_LIMIT_PER_PAGE = 30
+'''
+EMAIL
+'''
 EMAIL_USE_TLS = True
 EMAIL_PORT = '587'
 EMAIL_HOST = 'smtp.gmail.com'
-#TEST EMAIL ON SERVER START
+#test onserver start
 SEND_TEST_EMAIL = False
 
 STATICFILES_FINDERS = (
@@ -168,7 +198,6 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'alert alert-success',
     messages.INFO: 'alert alert-info',
 }
-API_LIMIT_PER_PAGE = 30
 
 INSTALLED_APPS = (
     'django.contrib.auth',

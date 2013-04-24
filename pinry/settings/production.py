@@ -35,21 +35,12 @@ DATABASES = {
 HTTPS_SUPPORT = True
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-#HOST
-HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
+#HOST (only use in settings file for TEMP URL)
+HOST_NAME = os.environ.get('HOST_NAME')
+"""
 SITE_URL = 'http://'+HOST_NAME
 SSL_SITE_URL = 'https://'+HOST_NAME
-
-#RDIRECTS
-LOGIN_REDIRECT_URL = SITE_URL+LOGIN_REDIRECT_URL
-
-'''STATIC_PREFIX
-Static url can not be full url on local dev server so 
-this adds it to the bookmarklet. MUST BE = '' on production.
-'''
-STATIC_PREFIX = SITE_URL
-
-print 'SITE_URL: ', SITE_URL
+"""
 print 'DB_NAME: ', os.environ.get("DB_NAME")
 
 DEFAULT_FILE_STORAGE = 'pinry.settings.s3utils.MediaS3BotoStorage'
@@ -78,14 +69,14 @@ STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hoste
 - use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
 - STATIC_PREFIX MUST BE = '' on production.
 '''
-STATIC_PREFIX = ''
+#STATIC_PREFIX = ''
 
 COMPRESS_ENABLED = True
 COMPRESS_URL = STATIC_URL
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_OFFLINE = False
-'''COMPRESS_OFFLINE issue:
+"""COMPRESS_OFFLINE issue:
 Compressing... Error: An error occured during rendering /app/pinry/pins/templates/pins/bmbase.html: '/static/vendor/boot
 strap/2.0.3/css/bootstrap.css' isn't accessible via COMPRESS_URL ('http://pinry.s3.amazonaws.com/static/') and can't be
 compressed
-'''
+"""

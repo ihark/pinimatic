@@ -6,21 +6,12 @@ import os
 
 print '--Development Settings Loading'
 
+# quick toggles to overide init
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 PUBLIC = False
+COMPRESS_ENABLED = True
 
-#HTTPS
-HTTPS_SUPPORT = True
-LOGIN_REDIRECT_URL = SITE_URL+LOGIN_REDIRECT_URL
-
-#COMPRESSOR
-COMPRESS_ENABLED = False
-#COMPRESS_STORAGE = STATICFILES_STORAGE 
-COMPRESS_URL = STATIC_URL
-COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_OFFLINE = False
-
+# SQLite3
 '''
 DATABASES = {
   'default': {
@@ -29,6 +20,7 @@ DATABASES = {
   }
 }
 '''
+# Heroku postgreSQL
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',

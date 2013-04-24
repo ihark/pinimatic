@@ -3,60 +3,7 @@ console.warn('ajaxform.js has exicuted: waiting for doc ready');
 var messageDivId = 'messageList';
 $(document).ready(function () {
 	console.warn('ajax form document ready');
-	//ajax setup
-	var _super = $.ajaxSettings.xhr;
-	$.ajaxSetup({
-		// Required for reading Location header of ajax POST responses in firefox.
-		xhr: function () {
-			console.log('-------------xhr setup xhr--');
-			var xhr = _super();
-			var getAllResponseHeaders = xhr.getAllResponseHeaders;
-			xhr.getAllResponseHeaders = function () {
-				var allHeaders = getAllResponseHeaders.call(xhr);
-				if (allHeaders) {
-					return allHeaders;
-				}
-				allHeaders = "";
-				$(["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma", "Location"]).each(function (i, header_name) {
-					if (xhr.getResponseHeader(header_name)) {
-						allHeaders += header_name + ": " + xhr.getResponseHeader(header_name) + "\n";
-					}
-				});
-				return allHeaders;
-			};
-			return xhr;
-		},
-		headers: { "cache-control": "no-cache" },//to prevent ios safari from caching.
-		//TODO: temp added for X-CSRFToken header
-		beforeSend: function(xhr, settings) {
-			console.log('-------------before send--');
-			function getCookie(name) {
-				var cookieValue = null;
-				console.warn(document.cookie)
-				if (document.cookie && document.cookie != '') {
-					var cookies = document.cookie.split(';');
-					for (var i = 0; i < cookies.length; i++) {
-						var cookie = jQuery.trim(cookies[i]);
-						// Does this cookie string begin with the name we want?
-					if (cookie.substring(0, name.length + 1) == (name + '=')) {
-						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-						break;
-					}
-				}
-			}
-			return cookieValue;
-			}
-			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-				// Only send the token to relative URLs i.e. locally.
-				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-			}else{
-				if (typeof viud === 'undefined'){viud=null}
-				xhr.setRequestHeader("X-CSRFToken", viud);
-			}
-			//testing...
-			
-		} 
-	}); 
+
 	////ajax submit
 	$('#ajaxform').submit(function () { //// catch the form's submit event
 		var csrfToken = 'placeholder';

@@ -162,7 +162,8 @@ class PinForm(forms.ModelForm):
             #print '--form imgUrl without ID found: '+str(imgUrl)
             self.check_if_image(imgUrl)
             try:
-                Pin.objects.get(imgUrl=imgSrc)
+                #TODO: validat agains imgSrc
+                Pin.objects.get(imgName=imgUrl)
                 raise forms.ValidationError("You have alredy pinned this image!")
             except Pin.DoesNotExist:
                 protocol = imgUrl.split(':')[0]

@@ -7,6 +7,7 @@ body {
 }
 #overlay{
 	background-color: transparent !important;
+	overflow:auto;
 }
 
 #overlay *, ::after, ::before {
@@ -95,7 +96,7 @@ text-align: left;
 }
 #overlay .modal {
   width: 450px !important;
-  margin: -150px 0 0 -225px  !important;
+  margin-left: -225px !important;
   overflow: auto !important;
   max-height: 400px !important;
   z-index: 10 !important;

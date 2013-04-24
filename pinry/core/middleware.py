@@ -22,6 +22,7 @@ class Public(object):
             ]
         self.acceptable_domains = (
                 '/accounts/',
+                '/bookmarklet/',
 
             )
     

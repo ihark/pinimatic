@@ -82,6 +82,8 @@ SECURE_REQUIRED_PATHS = (
     '/accounts/',
     '/management/',
     '/contact/',
+    '/bookmarklet/',
+    '/ajax/submit/',
 )
 
 '''
@@ -96,7 +98,7 @@ MEDIA_URL = SITE_URL+'/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = SITE_URL+'/media/tmp/'
 STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
-STATIC_URL = SITE_URL+'/static/'
+STATIC_URL = '/static/'
 #Uplaoded images path
 IMAGES_PATH = 'pins/pin/originals/'
 

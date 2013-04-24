@@ -37,7 +37,8 @@ if settings.SITE_IP.split('.')[0] == '192':
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-if settings.SITE_IP.split('.')[0] == '192':#and settings.DEBUG == False
+#enables dev server to serve static files with compressor & collect static
+if settings.SITE_IP.split('.')[0] == '192':
     urlpatterns += patterns('',
         url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.STATIC_ROOT,

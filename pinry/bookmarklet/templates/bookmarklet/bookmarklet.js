@@ -1,6 +1,6 @@
-﻿javascript :var baseurl = "{{ BASE_URL }}";
+﻿javascript :var baseurl = "{{ SSL_SITE_URL }}";
 			var authUserO = {{ auth_user_o|safe }};
-			var apiURL = "{{ API_URL }}";
+			var apiURL = "https:{{ API_URL }}";
 			var viud="{{ csrftoken }}";
 			(function () { 
 	console.warn('--start bookmarklet--');
@@ -118,7 +118,7 @@
 	}
 	//load other scripts
 	function jqReady() {
-		loadScript("vendor/bootstrap/2.0.3/js/bootstrap.js", "jQuery.fn.alert", bootstrapReady);
+		loadScript("vendor/bootstrap/2.2.2/js/bootstrap.js", "jQuery.fn.alert", bootstrapReady);
 	}
 	function bootstrapReady() {
 		loadScript("vendor/jquery-ui/1.10.2.custom/js/jquery-ui-1.10.2.custom.js", "jQuery.ui", jqueryuiReady);

@@ -2,6 +2,7 @@
 			var authUserO = {{ auth_user_o|safe }};
 			var apiURL = "{{ API_URL }}";
 			var viud="{{ csrftoken }}";
+			var staticPrefix="{{STATIC_PREFIX}}";
 			(function () { 
 	console.warn('--start bookmarklet--');
 	{% load static %}
@@ -30,8 +31,8 @@
 		os = "position:absolute; top:0px; left:0px; right:0px; bottom:0px; z-index:900000000000000000000000000;"
 		setStyles(o, os)
 		o.innerHTML += '{% spaceless %}{% include "pins/bmbase.html" %}{% endspaceless %}';
-		//apped /static/CACHE with static prefix
-		o.innerHTML = o.innerHTML.replace("/static/CACHE/","{{ STATIC_PREFIX }}/static/CACHE/")
+		//apped all occurances of /static/ in the bmbase template with staticPrefix
+		o.innerHTML = o.innerHTML.replace(/\/static\//g,staticPrefix+"/static/")
 		b.appendChild(o);// append overlay to document body
 		console.warn('overlay added');
 		////create modal backdrop

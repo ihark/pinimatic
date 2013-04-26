@@ -9,7 +9,7 @@ print '--Development Settings Loading'
 # quick toggles to overide init
 DEBUG = True
 PUBLIC = False
-COMPRESS_ENABLED = True
+COMPRESS_ENABLED = False
 
 # SQLite3
 '''

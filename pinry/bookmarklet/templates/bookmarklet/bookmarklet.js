@@ -102,12 +102,12 @@
 		////create image grid container
 		var igs = d.createElement("div");
 		igs.setAttribute("id", "image-grid-scroller");
-		igss = "overflow-x:scroll; position:fixed; left:0px; right:0px; bottom:5px; top:"+hh+"px;"
+		igss = "overflow-x:hidden; overflow-y:scroll; position:fixed; left:0px; right:0px; bottom:0px; clear:both; top:"+hh+"px;"
 		setStyles(igs, igss);
 		o.appendChild(igs);// append image grid container to overlay
 		var igc = d.createElement("div");
 		igc.setAttribute("id", "image-grid-container");
-		igcs = "z-index:0; text-align: center; margin: 0 0 25px 0px; position: relative; clear:both; top: "+hh+"px;";
+		igcs = "z-index:0; text-align: center; margin: 0 0 0 0; position: relative; top: 0";
 		setStyles(igc, igcs);
 		igs.appendChild(igc);// append image grid container to overlay
 		

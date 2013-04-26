@@ -7,7 +7,6 @@ body {
 }
 #overlay{
 	background-color: transparent !important;
-	overflow:auto;
 }
 
 #overlay *, ::after, ::before {
@@ -140,7 +139,9 @@ text-align: left;
   padding: 4px 10px 4px 10px !important;
   margin-bottom: 2px !important;
   margin-top: 0px !important;
-  list-style: disc !important;
+  list-style: none !important;
+  list-style-position:inside !important;
+  text-indent: 0px !important;
 }
 
 #overlay .modal-header {
@@ -213,10 +214,7 @@ text-align: left;
   width: 180px;
   text-align: center;
 }
-#imageGrid img {
-	width:100%;
-	height:100%;
-}
+
 #thumb_div img {
 	max-height: 160px;
 	max-width: 180px;
@@ -276,7 +274,10 @@ text-align: left;
   padding-left: 0px;
   cursor: default;
 }
-
+.imageGrid img {
+	width:100%;
+	height:auto;
+}
 /*jquery-ui*/
 .ui-autocomplete {
   z-index:900000000000000000000000001;

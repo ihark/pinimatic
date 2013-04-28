@@ -49,13 +49,15 @@ def redirects(request):
     #If redirect_to_referer utility avalable:
     '''referer = redirect_to_referer(request)'''
     #No dependancies
-    '''referer = request.META.get('HTTP_REFERER', None)
+    '''
+    referer = request.META.get('HTTP_REFERER', None)
     if referer:
         try:
             redirect_to = urlsplit(referer, 'http', False)[2]
         except IndexError:
             pass
     else:
-        redirect_to = '{% url core:home %}''''
+        redirect_to = '{% url core:home %}'
+    '''
     return {'HTTP_REFERER':referer,}
 

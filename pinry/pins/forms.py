@@ -21,8 +21,9 @@ class PinForm(forms.ModelForm):
     image = forms.ImageField(widget=FileInput(),label='', required=False)
     uImage = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}), required=False)
     repin = forms.CharField(widget=HiddenInput(attrs={'style':'display: none;'}),required=False, initial=None)
-    tags = CustomTagField(label='Tags*', help_text='Tags are like folders, except that a taged item can exist in many folders simultaniously. / '
-                                                          'To create a tag with more than one word use quotation marks: "multiword tag"', required=False)
+    tags = CustomTagField(label='Groups*', help_text='Groups are how you organize your pins:  '
+                                                     'Use quotation marks for multiword groups: "Mark Jones".  '
+                                                     'Press space or enter after each group.', required=False)
     tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*Select from Your Tags', required=False)
     """
     tagsUser: inorder to limit tags list to the user's tags pass a user kwarg when calling: PinForm(user=request.user).

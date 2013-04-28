@@ -18,9 +18,9 @@ class CustomHeaderMiddleware(RemoteUserMiddleware):
 class Public(object):
     def __init__(self):
         self.acceptable_paths = [
-                #'/accounts/login/',
                 '/private/',
                 '/ajax/submit/',
+                reverse('pins:new-pin'),
             ]
         self.acceptable_domains = (
                 '/accounts/',

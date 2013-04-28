@@ -15,6 +15,8 @@ from django.core.mail import send_mail
 from .forms import ContactForm
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import requires_csrf_token
+from pinry.api.api import UserResource
+from ..core.utils import redirect_to_referer
 #from django.contrib.admin.views.decorators import staff_member_required
 
 
@@ -57,7 +59,7 @@ def logout_user(request):
     messages.success(request, 'You have successfully logged out.')
     return HttpResponseRedirect(reverse('core:home'))
     
-from pinry.api.api import UserResource
+
 @requires_csrf_token 
 def bookmarklet(request):
     srcUrl = request.GET.get('srcUrl','')
@@ -75,7 +77,6 @@ def bookmarklet(request):
         #this is a way to get csrf token into IE via bookmarklet
         #csrftoken = get_token(request)
         csrftoken = "null"
-        #print 'request: ', request
 
         resp = render_to_string('bookmarklet/bookmarklet.js',context_instance=RequestContext(request, {
                                                                                     "srcUrl": srcUrl,
@@ -98,17 +99,30 @@ def contact(request):
             message = form.cleaned_data['message']
             sender = form.cleaned_data['sender']
             cc_myself = form.cleaned_data['cc_myself']
-            #set where to send the contact email
+            #where the email gets sent!
             recipients = ['pinimatic@gmail.com']
             if cc_myself:
                 recipients.append(sender)
             send_mail(subject, sender+"\n\n"+message, sender, recipients)
-            return TemplateResponse(request, 'core/contact_thanks.html', {
+            #TODO: These messages should be click or swipe to close...
+            if subject == 'Feedback':
+                messages.success(request, "Thanks for the feedback!")
+            if subject == 'Bugs':
+                messages.success(request, "Thanks for the bug report!")
+            if subject == 'Support':
+                messages.success(request, "Thanks for contacting the support team.\
+                                          We'll get back to you with some answers \
+                                          as soon as we can!")
+            return HttpResponseRedirect(request.session['next'])
+            #TODO: clean up unused templates and put full messages in view.
+            """return TemplateResponse(request, 'core/contact_thanks.html', {
                                                                 'subject': subject,
                                                                 'sender': sender,
-                                                                }) 
+                                                                })"""
+            
     else:
-        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True })
+        next = redirect_to_referer(request)
+        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True, 'next': next })
 
     return TemplateResponse(request, 'core/contact.html', {'form': form})
 

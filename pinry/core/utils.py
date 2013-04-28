@@ -16,6 +16,7 @@ from django.core.files.images import ImageFile
 from django.core.urlresolvers import reverse
 
 def safe_path_prefix(request):
+    #TODO: Why do i need this, check if used...
     path_prefix = ''
     if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
         path_prefix = safe_base_url(request)
@@ -42,6 +43,10 @@ def safe_base_url(request):
     return base_url
 
 def safe_usbase_url(request):
+    """
+    Returns un-secure url for development server (http://host:port) 
+    and RACK_ENV (http://host)
+    """
     host = request.get_host()
     if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
         http_port = getattr(settings, 'HTTP_DEV_PORT', False)
@@ -50,6 +55,10 @@ def safe_usbase_url(request):
     return 'http://'+host
 
 def safe_sbase_url(request):
+    """
+    Returns secure url for development server (https://host:port) 
+    and RACK_ENV (https://host)
+    """
     host = request.get_host()
     if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
         http_port = getattr(settings, 'HTTP_DEV_PORT', False)
@@ -65,6 +74,47 @@ def safe_reverse(request, rev_path):
     Use safe_base_url(request)+reverse() to insure the correct port on the dev server
     """ 
     return safe_path_prefix(request)+reverse(rev_path)
+
+    
+from urlparse import urlsplit
+def redirect_to_referer(request, form=None, redirect=None):
+    """
+    1) If no form is provided return the referer.
+    2) If a bound form is provided return "next" field value (ignor referer).
+    3) If an unbound form is provided return the form with "next" field initial 
+    value set to the referrer.
+    
+    USAGE (formview):
+    form = MyForm()
+    form = redirect_to_referer(request, form)
+    redirect_to = redirect_to_referer(request, form)
+    return HttpResponseRedirect(redirect_to)
+    
+    USAGE (anyview):
+    redirect_to = redirect_to_referer(request)
+    return HttpResponseRedirect(redirect_to)
+    """ 
+    referer = request.META.get('HTTP_REFERER', None)
+    request_path = request.get_full_path()
+    if referer:
+        try:
+            redirect_to = urlsplit(referer, 'http', False)[2]
+        except IndexError:
+            pass
+    else:
+        redirect_to = reverse('core:home')
+        if redirect:
+            redirect_to = redirect
+
+    if form:
+        if form.is_bound:
+            redirect_to = form.cleaned_data['next']
+        else:
+            form.initial['next']=redirect_to
+            request.session['next'] = redirect_to
+            redirect_to = form
+
+    return redirect_to
 
 #ajax thumbnail uplaod
 #get uploaded image and pass to save    

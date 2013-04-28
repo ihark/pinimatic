@@ -60,10 +60,42 @@ class AllowOriginMiddleware(object):
             response['Access-Control-Allow-Credentials'] = 'true'
         return response
 
-
+from urlparse import urlsplit
+class SessionNextMiddleware(object):
+    """
+    Easy redirection to refering page:
+    Insures that request.session['next'] always contains the refering page for redirection ny
+    The refering path is added to session['next'] upon navigation and locks session['next'] during 
+    form validation. It becomes unloced when navigating away from the from or after a successfull submit.
+    SETUP (form template): 
+    Cancil button: <a href="{{request.session.next}}">Cancel</a>
+    SETUP (form view):
+    return HttpResponseRedirect(request.session['next'])
+    """
+    def process_request(self, request):
+        referer = request.META.get('HTTP_REFERER', None)
+        request_path = request.get_full_path()
+        if referer and request_path.split('/')[1] not in ['api', 'media']:
+            try:
+                referer = urlsplit(referer, 'http', False)[2]
+            except IndexError:
+                pass
+            save = request.REQUEST.get('save', False)
+            session_next = request.session.get('next',None)
+            next_locked = request.session.get('next_locked', None)        
+            if next_locked == None:
+                request.session['next_locked'] = False
+            if session_next == None:
+                request.session['next'] = reverse('core:home')
+            if request_path != request.session['next_locked']:
+                request.session['next_locked'] = False
+            if referer and request.method == 'POST' or save:
+                    request.session['next_locked'] = request_path
+            if not request.session['next_locked']:
+                    request.session['next'] = referer
+        return None
 
 from django.contrib import messages
-
 #enables django messages & form errors to be used with ajax requests
 class AjaxMessaging(object):
     def process_response(self, request, response):
@@ -180,3 +212,4 @@ class SecureRequiredMiddleware(object):
                 return HttpResponsePermanentRedirect(unsecure_url)
             #print 'middleware: --no redirect required'
         return None
+

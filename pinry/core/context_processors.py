@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from pinry.core.utils import safe_base_url, safe_sbase_url, safe_usbase_url
 
 
@@ -38,17 +39,23 @@ def staticPrefix(request):
     return {'STATIC_PREFIX': sp,}
 
 from urlparse import urlsplit
+from .utils import redirect_to_referer
 def redirects(request):
     """
     HTTP_REFERER: redirects to refering page
-    """ 
-    referer = request.META.get('HTTP_REFERER', None)
+    """
+    #If SessionNextMiddleware used:
+    referer = request.session.get('next', reverse('core:home'))
+    #If redirect_to_referer utility avalable:
+    '''referer = redirect_to_referer(request)'''
+    #No dependancies
+    '''referer = request.META.get('HTTP_REFERER', None)
     if referer:
         try:
             redirect_to = urlsplit(referer, 'http', False)[2]
         except IndexError:
             pass
     else:
-        redirect_to = '{% url core:home %}'
+        redirect_to = '{% url core:home %}''''
+    return {'HTTP_REFERER':referer,}
 
-    return {'HTTP_REFERER': redirect_to,}

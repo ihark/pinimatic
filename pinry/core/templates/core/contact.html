@@ -17,8 +17,7 @@
 			{% endfor %}
 			<div class="form-actions">
 				<button type="submit" class="btn btn-primary">Send</button>
-				<input type="hidden" name="next" value="{{ next }}" />
-				<a href="{{HTTP_REFERER}}" class="btn">Cancel</a>
+				<a href="{{request.session.next}}" class="btn">Cancel</a>
 			</div>
 		</form>
     </div>

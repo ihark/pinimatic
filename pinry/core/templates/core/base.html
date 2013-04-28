@@ -39,7 +39,7 @@
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="loadData(undefined, '{{ user.id }}');">Your Pins</a></li>
+							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="">Your Pins</a></li>
 							<li class="divider"></li>
 							<li><a href="{% url socialaccount_connections %}">Social Connections</a></li>
 							<li><a href="{% url account_email %}">Manage Email</a></li>
@@ -72,7 +72,7 @@
 						<li><a href="{% url core:help %}#use">Use Bookmarklet</a></li>
 						<li><a href="{% url core:help %}#tag ">What are Tags?</a></li>
 						<li class="divider"></li>
-						<li><a href="{% url core:contact %}#tag ">Contact Us</a></li>
+						<li><a href="{% url core:contact %}">Contact Us</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -85,6 +85,13 @@
 				{% block account-nav %}{% endblock %}
             </div>
         </div>
+		{% if request.user.is_superuser %}
+			<div id="dev-notes" style="color:White; z-index:10000; margin:-30px 0 0 5px;">
+			<p class="inline" style="margin-right:10px;">s.next = {{request.session.next}}</p>
+			<p class="inline" style="margin-right:10px;">s.next_locked = {{request.session.next_locked}}</p>
+			</div>
+		{% endif %}
+		
 		
 
             <ul id="messageList" class="messages">

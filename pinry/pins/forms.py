@@ -24,10 +24,10 @@ class PinForm(forms.ModelForm):
     tags = CustomTagField(label='Tags*', help_text='Tags are like folders, except that a taged item can exist in many folders simultaniously. / '
                                                           'To create a tag with more than one word use quotation marks: "multiword tag"', required=False)
     tagsUser = UserTagsField(queryset=Pin.tags.all().order_by('name'), help_text='*Or select from your previously used tags below', label='*Select from Your Tags', required=False)
-    '''
-    inorder to limit tags list to the user's tags 
-    pass a user kwarg when calling: PinForm(user=request.user)
-    '''
+    """
+    tagsUser: inorder to limit tags list to the user's tags pass a user kwarg when calling: PinForm(user=request.user).
+    """
+    
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -37,11 +37,11 @@ class PinForm(forms.ModelForm):
 
         if user and user.id:
             #get auth users pins
-                #must used#
+            """ most used """
             #qs = Pin.tags.most_common().filter(pin__submitter__exact=user).order_by('-num_times', 'name')
-                #last used#
+            """ last used """
             #qs = Pin.tags.all().filter(pin__submitter__exact=user).order_by('-pin__published')
-                #alphabetical#
+            """ alphabetical """
             qs = Pin.tags.all().filter(pin__submitter__exact=user).order_by('name')
             self.fields['tagsUser'].queryset = qs
             #get current tags for pin
@@ -149,8 +149,8 @@ class PinForm(forms.ModelForm):
         image = cleaned_data.get('image')
         uImage = cleaned_data.get('uImage')
         repin = cleaned_data.get('repin')
-        #tags = cleaned_data.get('tags')
-        #tagsUser = cleaned_data.get('tagsUser')
+        """tags = cleaned_data.get('tags')"""
+        """tagsUser = cleaned_data.get('tagsUser')"""
         #create saved_data attribute accecable by view with bound form
         self.saved_data = cleaned_data
         

@@ -161,6 +161,7 @@ MIDDLEWARE_CLASSES = (
     'pinry.core.middleware.AjaxMessaging',
     'pinry.core.middleware.P3PHeaderMiddleware',
     'pinry.core.middleware.SecureRequiredMiddleware',
+    'pinry.core.middleware.SessionNextMiddleware',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",

@@ -20,6 +20,7 @@ from follow.models import Follow
 from django.db.models import Count
 from django.contrib.sites.models import get_current_site
 from django.contrib.comments.models import Comment
+from ..core.utils import redirect_to_referer
 
 
 def AjaxSubmit(request):
@@ -127,30 +128,34 @@ def user_profile(request, profileId=None, tag=None):
 @login_required ()
 def new_pin(request, pin_id=None):
     save = request.REQUEST.get('save', False)
+    thumb = None
     if pin_id:
         try:
             print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
             form = PinForm(instance=pin, user=request.user)
+            """form = redirect_to_referer(request, form)"""
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
             if not request.user.is_superuser and pin.submitter != request.user:
-                messages.error(request, 'You can not edit other users pins x.')  
-                return HttpResponseRedirect(reverse('pins:recent-pins'))
+                messages.error(request, 'You can not edit other users pins x.')
+                """redirect_to = redirect_to_referer(request)"""
+                return HttpResponseRedirect(request.session['next'])
         except Pin.DoesNotExist:
             messages.error(request, 'This pin does not exist.')
     else:
         print 'view - new pin - no pin id'
         pin = Pin()
-        form = PinForm(user=request.user)
-        thumb = '/static/core/img/thumb-default.png'
+        if not request.method == 'POST' or save:
+            form = PinForm(user=request.user)
+            """form = redirect_to_referer(request, form)"""
         
     if request.method == 'POST' or save:
         print 'view - enterd save mode'
         form = PinForm(request.REQUEST, request.FILES, instance=pin)
         # request.FILES is for file uploader 
         #TODO: do i need request.REQUEST?
-        '''
+        """
         #print all form fields for debugging
         print 'request.FILES:',request.FILES
         print 'form.instance = '+str(form.instance.id)
@@ -161,7 +166,7 @@ def new_pin(request, pin_id=None):
             except:
                 print f.name+' = does not exist'
         #end debug
-        '''
+        """
         if form.is_valid():
             print 'form is valid'
             pin = form.save(commit=False)
@@ -175,12 +180,13 @@ def new_pin(request, pin_id=None):
             pin.save()
             print 'view - form.save_m2m()'
             form.save_m2m()
+            """redirect_to = redirect_to_referer(request, form)"""
             if pin_id:
                 messages.success(request, 'Pin successfully modified.')
-                return HttpResponseRedirect(reverse('pins:recent-pins'))
+                return HttpResponseRedirect(request.session['next'])
             else:
                 messages.success(request, 'New pin successfully added.')
-                return HttpResponseRedirect(reverse('pins:recent-pins'))
+                return HttpResponseRedirect(request.session['next'])
             
         else:
             messages.error(request, 'Pin did not pass validation!')
@@ -198,7 +204,8 @@ def new_pin(request, pin_id=None):
                     print 'view - edit invalid form'
     else:
         print 'view - not POST or Save'
-        
+    if not thumb:
+        thumb = '/static/core/img/thumb-default.png'
     context = {
             #'tempImg': tempImg
             'form': form,

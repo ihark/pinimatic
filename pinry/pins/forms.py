@@ -28,7 +28,7 @@ class PinForm(forms.ModelForm):
     """
     tagsUser: inorder to limit tags list to the user's tags pass a user kwarg when calling: PinForm(user=request.user).
     """
-    
+    next = forms.CharField(widget=HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -58,6 +58,7 @@ class PinForm(forms.ModelForm):
             'tags',
             'uImage',
             'repin',
+            'next',
         )
 
 

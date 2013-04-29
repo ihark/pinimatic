@@ -44,10 +44,15 @@ def redirects(request):
     """
     HTTP_REFERER: redirects to refering page
     """
+    """
+    SESSION_NEXT: redirects to path in request.session['next']
+    """
+    '''
     #If SessionNextMiddleware used:
-    referer = request.session.get('next', reverse('core:home'))
+    session_n = session_next(request)
+    '''
     #If redirect_to_referer utility avalable:
-    '''referer = redirect_to_referer(request)'''
+    http_referer = redirect_to_referer(request)
     #No dependancies
     '''
     referer = request.META.get('HTTP_REFERER', None)
@@ -59,5 +64,5 @@ def redirects(request):
     else:
         redirect_to = '{% url core:home %}'
     '''
-    return {'HTTP_REFERER':referer,}
+    return {'HTTP_REFERER':http_referer, 'SESSION_NEXT':'remove SESSION_NEXT'}
 

@@ -14,16 +14,20 @@ from django.core.files.storage import default_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.files.images import ImageFile
 from django.core.urlresolvers import reverse
-
+'''
 def safe_path_prefix(request):
-    #TODO: Why do i need this, check if used...
+    """
+    Use when only a path is requred in production, but a full url is needed in the development
+    environment due to http/https ports being hard coded.
+    """
     path_prefix = ''
     if getattr(settings, 'HTTPS_SUPPORT', False) and not getattr(settings, 'RACK_ENV', False):
         path_prefix = safe_base_url(request)
     return path_prefix
-
+'''
 def safe_base_url(request):
     """
+    Use when a full url is required in production but not http/https specific (//doamin.com).
     Ensures that proper secure or unsecure url's are given when on the development server.
     Returns generic url '//' unless HTTPS_SUPPORT=True and RACK_ENV=False, then it will return
     either a secure 'https//' or unsecure 'http//' URL depending on the request source host.
@@ -68,13 +72,13 @@ def safe_sbase_url(request):
     else:
         sbase_url = 'https://'+host
     return sbase_url
-
+'''
 def safe_reverse(request, rev_path):
     """
     Use safe_base_url(request)+reverse() to insure the correct port on the dev server
     """ 
     return safe_path_prefix(request)+reverse(rev_path)
-
+'''
     
 from urlparse import urlsplit
 def redirect_to_referer(request, form=None, redirect=None):
@@ -84,38 +88,61 @@ def redirect_to_referer(request, form=None, redirect=None):
     3) If an unbound form is provided return the form with "next" field initial 
     value set to the referrer.
     
-    USAGE (formview):
+    USAGE (MyForm forms.py):
+    A field named 'next' is required:
+    next = forms.CharField(widget=HiddenInput())
+    
+    USAGE (MyForm views.py):
     form = MyForm()
     form = redirect_to_referer(request, form)
+    
     redirect_to = redirect_to_referer(request, form)
     return HttpResponseRedirect(redirect_to)
     
-    USAGE (anyview):
+    USAGE (MyForm template_name.py):
+    <a href="{{form.next.value}}">Cancel</a>
+    
+    USAGE (any view.py):
     redirect_to = redirect_to_referer(request)
     return HttpResponseRedirect(redirect_to)
+    
+    USAGE (MyForm as modal: templatetag_name.py)
+    form = MyForm(initial={'next':request.get_full_path()})
     """ 
     referer = request.META.get('HTTP_REFERER', None)
     request_path = request.get_full_path()
     if referer:
         try:
-            redirect_to = urlsplit(referer, 'http', False)[2]
+            su = urlsplit(referer)
+            redirect_to = su.path
         except IndexError:
             pass
     else:
         redirect_to = reverse('core:home')
         if redirect:
             redirect_to = redirect
-
     if form:
+        
         if form.is_bound:
             redirect_to = form.cleaned_data['next']
         else:
             form.initial['next']=redirect_to
-            request.session['next'] = redirect_to
+            print 'redirect_to: ',redirect_to
             redirect_to = form
 
     return redirect_to
-
+'''
+def session_next(request, rev_redirect='core:home'):
+    """
+    Redirects to path in request.session['next']
+    USAGE (anyview):
+    return HttpResponseRedirect(session_next(request))
+    USAGE (templates):
+    See contect processor {{SESSION_NEXT}}
+    """ 
+    session_next = safe_path_prefix(request)+request.session.get('next', reverse(rev_redirect))
+    return session_next
+'''
 #ajax thumbnail uplaod
 #get uploaded image and pass to save    
 def ajax_upload( request ):

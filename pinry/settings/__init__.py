@@ -22,28 +22,33 @@ P3P_COMPACT = 'CP="NOI OUR NID PSA"'
 
 ''' 
 HTTPS & PORTS 
-required for development server only
+Required for development server only
 - You must run the development server with the ports specified below
 - to handle http & https redirects. They are not needed in a production env.
 - ie: python manage.py runserver 0.0.0.0:5000, forman uses 5000 by default.
-- set stunnel or similar SSL proxy to handle the SSL requestes on the port specified
+- set stunnel or similar SSL proxy to handle the SSL requests on the port specified.
 '''
 HTTP_DEV_PORT = '5000'
 HTTPS_DEV_PORT= '5443'
 HTTPS_SUPPORT = True
+"""SECURITY WARNING: If the headder specified in SECURE_PROXY_SSL_HEADER is not supported on your production 
+server you must limit this settings value to the developemnt environment ONLY!!!!"""
 #For request.is_secure() with heroku & dev server
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#These paths will be forced to HTTPS and all others will be forced to HTTP
 SECURE_REQUIRED_PATHS = (
     '/admin/',
     '/accounts/',
     '/management/',
     '/contact/',
-    '/ajax/submit/',
 )
+#Do not force HTTP or HTTPS on these paths
 SECURE_IGNORED_PATHS = (
     '/api/',
     '/bookmarklet/',
     '/static/',
+    '/media/',
+    '/ajax/',
 )
 '''
 LOGIN & LOGOUT
@@ -149,6 +154,8 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 MIDDLEWARE_CLASSES = (
+    'pinry.core.middleware.DevHttpsMiddleware',
+    'pinry.core.middleware.SecureRequiredMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -160,8 +167,8 @@ MIDDLEWARE_CLASSES = (
     'pinry.core.middleware.AllowOriginMiddleware', 
     'pinry.core.middleware.AjaxMessaging',
     'pinry.core.middleware.P3PHeaderMiddleware',
-    'pinry.core.middleware.SecureRequiredMiddleware',
-    'pinry.core.middleware.SessionNextMiddleware',
+    #'pinry.core.middleware.SessionNextMiddleware',
+    
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -194,10 +201,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MESSAGE_TAGS = {
-    messages.WARNING: 'alert',
-    messages.ERROR: 'alert alert-error',
-    messages.SUCCESS: 'alert alert-success',
-    messages.INFO: 'alert alert-info',
+    messages.WARNING: 'alert fade click',
+    messages.ERROR: 'alert alert-error fade click',
+    messages.SUCCESS: 'alert alert-success fade click',
+    messages.INFO: 'alert alert-info click',
 }
 
 INSTALLED_APPS = (

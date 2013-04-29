@@ -106,14 +106,15 @@ def contact(request):
             send_mail(subject, sender+"\n\n"+message, sender, recipients)
             #TODO: These messages should be click or swipe to close...
             if subject == 'Feedback':
-                messages.success(request, "Thanks for the feedback!")
+                messages.info(request, "Thanks for the feedback!")
             if subject == 'Bugs':
-                messages.success(request, "Thanks for the bug report!")
+                messages.info(request, "Thanks for the bug report!")
             if subject == 'Support':
-                messages.success(request, "Thanks for contacting the support team.\
+                messages.info(request, "Thanks for contacting the support team.\
                                           We'll get back to you with some answers \
                                           as soon as we can!")
-            return HttpResponseRedirect(request.session['next'])
+            redirect_to = redirect_to_referer(request, form)
+            return HttpResponseRedirect(redirect_to)
             #TODO: clean up unused templates and put full messages in view.
             """return TemplateResponse(request, 'core/contact_thanks.html', {
                                                                 'subject': subject,
@@ -121,9 +122,8 @@ def contact(request):
                                                                 })"""
             
     else:
-        next = redirect_to_referer(request)
-        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True, 'next': next })
-
+        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True})
+        form = redirect_to_referer(request, form)
     return TemplateResponse(request, 'core/contact.html', {'form': form})
 
 def custom_500(request):

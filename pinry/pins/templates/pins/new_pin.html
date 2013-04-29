@@ -8,7 +8,7 @@
 {% block yield %}
     <div class="form-container">
 		<div class="form-header">
-			<h3 id="edit-form-title" >Edit Pin</h3>
+			<h3 id="edit-form-title" >Edit Pin</h3>{% if request.user.is_superuser %}{{form.next.value}}{% endif %}
 			<span>* Required fields</span>
 		</div>
 		<form enctype="multipart/form-data" action="" id="edit-pin-form" method="post" class="form">
@@ -27,7 +27,7 @@
 			</div>
 			<div class="form-actions">
                 <button id="submit-btn" type="submit" class="btn btn-primary">Post</button>
-				<a href="{{request.session.next}}" onClick="cancelNewPin();" class="btn">Cancel</a>
+				<a href="{{form.next.value}}" onClick="cancelNewPin();" class="btn">Cancel</a>
 			</div>
 		</form>
     </div>

@@ -4,12 +4,18 @@ $(document).ready(
 
 function alertFade() {
     var delayTime  = 3000,
-        alerts     = $('.alert');
+        fades     = $('.alert.fade');
+		clicks     = $('.alert.click');
 
-    delayTime = delayTime + (alerts.length * 250);
+    delayTime = delayTime + (fades.length * 250);
 
-    alerts.each(function() {
+    fades.each(function() {
         $(this).delay(delayTime).fadeOut('slow');
         delayTime -= 250;
     });
+	clicks.each(function() {
+        $(this).append('<span class="close">X</span>');
+        delayTime -= 250;
+    });
+	
 }

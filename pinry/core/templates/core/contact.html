@@ -8,7 +8,7 @@
 {% block yield %}
     <div class="form-container">
         <div class="form-header">
-			<h3>Contact {{site_name}}</h3>
+			<h3>Contact {{site_name}}</h3>{% if request.user.is_superuser %}{{form.next.value}}{% endif %}
 		</div>
 		<form action="{% url core:contact %}" method="post" class="form-horizontal">
 			{% csrf_token %}
@@ -17,7 +17,7 @@
 			{% endfor %}
 			<div class="form-actions">
 				<button type="submit" class="btn btn-primary">Send</button>
-				<a href="{{request.session.next}}" class="btn">Cancel</a>
+				<a href="{{form.next.value}}" class="btn">Cancel</a>
 			</div>
 		</form>
     </div>

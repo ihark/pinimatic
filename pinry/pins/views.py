@@ -134,13 +134,13 @@ def new_pin(request, pin_id=None):
             print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
             form = PinForm(instance=pin, user=request.user)
-            """form = redirect_to_referer(request, form)"""
+            form = redirect_to_referer(request, form)
             #show existing thumbmail on edit form.
             thumb = pin.thumbnail.url
             if not request.user.is_superuser and pin.submitter != request.user:
                 messages.error(request, 'You can not edit other users pins x.')
-                """redirect_to = redirect_to_referer(request)"""
-                return HttpResponseRedirect(request.session['next'])
+                redirect_to = redirect_to_referer(request)
+                return HttpResponseRedirect(redirect_to)
         except Pin.DoesNotExist:
             messages.error(request, 'This pin does not exist.')
     else:
@@ -148,7 +148,7 @@ def new_pin(request, pin_id=None):
         pin = Pin()
         if not request.method == 'POST' or save:
             form = PinForm(user=request.user)
-            """form = redirect_to_referer(request, form)"""
+            form = redirect_to_referer(request, form)
         
     if request.method == 'POST' or save:
         print 'view - enterd save mode'
@@ -180,13 +180,13 @@ def new_pin(request, pin_id=None):
             pin.save()
             print 'view - form.save_m2m()'
             form.save_m2m()
-            """redirect_to = redirect_to_referer(request, form)"""
+            redirect_to = redirect_to_referer(request, form)
             if pin_id:
                 messages.success(request, 'Pin successfully modified.')
-                return HttpResponseRedirect(request.session['next'])
+                return HttpResponseRedirect(redirect_to)
             else:
                 messages.success(request, 'New pin successfully added.')
-                return HttpResponseRedirect(request.session['next'])
+                return HttpResponseRedirect(redirect_to)
             
         else:
             messages.error(request, 'Pin did not pass validation!')
@@ -229,7 +229,7 @@ def delete_pin(request, pin_id=None):
         messages.error(request, 'Pin with the given id does not exist.')
 
     print request
-    return HttpResponseRedirect(reverse('pins:recent-pins'))
+    return HttpResponseRedirect(session_next(request))
 
 #TODO: This needs to be setup. Currently using api only.
 def comment(request, pk=1):

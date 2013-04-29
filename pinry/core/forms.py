@@ -17,6 +17,7 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=Textarea())
     sender = forms.EmailField()
     cc_myself = forms.BooleanField(required=False)
+    next = forms.CharField(widget=HiddenInput())
 
 
 class CustomTagWidget(forms.TextInput):

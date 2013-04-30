@@ -19,7 +19,7 @@ from operator import attrgetter
 
 from django.contrib import messages
 from tastypie.exceptions import ImmediateHttpResponse
-from tastypie.http import HttpNoContent, HttpForbidden, HttpGone
+from tastypie.http import HttpNoContent, HttpForbidden, HttpGone, HttpCreated
 
 from taggit.utils import parse_tags
 from pinry.core.utils import format_tags
@@ -313,6 +313,10 @@ class PinResource(ModelResource):
         print '----obj_create------'
         repinUrl = '/api/v1/pin/'+bundle.data['repin']+'/'
         bundle = super(PinResource, self).obj_create(bundle, repinObj=repinUrl,  submitter=bundle.request.user, uImage=None, comments=[])
+        messages.success(bundle.request, 'Your pin has been added.')
+        mstore = messages.get_messages(bundle.request)
+        for m in mstore:                  
+            bundle.data['django_messages'] = [{"extra_tags": m.tags, "message": m, "level": m.level}]
         return bundle
         
 
@@ -328,16 +332,18 @@ class PinResource(ModelResource):
                 #delete the images
                 default_storage.delete(bundle.obj.image.name)
                 default_storage.delete(bundle.obj.thumbnail.name)
+                
                 #TODO:try += so i dont accendnetly over write the bundle data.
-                bundle.data = {"django_messages": [{"extra_tags": "alert alert-success", "message": 'Delete was successfull.', "level": 25}]}
-                print bundle
-                #using HttpGone in stead of HttpNoContent so success message can be displaied.
                 #TODO: how to add message to normal tasypie responce instead of forcing it here.  
                 #Also, why is it not getting picked up by middleware, so i can gust use django messages.
+                messages.success(bundle.request, 'Delete was successfull.')
+                mstore = messages.get_messages(bundle.request)
+                for m in mstore:                  
+                    bundle.data['django_messages'] = [{"extra_tags": m.tags, "message": m, "level": m.level}]
+                #using HttpGone in stead of HttpNoContent so success message can be displaied.
                 raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))
             else:
-                bundle.data = {"django_messages": [{"extra_tags": "alert alert-error", "message": 'You can not delete other users pins.', "level": 25}]}
-                print bundle
+                bundle.data = {"django_messages": [{"extra_tags": "alert alert-error fade-out", "message": 'You can not delete other users pins.', "level": 25}]}
                 raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
         
         

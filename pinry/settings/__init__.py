@@ -201,9 +201,9 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MESSAGE_TAGS = {
-    messages.WARNING: 'alert fade click',
-    messages.ERROR: 'alert alert-error fade click',
-    messages.SUCCESS: 'alert alert-success fade click',
+    messages.WARNING: 'alert click',
+    messages.ERROR: 'alert alert-error fade-out click',
+    messages.SUCCESS: 'alert alert-success fade-out click',
     messages.INFO: 'alert alert-info click',
 }
 

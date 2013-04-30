@@ -294,21 +294,27 @@ body {
     right: 10px;
     position: fixed;
     z-index: 200;
+	max-width: 300px;
 }
-
+    .messages div,
     .messages li {
-        margin: 10px 0;
-        padding: 10px 18px;
+        margin: 0px 10px 10px 10px;
         border: 1px solid #ccc;
-        font-size: 16px
+        font-size: 16px;
     }
-
+    .messages div:hover,
     .messages li:hover {
-        -webkit-transform: scale(1.1);
-           -moz-transform: scale(1.1);
-            -ms-transform: scale(1.1);
-             -o-transform: scale(1.1);
-                transform: scale(1.1);
+        -webkit-transform-origin:right center; /* Safari and Chrome */
+            -ms-transform-origin:right center; /* IE 9 */
+                transform-origin:right center;
+        -webkit-transform: scale(1.05);
+           -moz-transform: scale(1.05);
+            -ms-transform: scale(1.05);
+             -o-transform: scale(1.05);
+                transform: scale(1.05);
+        cursor: default;
+    }
+	.messages button{
         cursor: pointer;
     }
 

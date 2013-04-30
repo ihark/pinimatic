@@ -33,7 +33,7 @@ $(document).ready(function () {
 					if (index === "django_messages") {
 						$.each(jsonMessage.django_messages, function (i, item) {
 							////if success message
-							if (item.extra_tags == "alert alert-success"){
+							if (item.extra_tags.search("alert-success")+1){
 								$("#cancel").text("Close");
 								$("#btnsubmit").remove();
 							////if not logged in
@@ -95,6 +95,7 @@ function getMessages(xhr, targetForm){
 			$.each(jsonMessage, function(index, value) {
 				if (index === "django_messages") {
 					$.each(jsonMessage.django_messages, function (i, item) {
+						console.warn('message found'+item.message)
 						addMessage(messageDivId, item.message, item.extra_tags);
 					});
 				////handle general form errors
@@ -105,7 +106,7 @@ function getMessages(xhr, targetForm){
 				////handle tastypie field errors for pin
 				} else if (index === "pin") {
 					$.each(jsonMessage.pin, function (i, item) {
-						addMessage(messageDivId, item, "alert");
+						//addMessage(messageDivId, item, "alert fade-out click");
 						apply_form_field_error(targetForm, i, item, item.extra_tags);
 					});
 				////handle form field errors
@@ -142,7 +143,13 @@ function clearMessages(div_id) {
 	addMessageList(div_id);
 }
 function addMessage(html_id, text, extra_tags) {
-    var message = $('<li id="message" class="'+extra_tags+' alertSmall" style="crap" >'+text+'</li>').hide();
+	console.warn(extra_tags.search('click')+1)
+	if (extra_tags.search('click')+1){
+		var message = $('<div class="'+extra_tags+'"><button type="button" class="close" data-dismiss="alert">x</button>'+text+'</div>').hide();
+	}else{
+		var message = $('<li class="'+extra_tags+'">'+text+'</li>').hide();
+	}
+	//<button type="button" class="close" data-dismiss="alert">×</button>
 	$( '#'+html_id ).prepend(message);
 	//message.insertAfter(id);
     message.fadeIn(500);

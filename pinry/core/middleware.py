@@ -134,6 +134,7 @@ class Public(object):
                 '/bookmarklet/',
                 '/api/',
                 '/static/',
+                '/media/',
                 r'/favicon',
             )
     

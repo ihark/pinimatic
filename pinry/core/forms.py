@@ -1,5 +1,5 @@
 from taggit.forms import TagField, TagWidget
-from django.forms.widgets import SelectMultiple, Textarea, HiddenInput
+from django.forms.widgets import SelectMultiple, Textarea, HiddenInput, TextInput
 from django import forms
 from django.utils.translation import ugettext as _
 from taggit.utils import parse_tags, edit_string_for_tags
@@ -10,16 +10,28 @@ from django import forms
 class ContactForm(forms.Form):
     SUBJECTS = (
         ('Feedback', 'Feedback'),
-        ('Bugs', 'Bugs'),
+        ('Bugs', 'Bug Report'),
         ('Support', 'Support'),
     )
     subject = forms.ChoiceField(choices=SUBJECTS)
-    message = forms.CharField(widget=Textarea())
-    sender = forms.EmailField()
+    message = forms.CharField(widget=Textarea(attrs={'placeholder':'Enter your message here'}))
+    sender = forms.EmailField(label='Your Email', widget=TextInput(attrs={'placeholder':'email@example.com'}))
     cc_myself = forms.BooleanField(required=False)
     next = forms.CharField(widget=HiddenInput())
+    honey = forms.CharField(required=False, label='', widget=TextInput(attrs={'style':'display: none;'}))
 
-
+    def __init__(self, *args, **kwargs):
+        super(forms.Form, self).__init__(*args, **kwargs)
+        
+    def clean_honey(self):
+        #print '--form clean_repin'
+        data = self.cleaned_data['honey']
+        if data == '':
+            pass
+        else:
+            raise forms.ValidationError("You must be a robot!")
+        return data    
+        
 class CustomTagWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
         attrs={'placeholder':'add new tags here'}

@@ -88,9 +88,7 @@ def bookmarklet(request):
     else:
         return HttpResponse("javascript :alert('Please go to pinimatic.herokuapp.com and install the new bookmarlet.  We apologise for any inconvenience.');")
     
-        
-    
-@login_required
+
 def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -122,7 +120,11 @@ def contact(request):
                                                                 })"""
             
     else:
-        form = ContactForm(initial={ 'sender': request.user.email, 'cc_myself': True})
+        if request.user.is_authenticated():
+            sender = request.user.email
+        else:
+            sender = ''
+        form = ContactForm(initial={ 'sender': sender, 'cc_myself': True})
         form = redirect_to_referer(request, form)
     return TemplateResponse(request, 'core/contact.html', {'form': form})
 

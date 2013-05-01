@@ -73,15 +73,15 @@ class UserResource(ModelResource):
 class FavsResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user', null=True, full=True)
     favid = fields.CharField(attribute='favorite_id', null=True)
-    folid = fields.CharField(attribute='folowing_id', null=True)
+    #folid = fields.CharField(attribute='folowing_id', null=True)
     
     
     class Meta:
         always_return_data = True
-        queryset = Follow.objects.all()
+        queryset = Follow.objects.filter(folowing__isnull=True)
         resource_name = 'favs'
         include_resource_uri = False
-        fields = ['favorite']
+        fields = ['favorite', 'user']
         allowed_methods = ['get']
         filtering = {
             'favorite': ALL_WITH_RELATIONS,
@@ -108,6 +108,9 @@ class FavsResource(ModelResource):
             orm_filters['user__id__exact'] = filters['user']
 
         return orm_filters
+    
+    def determine_format(self, request): 
+        return "application/json"     
     '''
     def apply_authorization_limits(self, request, object_list):
         return object_list.exclude(favorite__exact=None)
@@ -145,12 +148,16 @@ class FollowsResource(ModelResource):
             orm_filters['folowing__id__exact'] = filters['fers']
 
         return orm_filters
+    
+    def determine_format(self, request): 
+        return "application/json" 
+    
     '''
     def apply_authorization_limits(self, request, object_list):
         return object_list.exclude(favorite__exact=None)
         #.filter(user=request.user)
     '''
-
+    
 class ContentTypeResource(ModelResource):
     #model = fields.CharField(attribute = 'model', null=True)
     

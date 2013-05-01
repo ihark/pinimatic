@@ -30,6 +30,18 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a href="{% url core:home %}" class="brand pull-left">{{ site_name }}</a>
+				{% if request.user.is_superuser and in_dev_env %}
+					<ul class="nav pull-left">
+						<li class="dropdown">
+						<a href="#" style="border:none;" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li>{{request.session.next}}</li>
+							<li>{{request.session.next_locked}}</li>
+							<li>1) repin count icon </li>
+							<li>2) prepin through list </li>
+						</ul>
+					</ul>
+				{% endif %}
 				{% if user.is_authenticated %}
 				<!-- <li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">PiniFy It</a></li> -->
 				<ul class="nav pull-right">
@@ -85,14 +97,7 @@
 				{% block account-nav %}{% endblock %}
             </div>
         </div>
-		{% if request.user.is_superuser %}
-			<div id="dev-notes" style="color:White; z-index:10000; margin:-30px 0 0 5px;">
-			<p class="inline" style="margin-right:10px;">s.next = {{request.session.next}}</p>
-			<p class="inline" style="margin-right:10px;">s.next_locked = {{request.session.next_locked}}</p>
-			</div>
-		{% endif %}
-		
-		
+
 
             <ul id="messageList" class="messages">
                 {% for message in messages %}

@@ -337,6 +337,7 @@ window.onpopstate = function(e) {
 	console.log('pop state: '+e.state);
 	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
 	if (e.state) window.location.href = e.state;
+	resetForms();
 };
 
 /**Receives data from the API, creates HTML for images and updates the layout
@@ -445,8 +446,13 @@ function onLoadData(data, insert) {
 					html += '<l><span class="">By: </span>'
 					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.id+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
-				html +='<div class="pin-stats pull-right">'
-						html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span>';
+				html +='<div class="pin-stats pull-right dropdown">'
+						html += '<div class="dropdown-toggle pull-right" id="dLabel" role="button" data-toggle="dropdown" data-target="#"><i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
+						html += '<ul class="display favs-list dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
+						for (f in image.favorites){
+							html += '<li class="display favs item"><a href="/user/'+image.favorites[f].user.id+'/">'+image.favorites[f].user.username+'</a></li>';
+						}
+						html += '</ul>';
 						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
 				html +='</div>'
 			//DESCRIPTION
@@ -1338,6 +1344,16 @@ function toggleTouchHover(target, self){
 		target.toggleClass('touch-hover');
 		aTouchHover.toggleClass('touch-hover')
 		aTouchHover = target;
+	}
+}
+//reset all froms on page
+function resetForms(){
+	console.warn('****resetForms()')
+	forms = $('form')
+	for (form in forms.length){
+		try{
+			forms[form].reset();
+		}catch(err){}
 	}
 }
 //checks if value is in an array return false or value

@@ -70,6 +70,46 @@ class UserResource(ModelResource):
         result = object_list.filter(id=request.user.id)
         return result
     '''
+#not currently used due to solution in pin resource    
+class RepinsResource(ModelResource):
+    user = fields.ForeignKey(UserResource, 'user', null=True, full=True)
+    repin_from = fields.CharField(attribute='repin__id')
+
+
+    class Meta:
+        always_return_data = True
+        queryset = Pin.objects.filter(repin__isnull=False)
+        resource_name = 'repins'
+        include_resource_uri = False
+        allowed_methods = ['get']
+        fields=['pk', 'id']
+        filtering = {
+            'id': ALL_WITH_RELATIONS,
+            'user': ALL_WITH_RELATIONS,
+        }
+        
+        #authentication = BasicAuthentication()
+        authorization = DjangoAuthorization()
+        
+    def build_filters(self, filters=None):
+        if filters is None:
+            filters = {}
+
+        orm_filters = super(RepinsResource, self).build_filters(filters)
+        '''
+        if 'favid' in filters:
+            orm_filters['favorite__id__exact'] = filters['favid']
+        '''
+
+        return orm_filters
+    
+    def determine_format(self, request): 
+        return "application/json"     
+    '''
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.exclude(favorite__exact=None)
+        #.filter(user=request.user)
+    '''
 class FavsResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user', null=True, full=True)
     favid = fields.CharField(attribute='favorite_id', null=True)
@@ -176,8 +216,9 @@ class PinResource(ModelResource):
     tags = fields.ListField()
     imgUrl = fields.CharField(attribute='imgUrl')
     srcUrl = fields.CharField(attribute='srcUrl', null=True)
-    repinObj = fields.ForeignKey('pinry.api.api.PinResource', 'repinObj', null=True)
-    repin = fields.CharField(attribute='repinObj__id', null=True)
+    repinedObj = fields.ForeignKey('pinry.api.api.PinResource', 'repin', null=True)
+    repined = fields.CharField(attribute='repin__id', null=True)
+    repins = fields.ToManyField('pinry.api.api.PinResource', attribute=lambda bundle: Pin.objects.filter(repin=bundle.obj.id), null=True, full=True)
     submitter = fields.ForeignKey(UserResource, 'submitter', full = True)
     favorites = fields.ToManyField(FavsResource, 'f_pin', full=True, null=True)
     popularity = fields.DecimalField(attribute='popularity', null=True)

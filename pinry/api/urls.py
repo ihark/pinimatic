@@ -8,6 +8,7 @@ from .api import CmntResource
 from .api import ContentTypeResource
 from .api import FollowsResource
 from .api import PinTagResource
+from .api import RepinsResource
 
 v1_api = Api(api_name='v1')
 v1_api.register(PinResource())
@@ -17,6 +18,7 @@ v1_api.register(CmntResource())
 v1_api.register(ContentTypeResource())
 v1_api.register(FollowsResource())
 v1_api.register(PinTagResource())
+v1_api.register(RepinsResource())
 
 urlpatterns = patterns('',
     (r'', include(v1_api.urls)),

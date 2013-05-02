@@ -45,21 +45,32 @@ if( /iPad/i.test(navigator.userAgent) ) {
 }
 
 
-//TOUCH: TEST FOR TOUCH DEVICE
+//TOUCH: TEST FOR TOUCH DEVICE & Setup touch devices
 var touchOn = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
 function setUpTouch() {
+	console.log(touchOn)
 	if (touchOn){
 		$('.touch-off').toggleClass('touch-on touch-off');
 		$('.touch-on.hide').toggleClass('hide show');
 	}
+	if (!touchOn){
+		$('.touch-on').toggleClass('touch-off touch-on');
+		$('.touch-on.show').toggleClass('show hide');
+	}
 };
-/* 
-$(document).on( 'touchstart', '.pin', function(e){	
-	alert('touchstart')
+//handle touch/mouse devices
+$(document).on( 'mousemove', '.pin', function(e){	
+	touchOn=false
+	setUpTouch()
 });
-$(document).on( 'MSPointerUp', '.pin', function(e){	
-	alert('MSPointerUp')
-}); */
+$(document).on( 'touchstart', '.pin.item .image', function(e){	
+	//stop mousemove from fireing for touch/mouce devices
+	e.preventDefault()
+	touchOn=true
+	setUpTouch()
+	target = $(e.target).closest('.pin').find('.pin-options')
+	target.trigger('click');
+});
 
 /** GENERIC FUNCTION FOR AJAX CALLS:
  *url: url to make ajax call
@@ -339,7 +350,6 @@ window.onpopstate = function(e) {
 	if (e.state) window.location.href = e.state;
 	resetForms();
 };
-
 /**Receives data from the API, creates HTML for images and updates the layout
  * insert: set to "prepend" to prepend existing HTML, "exclude" appends data to existing HTML.
  */
@@ -376,6 +386,11 @@ function onLoadData(data, insert) {
 						userFav = true;
 					}
 				}
+				for (r in image.repins){
+					if (image.repins[r].submitter.id == authUserO.id){
+						repined = true;
+					}
+				}
 				for (c in image.comments){
 					if (image.comments[c].user_id == authUserO.id){
 						userCmnt = true;
@@ -386,7 +401,7 @@ function onLoadData(data, insert) {
 				}
 			}
 			//SETUP HTML FOR LARGE PINS DISPLAY
-			html += '<div class="pin item" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'">';
+			html += '<div class="pin item" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'" data-repins="'+image.repins.length+'">';
 			//IMAGE CONTAINER
 				html += '<div class="image touch-off">';
 			//OPTIONS
@@ -408,9 +423,9 @@ function onLoadData(data, insert) {
 							html += '<div id="favs" data-state="'+userFav+'" class="inline">'
 								html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
 								if (userFav) {
-								html += '<i title="Remove Favorite" class="icon-star"></i>';
+								html += '<i title="Remove Favorite" class="uf icon-star icon-star-empty"></i>';
 								} else {
-								html += '<i title="Add Favorite" class="icon-star icon-star-empty"></i>';
+								html += '<i title="Add Favorite" class="icon-star"></i>';
 								};
 								html += '<br>Fav</a></div>'
 							if (!userPin  && !repined){
@@ -442,19 +457,44 @@ function onLoadData(data, insert) {
 					html += '<img src="'+image.thumbnail+'" width="200" ></a>';
 				html += '</div>';
 			//INFO - STATS
+				//submitter
 				html += '<div class="pin-info">';
 					html += '<l><span class="">By: </span>'
 					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.id+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
+				//favs
 				html +='<div class="pin-stats pull-right dropdown">'
-						html += '<div class="dropdown-toggle pull-right" id="dLabel" role="button" data-toggle="dropdown" data-target="#"><i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
-						html += '<ul class="display favs-list dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
-						for (f in image.favorites){
-							html += '<li class="display favs item"><a href="/user/'+image.favorites[f].user.id+'/">'+image.favorites[f].user.username+'</a></li>';
-						}
-						html += '</ul>';
-						html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span>';
+					html += '<div class="stat dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">'
+					html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
+					html += '<ul class="display list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
+					uu = uniqueUsers(image.favorites, 'user')
+					for (u in uu){
+						html += '<li id="'+uu[u].id+'" class="display favs item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+					}
+					html += '</ul>';
 				html +='</div>'
+				//cmnts
+				html +='<div class="pin-stats pull-right dropdown">'
+					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
+					html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span></div>';
+					html += '<ul class="display list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
+					uu = uniqueUsers(image.comments, 'user')
+					for (u in uu){
+						html += '<li id="'+uu[u].id+'" class="display cmnts item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+					}
+					html += '</ul>';
+				html +='</div>'
+				//repin
+				html +='<div class="pin-stats pull-right dropdown">'
+					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
+					html += '<i class="display icon-plus repins"></i><span class="display text light repins">'+image.repins.length+'</span></div>';
+					html += '<ul class="display list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">';
+					uu = uniqueUsers(image.repins, 'submitter')
+					for (u in uu){
+						html += '<li id="'+uu[u].id+'" class="display repins item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+					}
+					html += '</ul>';
+				html +='</div>';
 			//DESCRIPTION
 				html += '<div class="pin-desc">';
 					if (image.description) html += '<p id="desc">'+image.description+'</p>';
@@ -490,10 +530,11 @@ function onLoadData(data, insert) {
 			}
 			
 			//hide elements as required
+			if (!image.repins[0]) $('#'+image.id+'-pin .display.repins').hide()//hide repin stat display
 			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()//hide fav stat display
 			if (!image.comments[0]) $('#'+image.id+'-pin .display.cmnts').hide()//hide cmmt stat display
 			if (!image.comments[0]) $('#'+image.id+'-pin .pin-cmnts').hide()//hide cmmt section
-			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()
+			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()//hide comment form
 			
 			applyLayout();
 		}//end typical view
@@ -585,7 +626,17 @@ function onLoadData(data, insert) {
 	setUpTouch()
 };
 
-
+function uniqueUsers(object,userO){
+	unique = []
+	for (o in object){
+		id = object[o][userO].id
+		if (!unique[id]){
+			user = object[o][userO]
+			unique[id] = user
+		}
+	}
+	return unique
+}
 //TOUCH: form label tool-tips with ios support
 $(document).on( 'touchend', 'label[title]', function(e){	
 	alert(e.target.title)
@@ -734,13 +785,16 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	data = $(this).serializeObject()
 	delete data.id
 	sData = JSON.stringify(data)
-	ajax(this, false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
+	//replaced by toggle//ajax(this, false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
+	var target = $("#"+data.repin+"-pin").find("#repins")
+	togglePinStat(target[0], 'icon-plus-sign', 'POST', pinURL, null, sData)
 	return false
 });
-function onRepinSuccess(data, ajaxStatus, xhr){
+function repinsSuccess(result, pin){
 	console.log('-onRepinSuccess');
-	console.log(data);
-	data = {objects:[data]};
+	console.log(result);
+	data = []
+	data['objects'] = [result];
 	console.log(data);
 	console.log(data.length);
 	onLoadData(data, 'prepend');
@@ -958,6 +1012,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 	var dispText = pin.find('.display.text.'+name);
 	var countP = aProfile.attr('data-'+name);
 	var dispTextP = aProfile.find('.display.text.'+name);
+	var list = pin.find('.display.list-'+name);
 	
 	if (authUserO && authUserO.id == aProfileO.id) {
 		var updateProfile = true;
@@ -973,6 +1028,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 			icon.toggleClass(fIcon);
 			pin.attr('data-'+name, count);
 			dispText.html(count);
+			list.find('#'+authUserO.id).remove()
 			if (count == 0) {
 				disp.hide();
 			}
@@ -992,6 +1048,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 			icon.toggleClass(fIcon);
 			pin.attr('data-'+name, count);
 			dispText.html(count);
+			list.append('<li id="'+authUserO.id+'" class="display '+name+' item"><a href="/user/'+authUserO.id+'/">'+authUserO.username+'</a></li>')
 			disp.show();
 			if (updateProfile){
 				aProfile.attr('data-'+name, countP);
@@ -1001,7 +1058,9 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 		//exicute callback with nameSucess
 		var statA = new Array(201, 204)
 		var stat = xhr.status
+		console.warn('stat =', xhr.status, name+'Success')
 		if (statA.indexOf(stat)>=0 && typeof(window[name+'Success']) === "function"){
+			console.warn('calleing success:', window[name+'Success'])
 			window[name+'Success'](result, pin);
 		}
 	}
@@ -1334,6 +1393,7 @@ function cancelNewPin(){
 */
 function toggleTouchHover(target, self){
 	if(self===undefined){self = true}
+	console.log(target)
 	if(!aTouchHover){
 		target.toggleClass('touch-hover');
 		aTouchHover = target;
@@ -1343,6 +1403,19 @@ function toggleTouchHover(target, self){
 	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
 		target.toggleClass('touch-hover');
 		aTouchHover.toggleClass('touch-hover')
+		aTouchHover = target;
+	}
+}
+function toggleHover(target, self){
+	if(self===undefined){self = true}
+	if(!aTouchHover){
+		target.addClass('touch-hover');
+		aTouchHover = target;
+	}else if(aTouchHover && aTouchHover[0] == target[0] && self){
+
+	}else if(aTouchHover != undefined && aTouchHover[0] != target[0]){
+		target.addClass('touch-hover');
+		aTouchHover.removeClass('touch-hover')
 		aTouchHover = target;
 	}
 }

@@ -115,7 +115,7 @@ ROOT_URLCONF = 'pinry.urls'
 INTERNAL_IPS = ['127.0.0.1']
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-MEDIA_URL = '/media/'
+MEDIA_URL = 'http://'+INTERNAL_IPS[0]+':'+HTTP_DEV_PORT+'/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = '/media/tmp/'
 from pinry.core.utils import safe_base_url

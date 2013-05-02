@@ -202,6 +202,9 @@ h1, h2, h3, h4, h5, h6 {
   z-index:1100;
 }
 /* PINIMATIC */
+.dev-notes > .dropdown-menu{
+		min-width:400px;
+	}
 .errorlist {
 	margin: 0 0 10px 15px;
 	color: #B94A48
@@ -488,7 +491,7 @@ body {
 	}
 	.pin-info {
 		font-size: 11px;
-		width: 158px;
+		width: auto;
 		margin-top: 2px;
 		display: inline-block;
 		line-height: 14px;
@@ -498,7 +501,7 @@ body {
 	}
 	.pin-stats {
 		float: right;
-		width: 44px;
+		width: auto;
 		text-align: right;
 		line-height: 14px;
 		margin-top: 2px;
@@ -515,6 +518,11 @@ body {
 	.pin-stats > ul > li > a:hover{
 		color: #398F00;
 		background-image: linear-gradient(to bottom, rgb(234, 238, 240), rgb(227, 232, 235));
+	}
+	.pin-stats > .stat{
+		width:auto;
+		display:inline-block;
+		cursor:pointer;
 	}
 	/*drop-down caret*/
 	.dm-caret.dropdown-menu:before {
@@ -881,6 +889,14 @@ form h1 {
 	background-image: url("/static/core/img/icons-chat-11.png");
 	background-position: -0px 1px;
 }
+i.repins {
+	/* background-size:469px 159px;
+	background-position:-408px -96px; */
+	/* 75% */
+	background-size:351.75px 119.25px;
+	background-position:-304px -72px;
+}
+
 
 /* TOIUCH */
 .touch-on{

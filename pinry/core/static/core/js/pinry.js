@@ -47,38 +47,36 @@ if( /iPad/i.test(navigator.userAgent) ) {
 
 //TOUCH: TEST FOR TOUCH DEVICE & Setup touch devices
 var touchOn = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
-function setUpTouch() {
-	if (touchOn){
+function setUpTouch(s) {
+	if (s){
 		$('.touch-off').toggleClass('touch-on touch-off');
 		$('.touch-on.hide').toggleClass('hide show');
+		touchOn = true
 	}
-	if (!touchOn){
+	if (!s){
 		$('.touch-on').toggleClass('touch-off touch-on');
 		$('.touch-on.show').toggleClass('show hide');
+		touchOn = false
 	}
+	console.warn('touchOn: ',touchOn)
 };
 //handle touch/mouse devices
-/* 
-$(document).on( 'mousemove', '.pin', function(e){	
-	if (touchOn){
-		touchOn=false
-		setUpTouch()
+var lastTouch = 0
+var lastMouse = 0
+$("body").bind("touchstart mousedown", function (event) {
+	if (event.type=="touchstart"){
+		lastTouch = event.timeStamp
+		if (!touchOn) setUpTouch(true);
+	}
+	if (event.type=="mousedown" && touchOn){
+		lastMouse = event.timeStamp
+		dif = lastMouse-lastTouch
+		if (dif > 250){
+			setUpTouch(false)
+		}
 	}
 });
 
-$(document).on( 'touchmove', 'body', function(e){	
-	//stop mousemove from fireing for touch/mouce devices
-	e.preventDefault()
-	//e.stopPropagation()
-	if (!touchOn){
-		touchOn=true
-		setUpTouch()
-		target = $(e.target)
-		console.log(touchOn)
-		//target.find('.img-btn').trigger('touchend');
-	}
-}); 
- */
 /** GENERIC FUNCTION FOR AJAX CALLS:
  *url: url to make ajax call
  *async: Boolien false makes non async call, Defaults to true
@@ -630,7 +628,7 @@ function onLoadData(data, insert) {
 	//Apply layout to show any static pins in template
 	applyLayout();
 	//TOUCH: DEVICE SETUP
-	setUpTouch()
+	setUpTouch(touchOn)
 };
 
 function uniqueUsers(object,userO){
@@ -1398,7 +1396,7 @@ function cancelNewPin(){
 */
 function toggleTouchHover(target, self){
 	if(self===undefined){self = true}
-	console.log(target)
+	//console.log(target)
 	if(!aTouchHover){
 		target.toggleClass('touch-hover');
 		aTouchHover = target;
@@ -1470,6 +1468,7 @@ function getHost(url){
 	if (p[1]===undefined){h=p[0]}else{h=p[1]};
 	return h
 }
+//get sive of current window
 function getWindowSize() {
   var myWidth = 0, myHeight = 0;
   if( typeof( window.innerWidth ) == 'number' ) {
@@ -1487,6 +1486,7 @@ function getWindowSize() {
   }
   return {width:myWidth, height:myHeight}
 }
+// url / display safe
 function idSafe(s){
 	s = s.replace(/\s/g, '-')
 	s = s.replace(/&/g, 'ands')
@@ -1501,7 +1501,21 @@ function urlSafe(s){
 	s = s.replace(/&/g, '%26')
 	return s
 }
-
+//kill events (unused)
+var k = function(e){
+	e.preventDefault();
+	e.stopPropagation();
+	
+	return false;
+ }
+function kill(type){
+ console.log('kill',type)
+ window.document.body.addEventListener(type, k, true);
+}
+function unkill(type){
+ console.warn('unkill', type)
+ window.document.body.removeEventListener(type, k, true);
+}
 //jquery function to format form data as assoc.array
 (function($){
 // Use internal $.serializeArray to get list of form elements which is

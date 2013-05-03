@@ -15,11 +15,14 @@ class Command(BaseCommand):
             new_domain = args[0]
         except:
             raise CommandError('You must specify a domain: modifyimgurls <xxx://xxx.xxx.xxx>')
-        found = re.findall('\w*?://.*?', str(new_domain))
+        found = re.findall('\w*?://[^/]*?', str(new_domain))
         if found:
             pins = Pin.objects.all()
             for pin in pins:
                 new_img_url = re.sub('\w*?://.*?/', new_domain+'/', pin.image.url)
+                is_domain = re.findall('\w*?://.*?/', new_img_url)
+                if not is_domain:
+                    new_img_url = re.sub('/', new_domain+'/', pin.image.url)
                 pin.imgUrl = new_img_url
                 #print('new_img_url:', pin.imgUrl)
                 super(Pin, pin).save()

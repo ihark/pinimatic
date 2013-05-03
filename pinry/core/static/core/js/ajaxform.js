@@ -88,6 +88,7 @@ if (authUserO){tu = authUserO.id}else{tu = null};
 
 //get and process messages targetForm should be sent as $(targetForm)
 function getMessages(xhr, targetForm){
+	console.warn('*****get messages')
 	var contentType = xhr.getResponseHeader("Content-Type");
 	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {
 		try{
@@ -95,30 +96,33 @@ function getMessages(xhr, targetForm){
 			$.each(jsonMessage, function(index, value) {
 				if (index === "django_messages") {
 					$.each(jsonMessage.django_messages, function (i, item) {
-						console.warn('message found'+item.message)
+						console.log('django_messages: '+item.message)
 						addMessage(messageDivId, item.message, item.extra_tags);
 					});
 				////handle general form errors
 				} else if (index === "__all__") {
 					$.each(jsonMessage.__all__, function (i, item) {
+						console.log('__all__: '+item.message)
 						addMessage(messageDivId, item.message, item.extra_tags);
 					});
 				////handle tastypie field errors for pin
 				} else if (index === "pin") {
 					$.each(jsonMessage.pin, function (i, item) {
+						console.log('pin: '+item.message)
 						//addMessage(messageDivId, item, "alert fade-out click");
 						apply_form_field_error(targetForm, i, item, item.extra_tags);
 					});
 				////handle form field errors
 				} else {
 					$.each(jsonMessage[index], function (i, item) {
+						console.log('else: '+item.message)
 						apply_form_field_error(targetForm, index, item.message, item.extra_tags);
 					});
 				}
 			});
 		}
 		catch(err){
-			console.log(err)
+			console.log('getMessages error: ',err)
 		}
 	}
 	return jsonMessage
@@ -143,7 +147,6 @@ function clearMessages(div_id) {
 	addMessageList(div_id);
 }
 function addMessage(html_id, text, extra_tags) {
-	console.warn(extra_tags.search('click')+1)
 	if (extra_tags.search('click')+1){
 		var message = $('<div class="'+extra_tags+'"><button type="button" class="close" data-dismiss="alert">x</button>'+text+'</div>').hide();
 	}else{
@@ -211,13 +214,11 @@ function getTags(user) {
 }
 //things to do when modal is activated
 $('.modal').live('shown', function(e){
-   console.warn('modal shown')
    //$('.ui-autocomplete').css('position', 'fixed')
    $('body').css('overflow', 'hidden')
 });
 //things to do when modal is activated
 $('.modal').live('hide', function(e){
-   console.warn('modal hidden')
    //$('.ui-autocomplete').css('position', 'absolute')
    $('body').css('overflow', 'auto')
 });

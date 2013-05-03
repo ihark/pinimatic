@@ -96,10 +96,12 @@ class Pin(models.Model):
             if self.uImage:
                 print 'model - delete_uplaod called'
                 delete_upload(None, self.uImage)
+        media_url = settings.MEDIA_URL
         if not self.srcUrl:
             print 'model - if not srcUrl'
-            self.srcUrl = settings.MEDIA_URL+self.image.name
-        self.imgUrl = settings.MEDIA_URL+self.image.name
+            self.srcUrl = media_url+self.image.name
+        #always link to our saved image to prevent linking back to dead images.
+        self.imgUrl = media_url+self.image.name
         super(Pin, self).save(*args, **kwargs)
     
     class Meta:

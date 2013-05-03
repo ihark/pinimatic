@@ -159,7 +159,6 @@ class PinForm(forms.ModelForm):
         if image and imgUrl and not id:
             #print '--form image and imgUrl and not id'
             raise forms.ValidationError("Choose a url OR upload")
-        #print 'repin = ', repin  
         if imgUrl and not id and not repin:
             #print '--form imgUrl without ID found: '+str(imgUrl)
             self.check_if_image(imgUrl)

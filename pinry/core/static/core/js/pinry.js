@@ -48,7 +48,6 @@ if( /iPad/i.test(navigator.userAgent) ) {
 //TOUCH: TEST FOR TOUCH DEVICE & Setup touch devices
 var touchOn = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
 function setUpTouch() {
-	console.log(touchOn)
 	if (touchOn){
 		$('.touch-off').toggleClass('touch-on touch-off');
 		$('.touch-on.hide').toggleClass('hide show');
@@ -59,19 +58,27 @@ function setUpTouch() {
 	}
 };
 //handle touch/mouse devices
+/* 
 $(document).on( 'mousemove', '.pin', function(e){	
-	touchOn=false
-	setUpTouch()
-});
-$(document).on( 'touchstart', '.pin.item .image', function(e){	
-	//stop mousemove from fireing for touch/mouce devices
-	e.preventDefault()
-	touchOn=true
-	setUpTouch()
-	target = $(e.target).closest('.pin').find('.pin-options')
-	target.trigger('click');
+	if (touchOn){
+		touchOn=false
+		setUpTouch()
+	}
 });
 
+$(document).on( 'touchmove', 'body', function(e){	
+	//stop mousemove from fireing for touch/mouce devices
+	e.preventDefault()
+	//e.stopPropagation()
+	if (!touchOn){
+		touchOn=true
+		setUpTouch()
+		target = $(e.target)
+		console.log(touchOn)
+		//target.find('.img-btn').trigger('touchend');
+	}
+}); 
+ */
 /** GENERIC FUNCTION FOR AJAX CALLS:
  *url: url to make ajax call
  *async: Boolien false makes non async call, Defaults to true
@@ -80,7 +87,7 @@ $(document).on( 'touchstart', '.pin.item .image', function(e){
  *reqType: default='GET'
  */
 
-function ajax(self, reload, url, async, reqType, cbS, cbE, data){
+function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 	if (async == undefined) async = true;
 	if (reqType == undefined) reqType = 'GET';
 	var rData
@@ -89,8 +96,8 @@ function ajax(self, reload, url, async, reqType, cbS, cbE, data){
 		var statusCode = xhr.status;
 		var statusText = xhr.statusText;
 		//precess & display ajax messages
-		var jsonMessage = getMessages(xhr, $(self))
-		alertFade()//set messages to fade out
+		var jsonMessage = getMessages(xhr, $(messageTarget))
+		alertFade()//display and fade messages
 		//if callback exicute call back
 		if (cbS){
 			cbS(data, ajaxStatus, xhr)
@@ -109,25 +116,25 @@ function ajax(self, reload, url, async, reqType, cbS, cbE, data){
 		//if (authUserO && authUserO.id == aProfileO.id || !aProfileO.id){
 		if (reload){
 			console.log('--TODO:eliminate need for this--reloading data after ajax')
-			loadData(undefined, undefined, true)//reloads data
+			loadData(undefined, undefined, true)//reloads page & data
 		}
 		//}
 	}
 	function onApiError(xhr, settings, what) {
 		//TODO: may wnat to change tastypie form field error responce if possible to success.....
-		var jsonMessage = getMessages(xhr, $(self))
+		var jsonMessage = getMessages(xhr, $(messageTarget))
 		alertFade()//set messages to fade out
-		if (cbE){cbE(xhr, settings, what)}else{console.warn('ajax() - ajax error')};
+		if (cbE){cbE(xhr, settings, what)}else{console.warn('ajax()error: ',xhr, settings, what)};
 	}
 	console.log('-ajax - 1 custom ajax()');
 
 	$.ajax({//1 custom ajax function
-		context: self,
+		context: messageTarget,
 		url: url,
 		type: reqType,
 		contentType: 'application/json',
 		data: data,
-		dataType: 'json',
+		//dataType: 'json', 
 		processData: false,
 		headers:  {
 			//'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
@@ -731,14 +738,18 @@ $(document).on('touchstart', '.pin-options-btn', function(e){
 	target = $(e.target).closest('.pin').find('.pin-options');
 	toggleTouchHover(target)
 }); */
+
 //TOUCH: pin image overlay button for touch devices
 $(document).on('click', '.pin.item .image.touch-on', function(e){
 	//do not preventDefault() or inner option hrefs will not work.
+	//e.preventDefault();
+	//e.stopPropagation()
 	target = $(e.target).closest('.pin').find('.pin-options');
 	toggleTouchHover(target, true)
 });
 //Options > Comment: TOUCH: handler to toggle options hover for touch devices
-$(document).on( 'MSPointerUp touchstart', '.pin-cmnt.touch-on .display', function(e){
+
+$(document).on( 'touchstart', '.pin-cmnt.touch-on .display', function(e){
 	e.preventDefault();
 	var cmnt = $(this).closest('.pin-cmnt')
 	var opt = cmnt.find('.options')
@@ -787,24 +798,16 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	sData = JSON.stringify(data)
 	//replaced by toggle//ajax(this, false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
 	var target = $("#"+data.repin+"-pin").find("#repins")
-	togglePinStat(target[0], 'icon-plus-sign', 'POST', pinURL, null, sData)
+	togglePinStat(target[0], 'icon-plus-sign', 'POST', pinURL, null, sData, this)
 	return false
 });
 function repinsSuccess(result, pin){
-	console.log('-onRepinSuccess');
-	console.log(result);
+	console.log('---onRepinSuccess');
+	//onLoadData requires data.objects
 	data = []
 	data['objects'] = [result];
-	console.log(data);
-	console.log(data.length);
 	onLoadData(data, 'prepend');
 	$('#re-pin').modal('toggle')
-}
-function onRepinError(xhr, ajaxStatus, textStatus){
-	console.log('-onRepinEror');
-	console.log('textStatus: '+textStatus);
-	console.log('ajaxStatus: '+ajaxStatus);
-	console.log(xhr.responseText);
 }
 
 //Options > Comment: on click open form
@@ -985,7 +988,7 @@ function insertCommentForm(pinId, cmntT, cmntId){
 *  4) Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
 */
 
-function togglePinStat(targetBtn, fIcon, type, url, id, data){
+function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	var button = $(targetBtn);
 	var icon = $(button).find('i')
 	var name = button.attr('id');
@@ -1019,7 +1022,8 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 	}
 
 	this.onSuccess = function(result, ajaxStutus, xhr) {
-		//console.log(result, ajaxStutus, xhr)
+		console.log('------togglePinStatus onSuccess-------')
+		console.log('result: ',result, 'xhr: ',xhr)
 		if (state == "true"){
 			console.log('state == "true"')
 			count--;
@@ -1056,18 +1060,19 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 			}
 		}
 		//exicute callback with nameSucess
-		var statA = new Array(201, 204)
+		var statusA = new Array(201, 204)
 		var stat = xhr.status
-		console.warn('stat =', xhr.status, name+'Success')
-		if (statA.indexOf(stat)>=0 && typeof(window[name+'Success']) === "function"){
-			console.warn('calleing success:', window[name+'Success'])
+		console.log('calling: ', xhr.status, name+'Success()')
+		if (statusA.indexOf(stat)>=0 && typeof(window[name+'Success']) === "function"){
 			window[name+'Success'](result, pin);
 		}
 	}
 	console.log(url)
 	if (typeof url == "string" && url != ""){
-		console.log('-ajax - 3 togglepin()');
-		$.ajax({//3
+		//console.log('-ajax - 3 togglepin()');
+		ajax(messageTarget, false, url, true, type, $.proxy(this.onSuccess, this), null, data)
+		
+		/* $.ajax({//3
 			url: pinsPrefix+url,
 			type: type,
 			data: data,
@@ -1076,7 +1081,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data){
 			error: function(jqXHR, settings) {
 				console.warn('togglePinStat() - ajax error');
 			},
-		});
+		}); */
 	}
 }
 

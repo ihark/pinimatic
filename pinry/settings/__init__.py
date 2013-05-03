@@ -100,13 +100,16 @@ STATIC_PREFIX = SITE_URL: used to prepend full url to STATIC_URL when static fil
  PATHS & URLS
 '''
 RACK_ENV = os.environ.get("RACK_ENV", False)
-"""
-import socket
-try:
-    SITE_IP = socket.gethostbyname(socket.gethostname())
-except:
-    SITE_IP = '192.168'
-MOVED TO: core.context_processors.py
+
+#ONLY USE FOR DEV SERVER MEDIA URL
+if not RACK_ENV:
+    import socket
+    try:
+        HOST_IP = socket.gethostbyname(socket.gethostname())
+    except:
+        HOST_IP = localhost
+
+"""MOVED TO: core.context_processors.py
 HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)
 SITE_URL = 'http://'+HOST_NAME+':'+HTTP_DEV_PORT
 SSL_SITE_URL = 'https://'+HOST_NAME+':'+HTTPS_DEV_PORT
@@ -115,7 +118,7 @@ ROOT_URLCONF = 'pinry.urls'
 INTERNAL_IPS = ['127.0.0.1']
 SITE_ROOT = os.path.join(os.path.realpath(os.path.dirname(__file__)), '../../')
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-MEDIA_URL = 'http://'+INTERNAL_IPS[0]+':'+HTTP_DEV_PORT+'/media/'
+MEDIA_URL = 'http://'+HOST_IP+':'+HTTP_DEV_PORT+'/media/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = '/media/tmp/'
 from pinry.core.utils import safe_base_url

@@ -629,7 +629,7 @@ body {
 			filter:alpha(opacity=0);
 		}
 		
-		.pin.item .image:hover.touch-off .pin-options,
+		.pin.item .image.touch-off:hover .pin-options,
 		.pin.item .image.touch-on .pin-options.touch-hover {
 			display: block;
 		}

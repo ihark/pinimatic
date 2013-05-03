@@ -37,13 +37,17 @@ var vn = { //viewname:"displayname"
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
 //set up screen size
+var ios
 if( /iPhone|iPod/i.test(navigator.userAgent) ) {
 	$('head').append('<meta name = "viewport" content = "initial-scale = .6">');
+	ios = true
 }
 if( /iPad/i.test(navigator.userAgent) ) {
 	$('head').append('<meta name = "viewport" content = "initial-scale = 1.0">');
+	ios = true
 }
-
+var ie10
+if (navigator.msMaxTouchPoints>0){ie10 = true}
 
 //TOUCH: TEST FOR TOUCH DEVICE & Setup touch devices
 var touchOn = 'ontouchstart' in window || (navigator.msMaxTouchPoints>0);
@@ -63,19 +67,36 @@ function setUpTouch(s) {
 //handle touch/mouse devices
 var lastTouch = 0
 var lastMouse = 0
-$("body").bind("touchstart mousedown", function (event) {
-	if (event.type=="touchstart"){
-		lastTouch = event.timeStamp
-		if (!touchOn) setUpTouch(true);
-	}
-	if (event.type=="mousedown" && touchOn){
-		lastMouse = event.timeStamp
-		dif = lastMouse-lastTouch
-		if (dif > 250){
-			setUpTouch(false)
+function realMouseDown(){
+	dif = lastMouse-lastTouch
+	console.log(dif)
+	if (ie10 && dif > 60){
+		return true
+	}else if(dif > 500){
+		return true
+	}else{return false}
+
+}
+if (!ios){
+	$("body").bind("MSPointerDown touchstart mousedown", function (event) {
+		console.log(event.type)
+		if (event.type=="touchstart"){
+			lastTouch = event.timeStamp
+			if (!touchOn) setUpTouch(true);
 		}
-	}
-});
+		if (event.type=="MSPointerDown"){
+			lastTouch = event.timeStamp
+			if (!realMouseDown() && !touchOn) setUpTouch(true);
+		}
+		if (event.type=="mousedown" && touchOn){
+			lastMouse = event.timeStamp
+			if (realMouseDown() && touchOn){
+				setUpTouch(false)
+			}
+		}
+		
+	});
+}
 
 /** GENERIC FUNCTION FOR AJAX CALLS:
  *url: url to make ajax call
@@ -643,7 +664,7 @@ function uniqueUsers(object,userO){
 	return unique
 }
 //TOUCH: form label tool-tips with ios support
-$(document).on( 'touchend', 'label[title]', function(e){	
+$(document).on( 'MSPointerUp tosuchend', 'label[title]', function(e){	
 	alert(e.target.title)
 });
 
@@ -747,7 +768,7 @@ $(document).on('click', '.pin.item .image.touch-on', function(e){
 });
 //Options > Comment: TOUCH: handler to toggle options hover for touch devices
 
-$(document).on( 'touchstart', '.pin-cmnt.touch-on .display', function(e){
+$(document).on( 'MSPointerDown touchstart', '.pin-cmnt.touch-on .display', function(e){
 	e.preventDefault();
 	var cmnt = $(this).closest('.pin-cmnt')
 	var opt = cmnt.find('.options')
@@ -1391,7 +1412,7 @@ function cancelNewPin(){
  
 /* TOGGLE TOUCH HOVER ELEMENT by touching another element for touch devices
 *- target is the element you want to show on touch & hover
-*- use $(document).on('touchend', '.class', function(e){get target here} 
+*- use $(document).on('MSPointerUp touchend', '.class', function(e){get target here} 
 *- the required css is: .class:hover.touch-off .taget,.class.touch-on .target.touch-hover{ hover state style }
 */
 function toggleTouchHover(target, self){

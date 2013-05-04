@@ -102,12 +102,11 @@ STATIC_PREFIX = SITE_URL: used to prepend full url to STATIC_URL when static fil
 RACK_ENV = os.environ.get("RACK_ENV", False)
 
 #ONLY USE FOR DEV SERVER MEDIA URL
-if not RACK_ENV:
-    import socket
-    try:
-        HOST_IP = socket.gethostbyname(socket.gethostname())
-    except:
-        HOST_IP = localhost
+import socket
+try:
+    HOST_IP = socket.gethostbyname(socket.gethostname())
+except:
+    HOST_IP = localhost
 
 """MOVED TO: core.context_processors.py
 HOST_NAME = os.environ.get('HOST_NAME', SITE_IP)

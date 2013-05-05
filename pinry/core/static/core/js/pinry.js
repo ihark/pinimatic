@@ -449,7 +449,7 @@ function onLoadData(data, insert) {
 							html += '<div id="favs" data-state="'+userFav+'" class="inline">'
 								html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
 								if (userFav) {
-								html += '<i title="Remove Favorite" class="uf icon-star icon-star-empty"></i>';
+								html += '<i title="Remove Favorite" class="icon-star icon-star-empty"></i>';
 								} else {
 								html += '<i title="Add Favorite" class="icon-star"></i>';
 								};
@@ -491,7 +491,7 @@ function onLoadData(data, insert) {
 				//favs
 				html +='<div class="pin-stats pull-right dropdown">'
 					html += '<div class="stat dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display icon favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
+					html += '<i class="display favs icon-favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
 					html += '<ul class="display list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
 					uu = uniqueUsers(image.favorites, 'user')
 					for (u in uu){
@@ -502,7 +502,7 @@ function onLoadData(data, insert) {
 				//cmnts
 				html +='<div class="pin-stats pull-right dropdown">'
 					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display icon cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span></div>';
+					html += '<i class="display cmnts icon-cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span></div>';
 					html += '<ul class="display list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.comments, 'user')
 					for (u in uu){
@@ -513,7 +513,7 @@ function onLoadData(data, insert) {
 				//repin
 				html +='<div class="pin-stats pull-right dropdown">'
 					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display icon-plus repins"></i><span class="display text light repins">'+image.repins.length+'</span></div>';
+					html += '<i class="display repins icon-plus"></i><span class="display text light repins">'+image.repins.length+'</span></div>';
 					html += '<ul class="display list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.repins, 'submitter')
 					for (u in uu){
@@ -958,7 +958,7 @@ function insertComment(username, userid, cmntT, cmntId){
 		if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
 	html += ' data-cmnt='+cmntId+'>';
 	if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
-	html += '<i class="icon cmnts"></i>';
+	html += '<i class="icon-cmnts icon-gray"></i>';
 	html += '<a href="/user/'+userid+'">' +username+': </a>';
 	html += '<span class="display text light" >'+cmntT+'</span>';
 	html += '</p> ';

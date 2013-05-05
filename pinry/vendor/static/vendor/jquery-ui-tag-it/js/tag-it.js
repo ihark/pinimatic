@@ -274,6 +274,7 @@
                     if (!that.tagInput.data('autocomplete-open')) {
                         that.createTag(that._cleanedInput());
                     }
+					//that.createTag(that._cleanedInput());
                 });
 
             // Autocomplete.

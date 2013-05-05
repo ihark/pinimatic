@@ -1,4 +1,15 @@
-﻿
+﻿//overide _create so tag is created when focus is lost
+$.widget( "ui.tagit", $.ui.tagit, {
+	_create: function() {
+		this._super( "_create" );
+		var that = this
+		this.tagInput.blur(function(e){
+			// Create a tag when the element loses focus.
+			// If autocomplete is enabled and suggestion was clicked, don't add it.
+			that.createTag(that._cleanedInput());
+		});
+	}
+});
 console.warn('ajaxform.js has exicuted: waiting for doc ready');
 var messageDivId = 'messageList';
 $(document).ready(function () {
@@ -59,13 +70,13 @@ $(document).ready(function () {
 		});
 		return false;
 	});
-
-if (authUserO){tu = authUserO.id}else{tu = null};
 //tagit settings
+if (authUserO){tu = authUserO.id}else{tu = null};
 	$('input[name="tags"]').tagit({
 		availableTags: getTags(tu),
 		placeholderText: 'add..',
 	});
+});
 	//integrate focus css to ul box
 	$('.tagit input').focus(function(event) {
 		target = $(event.target).closest('ul');
@@ -75,8 +86,8 @@ if (authUserO){tu = authUserO.id}else{tu = null};
 		target = $(event.target).closest('ul');
 		target.removeClass('active');
 	});
+	
 
-});
 ////this method requires default submit function which is broken in chrome due to injection of from after dom loaded
 // function popForm(form) {
 	// nw = window.open("", 'formpopup', 'width=800,height=400,resizeable,scrollbars');

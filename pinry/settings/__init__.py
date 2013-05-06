@@ -239,6 +239,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount.providers.linkedin',
     #'allauth.socialaccount.providers.twitter',
     'invitation',
+    'notification',
 )
 SOCIALACCOUNT_PROVIDERS ={ 
     'facebook':

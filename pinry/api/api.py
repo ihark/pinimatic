@@ -63,7 +63,13 @@ class UserResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         result =  object_list.filter(id=bundle.request.user.id)
         return result
-
+    def alter_list_data_to_serialize(self, request, bundle):
+        try:
+            bundle['objects'][0]
+        except:
+            bundle['objects']=[{'id':'null', 'username':'anonymous'}]
+        return bundle
+       
     ''' depreciated in 0.9.12-alpha
     def apply_authorization_limits(self, request, object_list):
         print '--apply_authorization_limits--'

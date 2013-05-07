@@ -101,8 +101,11 @@ if (authUserO){tu = authUserO.id}else{tu = null};
 function getMessages(xhr, targetForm){
 	console.warn('*****get messages')
 	var contentType = xhr.getResponseHeader("Content-Type");
+	console.warn(contentType)
+	if (contentType == undefined){contentType = "text"}
 	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {
 		try{
+			console.log(xhr.responseText)
 			var jsonMessage = $.parseJSON(xhr.responseText);
 			$.each(jsonMessage, function(index, value) {
 				if (index === "django_messages") {
@@ -190,38 +193,33 @@ function clear_form_field_errors(form) {
 }
 //jquery ui & taggit
 function getTags(user) {
-	if (!user){ user = null };
-	isLoading = true
-	$('#loader').show();
-	var tags = []
-	onSuccess = function( data, ajaxStatus, xhr) {
-		if (data.objects){
-			for (t in data.objects){
-				tags.push(data.objects[t].name)
+	if (user){ 
+		isLoading = true
+		$('#loader').show();
+		var tags = []
+		onSuccess = function( data, ajaxStatus, xhr) {
+			if (data.objects){
+				for (t in data.objects){
+					tags.push(data.objects[t].name)
+				}
 			}
-		}
-		console.log(tags)
-		isLoading = false
-		$('#loader').hide();
-	}
-	$.ajax({
-		url: apiURL+'pintags/?user='+user,
-		contentType: 'application/json',
-		withCredentials: true,
-		/* headers:  {
-			'x-requested-with' : 'XMLHttpRequest' //// add header for django form.is_valid() 
-		},
-		beforeSend: function(jqXHR, settings) {
-			jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-		}, */
-		success: onSuccess,
-		error: function(jqXHR, settings) {
-			console.warn('getTags - ajax error');
+			console.log(tags)
 			isLoading = false
 			$('#loader').hide();
-		},
-	});
-	return tags
+		}
+		$.ajax({
+			url: apiURL+'pintags/?user='+user,
+			contentType: 'application/json',
+			withCredentials: true,
+			success: onSuccess,
+			error: function(jqXHR, settings) {
+				console.warn('getTags - ajax error');
+				isLoading = false
+				$('#loader').hide();
+			},
+		});
+		return tags
+	};
 }
 //things to do when modal is activated
 $('.modal').live('shown', function(e){

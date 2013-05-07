@@ -23,6 +23,7 @@ var origin = window.location.origin;
 console.log(origin);
 var av=url(3);//active view
 var authUserO = ajax(this, false, userURL, false);//authenticated user object//used to determine current authenticated user
+console.warn('authUserO:',authUserO)
 var aTouchHover //tracks active pin options floater for touch devices
 var vn = { //viewname:"displayname"
 	favs:"Favorites",

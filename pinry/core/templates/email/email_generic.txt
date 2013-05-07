@@ -1,0 +1,3 @@
+{% load email %}
+
+{% block header_generic %}{% endblock %}

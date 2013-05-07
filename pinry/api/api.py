@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.comments.models import Comment
+from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import ContentType
 from tastypie import fields
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
@@ -403,6 +404,7 @@ class CmntResource(ModelResource):
     }, 'content_object')
     username = fields.CharField(attribute = 'user__username', null=True)
     user_id = fields.CharField(attribute = 'user__id', null=True)
+    validation = CleanedDataFormValidation(form_class=CommentForm)
     
     class Meta:
         always_return_data = True

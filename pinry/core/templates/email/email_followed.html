@@ -1,0 +1,7 @@
+{% load email %}
+{% header_generic %}
+<div class="container page">
+	<h6>Hey {{target}}<h6>
+	<p>You were followed by {{actor}}!</p>
+	<p>Go to http://pinimatic.herokuapp.com/user/{{actor.id}}/ to check out thier stuff.</p>
+</div>

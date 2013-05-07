@@ -1,0 +1,4 @@
+Hey {{target}},
+You were followed by {{actor}}!
+Go to http://pinimatic.herokuapp.com/user/{{actor.id}}/ to check out thier stuff.
+        

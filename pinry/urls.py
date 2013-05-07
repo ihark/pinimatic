@@ -27,6 +27,7 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^500/$', 'pinry.core.views.custom_500'),
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
+        (r'^email/$', 'django.views.generic.simple.direct_to_template', {'template': 'email/email_generic.html'}),
     )
 
 #url patters for local static and media files

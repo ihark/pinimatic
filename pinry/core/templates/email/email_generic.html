@@ -1,0 +1,38 @@
+{% load email %}
+{% header_generic request %}
+<style type="text/css">
+	@import url('http://fonts.googleapis.com/css?family=Fugaz One');
+	.navbar{
+	margin-bottom: 35px;
+	}
+	.container {
+		width:auto;
+		margin:auto;
+	}
+	.page{
+		width: auto;
+		min-width: 450px;
+		margin: 0px 30px;
+		padding: 10px 20px 10px 20px;
+		background: White;
+		border-radius: 6px;
+	}
+	.page{
+		color: #398F00;
+		text-decoration:none;
+	}
+	.navbar .nav > li > a{
+		color: #999;
+		text-shadow: none;
+		border-left: 1px solid #ccc;
+		margin: 0px;
+		cursor: pointer;
+		/*controll height & center*/
+		padding: 5px 8px;
+	}
+</style>
+<div class="container page">
+	<h6>Hey {{target}}<h6>
+	<p>You were followed by {{actor}}!</p>
+	<p>Check out thier stuff on <a href="http://pinimatic.herokuapp.com/user/{{actor}}/">{{site_name}}</a></p>
+</div>

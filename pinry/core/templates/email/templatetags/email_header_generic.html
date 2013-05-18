@@ -1,44 +1,7 @@
-<style type="text/css">
-	@import url('http://fonts.googleapis.com/css?family=Fugaz One');
-	.navbar{
-	margin-bottom: 35px;
-	}
-	.navbar-inner {
-		background: white;
-		height: 30px;
-		border-bottom: 1px solid #999;
-		padding:0;
-		width:100%;
-	}
-	.navbar .brand {
-		color: #444;
-		font-family: 'Fugaz One';
-		font-size: 18px;
-		padding-left:0px;
-		margin-left:10px;
-		/*controll height & center*/
-		line-height: 30px;
-		text-decoration:none;
-	}
-	.brand:hover{
-		color: #398F00;
-		text-decoration:none;
-	}
-	.navbar .nav > li > a{
-		color: #999;
-		text-shadow: none;
-		border-left: 1px solid #ccc;
-		margin: 0px;
-		cursor: pointer;
-		/*controll height & center*/
-		padding: 5px 8px;
-	}
+<tr height="34">
+	<th class="navbar navbar-top" style="text-align:center; vertical-align:middle; padding:0 10px;
+	border-top:1px solid #999; border-bottom:1px solid #999; background: white;">
+		<a class="brand" href="{{root_url}}"><img  height="18" alt="{{current_site.name}}" src="{{root_url}}/static/core/img/logo-18.png"></a>
+	</td>
+</tr>
 
-</style>
-<body style="background-color:#111; background-image:url('{{site_url}}static/core/img/backgrounds/pw_maze_black.png');">
-	<div class="navbar navbar-top">
-		<div class="navbar-inner">
-			<a href="{{site_url}}" class="brand pull-left">{{ site_name }}</a>
-		</div>
-	</div>
-</body>

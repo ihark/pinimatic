@@ -16,15 +16,28 @@ from django.template.loader import get_template
 from django.template import Context
 
 from django.contrib.sites.models import Site
+from notification import models as notification
 
 site = Site.objects.get_current()
 site_name = site.name
 site_url = 'http://%s/' % site.domain
 
+#notification.send(users, label, extra_context=None, sender=None)
+
 @receiver(followed, sender=User, dispatch_uid='follow.user')
 def user_follow_handler(user, target, instance, **kwargs):
-    print kwargs
+    '''
+    user: the user who acted
+    target: the user that has been followed
+    instance: the follow object
+    '''
+    print '--kwargs--',kwargs
+    print '--user--',user
+    print '--target--',target
+    print '--instance--',instance
     if user != target:
+        notification.send([target], "followed", {"from_user": user}, sender=user)
+        '''KEEP THIS HERE AS REFERENCE FOR USING THE EMIAL SYSTEM
         subject = "You have a new follower on %s." %settings.SITE_NAME 
         from_email, to_email = 'from@example.com', [target.email]
         # text_content = 'Hey %s,\n\nYou were followed by %s!\n\
@@ -41,41 +54,33 @@ def user_follow_handler(user, target, instance, **kwargs):
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
-
+'''
 @receiver(followed, sender=Pin, dispatch_uid='follow.pin')
 def pin_follow_handler(user, target, instance, **kwargs):
+    '''
+    user: the user who acted
+    target: the pin that has been followed
+    instance: the follow object
+    '''
+    print '--kwargs--',kwargs
+    print '--user--',user
+    print '--target--',target
+    print '--instance--',instance
     if user != target.submitter:
-        subject = "Someone digs your stuff on %s." %settings.SITE_NAME 
-        from_email, to_email = 'from@example.com', [target.submitter.email]
-        text_content = 'Hey %s,\n\n%s added your pin to thier favorites.  \n\
-                        Go to http://pinimatic.herokuapp.com/user/%s/ to check out thier stuff.\
-                        Keep up the good work!' % (target.submitter, user, user.id)
-        html_content = 'Hey %s,<br><br>%s added your pin to thier favorites.  \n\
-                        Check out thier stuff on <a href="http://pinimatic.herokuapp.com/user/%s/">%s</a>.\
-                        Keep up the good work!' % (target.submitter, user, user.id, settings.SITE_NAME)
-                        
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        notification.send([target.submitter], "favorited", {"from_user": user}, sender=target)
         
 from django.db.models.signals import post_save
-#TODO: Also notify pin followers
+#TODO: Also notify pin followers, use observe notification
 @receiver(post_save, sender=Comment, dispatch_uid='comment.user')
 def pin_comment_handler(sender, *args, **kwargs):
-    print 'comment'
     comment = kwargs.pop('instance', None)
     user = comment.user
     target = comment.content_object
+    print '--comment--',comment
+    print '--kwargs--',kwargs
+    print '--user--',user
+    print '--target--',target
     if user != target.submitter:
-        subject = "%s commented on your stuff." %user 
-        from_email, to_email = 'from@example.com', [target.submitter.email]
-        text_content = 'Hey %s,\n\n%s commented on your stuff.  Go to http://pinimatic.herokuapp.com/user/%s/ \
-                        to see what they said.' % (target.submitter, user, target.submitter)
-        html_content = 'Hey %s,<br><br>%s commented on your stuff.<br>See what they said on \
-                        <a href="http://pinimatic.herokuapp.com/user/%s/">%s</a>. \
-                        '% (target.submitter, user, target.submitter.id, settings.SITE_NAME)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        notification.send([target.submitter], "commented", {"from_user": user}, sender=target)
 
        

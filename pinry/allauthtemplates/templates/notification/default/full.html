@@ -1,0 +1,8 @@
+{% comment %}
+context: 
+"recipient": recipient,
+"sender": sender,
+"notice": notice_type),
+extra_context:
+"from_user":user,
+{% endcomment %}{% load i18n %}<a href="{{root_url}}{% url pins:profile from_user.id %}">{{from_user|capfirst}}</a> {% blocktrans with notice.description as notice %}{{ notice }}{% endblocktrans %}

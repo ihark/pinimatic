@@ -192,7 +192,7 @@ function onScroll(event) {
 
 //format pin grid and apply layout
 function applyLayout() {
-  $('#pins').imagesLoaded(function() {
+  $('#pins-container').imagesLoaded(function() {
       // Clear our previous layout handler.
       if(handler) handler.wookmarkClear();
       

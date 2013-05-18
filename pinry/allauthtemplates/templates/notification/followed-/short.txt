@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans %}{{from_user}} started following you{% endblocktrans %}

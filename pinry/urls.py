@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^comments/', include('django.contrib.comments.urls')),
     (r'^accounts/', include('invitation.urls')),
     (r'^accounts/', include('allauth.urls')),
+    (r'^accounts/notifications/', include('notification.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 #provide url for testing error pages
@@ -27,7 +28,7 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^500/$', 'pinry.core.views.custom_500'),
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
-        (r'^email/$', 'django.views.generic.simple.direct_to_template', {'template': 'email/email_generic.html'}),
+        (r'^email/$', 'django.views.generic.simple.direct_to_template', {'template': 'notification/default/email_body.html'}),
     )
 
 #url patters for local static and media files

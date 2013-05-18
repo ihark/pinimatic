@@ -1,6 +1,7 @@
 {% load new_pin %}
 {% load re_pin %}
 {% load compress %}
+{% load i18n %}
 
 <!DOCTYPE html>
 <html>
@@ -27,7 +28,7 @@
         
     </head>
     <body style="background-color:#111; background-image:url('{{STATIC_URL}}core/img/backgrounds/pw_maze_black.png');">
-        <div class="navbar navbar-fixed-top">
+		<div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a href="{% url core:home %}" class="brand pull-left">{{ site_name }}</a>
 				{% if request.user.is_superuser and in_dev_env %}
@@ -53,19 +54,20 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="">Your Pins</a></li>
+							<li><a href="{% url notification_notices %}">Your Notifications  {{notice_unseen_count}}</a></li>
 							<li class="divider"></li>
 							<li><a href="{% url socialaccount_connections %}">Social Connections</a></li>
-							<li><a href="{% url account_email %}">Manage Email</a></li>
+							<li><a href="{% url account_email %}">Manage Email Address</a></li>
 							{% if user.password == "!" %}
-							<li><a href="{% url account_set_password %}">Set Password</a></li>
+								<li><a href="{% url account_set_password %}">Set Password</a></li>
 								{% else %}
 								<li><a href="{% url account_change_password %}">Change Password</a></li>
 							{% endif %}
 							{% if remaining_invitations %}
-							<li><a href="{% url invitation_invite %}">Invite Friends</a></li>
+								<li><a href="{% url invitation_invite %}">Invite Friends</a></li>
 							{% endif %}
 							{% if user.is_staff %}
-							<li><a href="{% url invitation_invite_bulk %}">Send Bulk Invitations</a></li>
+								<li><a href="{% url invitation_invite_bulk %}">Send Bulk Invitations</a></li>
 							{% endif %}
 							<li class="divider"></li>
 							<li><a href="{% url account_logout %}">Log Out</a></li>
@@ -98,21 +100,36 @@
 				{% block account-nav %}{% endblock %}
             </div>
         </div>
-
-
-            <ul id="messageList" class="messages">
-                {% for message in messages %}
-					{% if 'click' in message.tags %}
-						<div class="{{ message.tags }}">
-						<button type="button" class="close" data-dismiss="alert">x</button>
-						{{ message }}</div>
-					{% else %}
-						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-					{% endif %}
-				{% endfor %}
-            </ul>
 		
+		<ul id="messageList" class="messages">
+			{% for message in messages %}
+				{% if 'click' in message.tags %}
+					<div class="{{ message.tags }}">
+					<button type="button" class="close" data-dismiss="alert">x</button>
+					{{ message }}</div>
+				{% else %}
+					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		
+		<div id="content-container">
+		<noscript>
+			<div class="container">
+				<div class="content center framed-white width-600">
+				<h4>Hey, you're missing all the good stuff!</h4>
+				<p>{{site_name}} requires javascript in order to function properly.  If you need help enableing it please click on your browser icon below.<p>
+				<p><a id="ieLink" href="http://www.enable-javascript.com/#ie"><img src="http://www.enable-javascript.com/images/ie9.gif" width="100" height="100" alt="Internet Explorer"></a>
+				<a id="firefoxLink" href="http://www.enable-javascript.com/#firefox"><img src="http://www.enable-javascript.com/images/firefox.gif" width="100" height="100" alt="Mozilla Firefox"></a>
+				<a id="chromeLink" href="http://www.enable-javascript.com/#chrome"><img src="http://www.enable-javascript.com/images/chrome.gif" width="100" height="100" alt="Google Chrome"></a>
+				<a id="safariLink" href="http://www.enable-javascript.com/#safari"><img src="http://www.enable-javascript.com/images/safari.gif" width="100" height="100" alt="Apple Safari"></a>
+				<a id="operaLink" href="http://www.enable-javascript.com/#opera"><img src="http://www.enable-javascript.com/images/opera.gif" width="100" height="100" alt="Opera"></a>
+				<p>
+				</div>
+			<div>
+		</noscript>
         {% block yield %}{% endblock %}
+		</div>
 		
 		<div id="loader" class="container">
 			<div class="">

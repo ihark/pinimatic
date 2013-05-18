@@ -1,3 +1,18 @@
+{% comment %}
+context: 
+"message":full.html 
+"recipient": recipient,
+"sender": sender,
+"notice": notice_type,
+"notices_url": notices_url,
+"root_url": root_url,
+"current_site": current_site,
+"unsubscribe_link": unsub_url,
+extra_context:
+"from_user":user,
+"notice_id": Notice.id/False,
+"sender_url": root_url+sender_url,
+{% endcomment %}
 {% load i18n %}
 {% load email %}
 
@@ -29,10 +44,10 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 					<tr>
 						<td class="body" width="auto" style="min-width: 150px; padding: 20px 20px 20px 20px;
 						background: White; border-radius: 6px;">
-							<div>Hey {{recipient}},<br><br></div>
-							<div>{{message}}<br>
-							Check out their stuff on 
-							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{root_url}}/user/{{from_user.id}}/">
+							<div>{%trans "Hey " %}{{recipient|capfirst}},<br><br></div>
+							<div>{{message}}!<br>
+							{%trans "Check it out on " %} 
+							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
 							<img height="14" alt="{{current_site.name}}" src="{{root_url}}/static/core/img/logo-18.png"></a>.
 							</div>
 						</td>
@@ -44,3 +59,4 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 	</table>
 	
 </body>
+

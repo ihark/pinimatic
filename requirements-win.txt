@@ -16,3 +16,4 @@ gunicorn==0.17.2
 -e git://github.com/arctelix/django-invitation.git#egg=django-invitation
 requests-oauthlib
 django-generic-aggregation
+django-picklefield

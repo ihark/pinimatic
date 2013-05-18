@@ -1,65 +1,12 @@
 {% extends 'core/base.html' %}
+{% load user_profile %}
 
-{% load follow_tags %}
-
-{% block title %}Recent Pins{% endblock %}
+{% block title %}{{ profile.username }}'s Pins{% endblock %}
 
 {% block yield %}
-<!-- 
-<script>
-var au = {{ authUserJ|safe }}
-</script> -->
 <div id="pins-container">
-	<div class="pin profile" id="{{ profile.id }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}" data-cmnts="{{ cmntsC }}">
-		<div class="header">
-			<a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');"><h4>{{ profile.username }}</h4></a>
-			{% if request.user != profile and user.is_authenticated%}
-				<button id="follow" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="true" {% else %}data-state ="false" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
-			{% endif %}
-		</div>
-		<div id="tags" class="section tags">
-			<h6>Filters:</h6>
-			<div class="tags"></div>
-		</div>
-		<div class="section center">
-			<div class="inline center vert-left">
-				<a id="user-pins"><div class="btn-hover"><span class="pins large display text">{{ pinsC }}</span><br>Pins</div></a>
-				<a id="user-tags"><div class="btn-hover"><span class="tags large display text">{{ tagsC }}</span><br>Groups</div></a>
-			</div>
-			<div class="inline center vert-auto">
-				<a id="user-favs"><div class="btn-hover"><span class="favs large display text">{{ favsC }}</span><br>Favorites</div></a>
-				<a id="user-cmnts"><div class="btn-hover"><span class="cmnts large display text">{{ cmntsC }}</span><br>Comments</div></a>
-			</div>
-			<div class="inline center vert-right">
-				<a id="user-fing"><div class="btn-hover"><span class="following large display text">{{ folowingC }}</span><br>Following</div></a>
-				<a id="user-fers"><div class="btn-hover"><span class="followers large display text">{{ folowersC }}</span><br>Followers</div></a>
-			</div>
-		</div>
-		<div class="section catagories"> 
-			<h6>Top Catagories:</h6>
-			<div class="inline">
-				{% for tag in tags %}
-					<a id="user-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/{{ profile.id }}/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
-				{% endfor %}
-			</div>
-		</div>
-		<div class="section sources"> 
-			<h6>Favorite sites</h6>
-			<div class="inline">
-			{% for srcDom in srcDoms %}
-			<li class="hover btn-hover"><a href="{{ srcDom.1.1 }}">{{ srcDom.0 }}<span class="white">: {{ srcDom.1.0 }}</span></a></li>
-			{% endfor %}
-			</div>
-		</div>
-		<!-- <div class="section">
-			<h6>Share</h6>
-			<div class="inline">
-				<a href="" title="Embed a gallery of images">ESS</a>
-				<a href="" title="RSS feed for {{ profile.id }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
-			</div>
-		</div> -->
+	<div id="pins">
+		{% user_profile request profileId %}
 	</div>
-	<div id="pins"></div>
 </div>
-
 {% endblock %}

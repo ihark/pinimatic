@@ -9,7 +9,6 @@ register = Library()
 #@register.simple_tag
 @register.inclusion_tag('email/templatetags/email_header_generic.html', takes_context=True)
 def header_generic(context, request):
-    print 'header_generic', context
     return context
     '''
     template = loader.get_template('email/templatetags/email_header_generic.html')
@@ -19,4 +18,8 @@ def header_generic(context, request):
     return render_to_string('email/templatetags/email_header_generic.html',
         {'foo': 'bar'},
         context_instance=RequestContext(request))
-    '''    
+    '''
+@register.inclusion_tag('email/templatetags/email_footer_generic.html', takes_context=True)
+def footer_generic(context, request):
+    print 'footer_generic', context
+    return context    

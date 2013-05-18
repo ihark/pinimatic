@@ -4,55 +4,56 @@
 
 {% block yield %}
 <div id="pins-container">
-	<div class="pin welcome" id="welcome-profile" data-profile="welcome">
-		<div class="header">
-			{% if user.is_authenticated %}
-			<h4>Welcome <a href="{% url core:home %}user/{{ user.id }}">{{ user }}:</a>
-			{% else %}
-			<h5 class="dark">Welcome to {{ site_name }}:</h5>
-			<h6><a style="color:#5BA300" href="{% url account_signup %}">Sign up</a> & start collecting your favorite images from the web.</h6>
-			{% endif %}
-		</div>
-		<div id="tags" class="section tags">
-			<h6>Filters:</h6>
-			<div class="tags"></div>
-		</div>
-		<div class="section browse">
-			{% if user.is_authenticated %}
-			<h6>Browse by:</h6>
-			<a id="user-fing" class="hover btn-hover" href="{% url core:home %}user/all/Following{{ tag.0 }}/"><p>Following</p></a>
-			{% else %}
-			<h6>In the mean time check this out:</h6>
-			{% endif %}
-			<p><a id="Recent-all" class="btn-hover" href="{% url core:home %}user/all/">Recent</a></p>
-			<p><a id="Popular-all" class="btn-hover" href="{% url core:home %}user/all/Popular{{ tag.0 }}/">Popular</a></p>
-			<p><a id="Category-all" class="btn-hover" href="{% url core:home %}user/all/Categories{{ tag.0 }}/">Categories</a></p>
-		</div>
-		<div class="section catagories">
-			<h6>Top Categories:</h6>
-			<div class="inline">
-				{% for tag in tags %}
-					<a id="all-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
+	<div id="pins">
+		<div class="pin welcome" id="welcome-profile" data-profile="welcome">
+			<div class="header">
+				{% if user.is_authenticated %}
+				<h4>Welcome <a href="{% url core:home %}user/{{ user.id }}">{{ user }}:</a>
+				{% else %}
+				<h5 class="dark">Welcome to {{ site_name }}:</h5>
+				<h6><a style="color:#5BA300" href="{% url account_signup %}">Sign up</a> & start collecting your favorite images from the web.</h6>
+				{% endif %}
+			</div>
+			<div id="tags" class="section tags">
+				<h6>Filters:</h6>
+				<div class="tags"></div>
+			</div>
+			<div class="section browse">
+				{% if user.is_authenticated %}
+				<h6>Browse by:</h6>
+				<a id="user-fing" class="hover btn-hover" href="{% url core:home %}user/all/Following{{ tag.0 }}/"><p>Following</p></a>
+				{% else %}
+				<h6>In the mean time check this out:</h6>
+				{% endif %}
+				<p><a id="Recent-all" class="btn-hover" href="{% url core:home %}user/all/">Recent</a></p>
+				<p><a id="Popular-all" class="btn-hover" href="{% url core:home %}user/all/Popular{{ tag.0 }}/">Popular</a></p>
+				<p><a id="Category-all" class="btn-hover" href="{% url core:home %}user/all/Categories{{ tag.0 }}/">Categories</a></p>
+			</div>
+			<div class="section catagories">
+				<h6>Top Categories:</h6>
+				<div class="inline">
+					{% for tag in tags %}
+						<a id="all-{{ tag.0 }}" class="hover btn-hover" href="{% url core:home %}user/all/{{ tag.0 }}/">{{ tag.0 }}<span class="white">: {{ tag.1 }}</span></a>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="section sources"> 
+				<h6>Start with these popular sources:</h6>
+				<div class="inline">
+				{% for srcDom in srcDoms %}
+				<li class="hover btn-hover"><a href="{{ srcDom.1.1 }}">{{ srcDom.0 }}<span class="white">: {{ srcDom.1.0 }}</span></a></li>
 				{% endfor %}
+				</div>
 			</div>
+			<!-- <div class="section">
+				<h6>Share</h6>
+				<div class="inline">
+					<a href="" title="Embed a gallery of images">ESS</a>
+					<a href="" title="RSS feed for {{ profile.username }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
+				</div>
+			</div> -->
 		</div>
-		<div class="section sources"> 
-			<h6>Start with these popular sources:</h6>
-			<div class="inline">
-			{% for srcDom in srcDoms %}
-			<li class="hover btn-hover"><a href="{{ srcDom.1.1 }}">{{ srcDom.0 }}<span class="white">: {{ srcDom.1.0 }}</span></a></li>
-			{% endfor %}
-			</div>
-		</div>
-		<!-- <div class="section">
-			<h6>Share</h6>
-			<div class="inline">
-				<a href="" title="Embed a gallery of images">ESS</a>
-				<a href="" title="RSS feed for {{ profile.username }}"><img width="10" height="10" src="http://www.wookmark.com/assets/icon-rss.png" alt="RSS feed for arctelix"></a>
-			</div>
-		</div> -->
 	</div>
-	<div id="pins"></div>
 </div>
 
 

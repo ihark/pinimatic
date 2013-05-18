@@ -79,5 +79,5 @@
 	</div>
 </div>
 <!-- append url with script below so that it may be bookmarked -->
-<script>document.title = "Pinify it";var stateObj = '#-delete_javascript:void((function(){ var e=document.createElement("script"); e.type="text/javascript"; e.src="{{ BASE_URL }}/bookmarklet/?srcUrl="+location.href; document.body.appendChild(e);})())';window.history.pushState(stateObj, 'Pinfy it', stateObj)</script>
+<script>document.title = "Pinify it";var stateObj = '#-delete_javascript:void((function(){ var e=document.createElement("script"); e.type="text/javascript"; e.src="{{ SSL_SITE_URL }}/bookmarklet/?srcUrl="+location.href; document.body.appendChild(e);})())';window.history.pushState(stateObj, 'Pinfy it', stateObj)</script>
 {% endblock %}

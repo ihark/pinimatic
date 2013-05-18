@@ -63,65 +63,23 @@ def recent_pins(request):
         }
 
     return TemplateResponse(request, 'pins/recent_pins.html', context)
-  
-from django.core.serializers.json import DjangoJSONEncoder
+
+def pin_detail(request, pinId):
+    pin = Pin.objects.get(id=pinId)
+    profileId = pin.submitter.id
+    
+    context = {
+            'profileId':profileId,
+            'pinId':pinId,
+        }
+
+    return TemplateResponse(request, 'pins/pin_detail.html', context)
     
 def user_profile(request, profileId=None, tag=None):
-    authUser = User.objects.values('id','username','first_name','last_name','date_joined','last_login').filter(username__exact=request.user)
-    authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)#not used keeping for tests
+    #provide profileId for user_profile templatetag
+    #profile gets its context from pins.utils getProfileContext()
+    context = {'profileId':profileId}
 
-    profile = User.objects.get(id__exact=profileId)
-    pins = Pin.objects.filter(submitter=profile)
-    pinsC = pins.count()
-    tags = pins.order_by('tags__name').filter(submitter=profile).values_list('tags__name').annotate(count=Count('tags__name'))
-    tagsC = tags.distinct().count()
-    folowers = Follow.objects.get_follows(profile).values_list('user__username', flat=True)
-    folowersC = folowers.count()
-    folowing = Follow.objects.filter(user=profile).exclude(folowing__exact=None)
-    folowingL = folowing.values_list('folowing__username', flat=True)
-    folowingC = folowingL.count()
-    #TODO: get folowing pins
-    favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
-    favsC = favs.count()
-    cmnts = Comment.objects.filter(user=profile, content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('pk', flat=True)
-    cmntsC = cmnts.count()
-
-    
-    #create dictionary of srcUrls striped to domain > convert to sorted list > put top 5 in srcDoms
-    srcUrls = pins.order_by('srcUrl').values_list('srcUrl').annotate(count=Count('srcUrl'))
-    srcDoms = get_top_domains(srcUrls, 5)
-    ''' DEBUG
-    print pinsC
-    print tags
-    print tagsC
-    print folowers
-    print folowersC
-    print folowing
-    print folowingC
-    print favs
-    print favsC
-    print srcDoms
-    print cmnts
-    print cmntsC
-    '''
-
-    context = {
-            'profile': profile,
-            'pinsC': pinsC,
-            'folowers': folowers,
-            'folowersC': folowersC,
-            'folowing': folowing,
-            'folowingC': folowingC,
-            'tags': tags,
-            'tagsC': tagsC,
-            'favs': favs,
-            'favsC': favsC,
-            'cmnts': cmnts,
-            'cmntsC': cmntsC,
-            'srcDoms': srcDoms,
-            'authUser': authUser,
-            'authUserJ': authUserJ
-        }
     return TemplateResponse(request, 'pins/user_profile.html', context)
 
 #create new pin or edit exitsing pin, based on presence of id.

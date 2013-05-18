@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+{% load user_profile %}
+{% load pin_detail %}
+
+{% block title %}Pin Detail{% endblock %}
+
+{% block yield %}
+<div <div id="pin-detail" class="container content">
+	<div class="pin-detail-container">
+		
+		<div class="user-detail">
+		{% user_profile request profileId %}
+		</div>
+		<div class="pin-detail">
+		{% pin_detail request pinId %}
+		</div>
+		<div style="clear:both;" />
+
+</div>
+
+{% endblock %}

@@ -82,7 +82,7 @@ INVITATION_USE_ALLAUTH = True
 ''' 
 USERS
 '''
-DEFAULT_USER_GROUP = 'Basic'
+DEFAULT_USER_GROUP = 'basic'
 ''' 
 LOCATION
 '''
@@ -188,6 +188,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
     "invitation.context_processors.remaining_invitations",
+    "notification.context_processors.notification",
 ) 
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
@@ -217,6 +218,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.sites',
+    'django.contrib.humanize',
     'south',
     'compressor',
     'taggit',

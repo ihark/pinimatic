@@ -1,0 +1,10 @@
+{% comment %} 
+context:
+"recipient": recipient,
+"sender": sender,
+"notice": .label . display .description,
+"current_site": .host .name,
+"root_url": root_url,
+extra_context:
+"from_user":user,
+{% endcomment %}{% load i18n %}{{from_user|capfirst}} {% blocktrans with notice.description as notice %}{{ notice }}{% endblocktrans %}

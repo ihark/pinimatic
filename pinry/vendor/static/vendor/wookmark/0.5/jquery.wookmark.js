@@ -16,7 +16,9 @@ $.fn.wookmark = function(options) {
         offset: 2,
         autoResize: false,
         itemWidth: $(this[0]).outerWidth(),
-        resizeDelay: 50
+        resizeDelay: 50,
+		//weather or not to show the pins after layout is applied
+		show: true,
       }, options);
   } else if(options) {
     this.wookmarkOptions = $.extend(this.wookmarkOptions, options);
@@ -165,5 +167,7 @@ $.fn.wookmark = function(options) {
   this.wookmarkLayout();
   
   // Display items (if hidden).
-  this.show();
+  if (this.wookmarkOptions.show){
+	this.show();
+  }
 };

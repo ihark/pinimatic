@@ -18,10 +18,8 @@ def get_top_domains(srcUrls, qty):
     srcDomains = {}
     for url in srcUrls:
         p = urlparse(url[0])
-        dom = p.netloc or unicode(current_site.name)
-        print 'dom: ',dom
+        dom = p.netloc or unicode(current_site.domain)
         count = url[1]
-        print 'count: ',count
         parts = p.scheme, p.netloc, '', '', '', ''
         url = urlunparse(parts)
         if dom not in srcDomains and dom != '':
@@ -30,7 +28,6 @@ def get_top_domains(srcUrls, qty):
             srcDomains[dom] = srcDomains[dom][0]+count, url
 
     srcDomains = sorted(srcDomains.iteritems(), key=operator.itemgetter(1), reverse=True)
-    print 'return: ',srcDomains[:qty]
     return srcDomains[:qty]
     
     
@@ -74,7 +71,6 @@ def getProfileContext(profileId):
     print cmnts
     print cmntsC
     '''
-
     context = {
             'profile': profile,
             'pinsC': pinsC,
@@ -100,6 +96,7 @@ def getPinContext(request, pinId):
     #datetime, favorite, folowing, id, user
     pin.favorites = Follow.objects.filter(favorite__id=pin.id)
     pin.favoritesC = pin.favorites.count()
+    #comments are obtained in template
     #pin.comments = Comment.objects.for_model(Pin).filter(object_pk=pin.id)
     #pin.cmntsC = pin.comments.count()
     pin.tags = pin.tags.all()
@@ -108,7 +105,7 @@ def getPinContext(request, pinId):
     pin.repinsC = pin.repins.count()
     pin.srcDom = get_top_domains([pin.srcUrl], 1)[0][0]
     
-    
+
     user = request.user
     user.fav = False
     for fav in pin.favorites:
@@ -124,11 +121,11 @@ def getPinContext(request, pinId):
     if pin.submitter == user:
         user.pin = True
 
-
+    '''
     print pin
     print pin.favorites
     print pin.favoritesC
-    #print pin.comments.all()
+    #print pin.comments
     #print pin.cmntsC
     print pin.tags
     print pin.tagsC
@@ -139,7 +136,7 @@ def getPinContext(request, pinId):
     print user.repin
     print user.cmnt
     print user.pin
-
+    '''
 
     context = {
             'pin': pin,

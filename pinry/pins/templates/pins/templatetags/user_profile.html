@@ -12,16 +12,16 @@
 	</div>
 	<div class="section center">
 		<div class="inline center vert-left">
-			<a id="user-pins"><div class="btn-hover"><span class="pins large display text">{{ pinsC }}</span><br>Pins</div></a>
-			<a id="user-tags"><div class="btn-hover"><span class="tags large display text">{{ tagsC }}</span><br>Groups</div></a>
+			<a id="user-pins" href="{% url pins:profile profile.id %}"><div class="btn-hover"><span class="pins large display text">{{ pinsC }}</span><br>Pins</div></a>
+			<a id="user-tags" href="{% url pins:profile profile.id %}Groups"><div class="btn-hover"><span class="tags large display text">{{ tagsC }}</span><br>Groups</div></a>
 		</div>
 		<div class="inline center vert-auto">
-			<a id="user-favs"><div class="btn-hover"><span class="favs large display text">{{ favsC }}</span><br>Favorites</div></a>
-			<a id="user-cmnts"><div class="btn-hover"><span class="cmnts large display text">{{ cmntsC }}</span><br>Comments</div></a>
+			<a id="user-favs" href="{% url pins:profile profile.id %}Favorites"><div class="btn-hover"><span class="favs large display text">{{ favsC }}</span><br>Favorites</div></a>
+			<a id="user-cmnts" href="{% url pins:profile profile.id %}Comments"><div class="btn-hover"><span class="cmnts large display text">{{ cmntsC }}</span><br>Comments</div></a>
 		</div>
 		<div class="inline center vert-right">
-			<a id="user-fing"><div class="btn-hover"><span class="following large display text">{{ folowingC }}</span><br>Following</div></a>
-			<a id="user-fers"><div class="btn-hover"><span class="followers large display text">{{ folowersC }}</span><br>Followers</div></a>
+			<a id="user-fing" href="{% url pins:profile profile.id %}Following"><div class="btn-hover"><span class="following large display text">{{ folowingC }}</span><br>Following</div></a>
+			<a id="user-fers" href="{% url pins:profile profile.id %}Following"><div class="btn-hover"><span class="followers large display text">{{ folowersC }}</span><br>Following</div></a>
 		</div>
 	</div>
 	<div class="section catagories"> 
@@ -48,4 +48,5 @@
 		</div>
 	</div> -->
 </div>
+
 

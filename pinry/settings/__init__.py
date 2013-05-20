@@ -140,6 +140,7 @@ API_LIMIT_PER_PAGE = 30
 '''
 EMAIL
 '''
+DEFAULT_FROM_EMAIL = 'Pinimatic <pinimatic@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_PORT = '587'
 EMAIL_HOST = 'smtp.gmail.com'

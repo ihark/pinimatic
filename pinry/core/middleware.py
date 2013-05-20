@@ -88,21 +88,20 @@ class SecureRequiredMiddleware(object):
             #print '----middleware: SecureRequired----'
             request_path = request.get_full_path()
             request_url = request.build_absolute_uri(request_path)
-            print '***secure requered - request_url: ',request_url
-            print '***secure requered - request.is_secure(): ',request.is_secure()
+            '''print '***secure requered - request_url: ',request_url
+            print '***secure requered - request.is_secure(): ',request.is_secure()'''
             server_port = request.META['SERVER_PORT']
             request_port = request.META['HTTP_HOST'].split(':')[-1]
-            #print 'middleware: --cheking request url: ', request_url
-            #print 'middleware: --secure_required: ', self.is_secure_path(request)
-            #print 'middleware: --requestis_secure: ', request.is_secure()
-            
+            '''print 'middleware: --cheking request url: ', request_url
+            print 'middleware: --secure_required: ', self.is_secure_path(request)
+            print 'middleware: --requestis_secure: ', request.is_secure()'''
             #Redirect to https if designated as a secure path
             if self.is_secure_path(request) and not request.is_secure():
                 secure_url = request_url.replace('http://', 'https://')
                 #DEVELOPMENT SEVER: Change port to dev_https_port
                 if self.dev_https_port:
                     secure_url = secure_url.replace(server_port, self.dev_https_port)
-                print '+++++++middleware+++++++ redirecting to https: ', secure_url
+                print '++middleware++ redirecting to https: ', secure_url
                 return HttpResponsePermanentRedirect(secure_url)
             
             #Redirect to http if NOT designated as a secure path
@@ -111,9 +110,9 @@ class SecureRequiredMiddleware(object):
                 #DEVELOPMENT SEVER: Change port to serverport
                 if self.dev_https_port:
                     unsecure_url = unsecure_url.replace(self.dev_https_port, server_port)
-                print '+++++++middleware+++++++ redirecting to http: ', unsecure_url
-                print '----ssl method', request.method
-                print '----ssl REQUEST', request.REQUEST
+                print '++middleware++ redirecting to http: ', unsecure_url
+                '''print '----ssl method', request.method
+                print '----ssl REQUEST', request.REQUEST'''
                 return HttpResponsePermanentRedirect(unsecure_url)
             #print 'middleware: --no redirect required'
         return None
@@ -149,7 +148,7 @@ class Public(object):
         if settings.PUBLIC == False and not request.user.is_authenticated():
             if request.path not in self.acceptable_paths:
                 if not self.is_acceptable_domain(request):
-                    print '+++++++middleware+++++++  redirected to private: ',request.path 
+                    print '+++middleware++  redirected to private: ',request.path 
                     #return HttpResponseRedirect(safe_reverse(request,'core:private'))
                     return HttpResponseRedirect(reverse('core:private'))
                 

@@ -24,29 +24,20 @@ from ..core.utils import redirect_to_referer
 
 
 def AjaxSubmit(request):
-    #tests
-    print '--- request recieved with obove reqest data ----'
-    #end tests
     form = PinForm(request.GET, request.FILES)
     if request.user.is_authenticated():
         if form.is_valid():
-            print '--- ajax form is valid ----'#
             pin = form.save(commit=False)
             pin.uImage = form.cleaned_data['uImage']
             pin.submitter = request.user
             try:
-                print '--- ajax try form.save ----'#
                 pin.save()
-                print '--- ajax form.saved ----'#
                 form.save_m2m()
-                print '--- ajax M2M form saved----'#
                 messages.success(request, 'New pin successfully added.')
             except:
                 messages.error(request, 'Oops! Somthing went wrong while saving this pin.')
     else:
-        print '--- user did not pass authentication----'#
         messages.error(request, 'Please log in to submit this item.', extra_tags='login')
-    
     return HttpResponse( simplejson.dumps( form.errors ), mimetype='application/json' ) 
     
 
@@ -89,7 +80,6 @@ def new_pin(request, pin_id=None):
     thumb = None
     if pin_id:
         try:
-            print 'view - edit pin - pin id exists'
             pin = Pin.objects.get(pk=pin_id)
             form = PinForm(instance=pin, user=request.user)
             form = redirect_to_referer(request, form)
@@ -102,14 +92,13 @@ def new_pin(request, pin_id=None):
         except Pin.DoesNotExist:
             messages.error(request, 'This pin does not exist.')
     else:
-        print 'view - new pin - no pin id'
         pin = Pin()
         if not request.method == 'POST' or save:
             form = PinForm(user=request.user)
             form = redirect_to_referer(request, form)
         
     if request.method == 'POST' or save:
-        print 'view - enterd save mode'
+        #print 'view - enterd save mode'
         form = PinForm(request.REQUEST, request.FILES, instance=pin)
         # request.FILES is for file uploader 
         #TODO: do i need request.REQUEST?
@@ -126,17 +115,17 @@ def new_pin(request, pin_id=None):
         #end debug
         """
         if form.is_valid():
-            print 'form is valid'
+            #print 'form is valid'
             pin = form.save(commit=False)
             pin.uImage = form.cleaned_data['uImage']
             if pin_id:
-                print 'view - save mode - pin id exists'
+                #print 'view - save mode - pin id exists'
                 pin.edit()
             else:
                 pin.submitter = request.user
-            print 'view - pin.save()'
+            #print 'view - pin.save()'
             pin.save()
-            print 'view - form.save_m2m()'
+            #print 'view - form.save_m2m()'
             form.save_m2m()
             redirect_to = redirect_to_referer(request, form)
             if pin_id:
@@ -151,17 +140,17 @@ def new_pin(request, pin_id=None):
             if form.is_bound:
                 if form.saved_data['uImage']:
                     #(only comes into play on image upload with form error on resubmit)
-                    print 'view - getting thumb & data for error corection form'
                     #this makes thumnail for image uplaod
                     thumb = settings.TMP_URL+form.saved_data['uImage']
                     #form.saved_data is = form.cleaned_data for invalid forms
                     form = PinForm(form.saved_data)
                 else:
-                    print 'view - url submitted for thumb'
+                    #print 'view - url submitted for thumb'
                     thumb = request.REQUEST['imgUrl']
-                    print 'view - edit invalid form'
+                    #print 'view - edit invalid form'
     else:
-        print 'view - not POST or Save'
+        pass
+        #print 'view - not POST or Save'
     if not thumb:
         thumb = '/static/core/img/thumb-default.png'
     context = {
@@ -186,7 +175,6 @@ def delete_pin(request, pin_id=None):
     except Pin.DoesNotExist:
         messages.error(request, 'Pin with the given id does not exist.')
 
-    print request
     return HttpResponseRedirect(session_next(request))
 
 #TODO: This needs to be setup. Currently using api only.

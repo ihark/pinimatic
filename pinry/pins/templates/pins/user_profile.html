@@ -5,8 +5,10 @@
 
 {% block yield %}
 <div id="pins-container">
+	<div class="load hide">
+	{% user_profile request profileId %}
+	</div>
 	<div id="pins">
-		{% user_profile request profileId %}
 	</div>
 </div>
 {% endblock %}

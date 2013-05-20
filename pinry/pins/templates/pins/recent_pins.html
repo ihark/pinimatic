@@ -4,7 +4,7 @@
 
 {% block yield %}
 <div id="pins-container">
-	<div id="pins">
+	<div class="load hide">
 		<div class="pin welcome" id="welcome-profile" data-profile="welcome">
 			<div class="header">
 				{% if user.is_authenticated %}
@@ -53,6 +53,9 @@
 				</div>
 			</div> -->
 		</div>
+	</div>
+	<div id="pins">
+
 	</div>
 </div>
 

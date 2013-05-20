@@ -1,9 +1,9 @@
 //Global Variables
 //STATIC_URL passed from base.html template context
+//var aProfileId passed from user_profile template tag
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
-
 //var favsURL = apiURL+'favs/?format=json&'
 var userURL = apiURL+'auth/user/?format=json'
 var page = 0;
@@ -34,6 +34,13 @@ var vn = { //viewname:"displayname"
 	cmnts:"Comments",
 	pop:"Popular"
 }
+//determines weather or ot to loadData() on page load http://domain/apiPrefix/
+function is_apiDoamin(){
+	return inArray(url(1), apiPrefixA);
+}
+var initialState = {tag:undefined, user:undefined, initial:true}//initial state of page for loadData and onpopstate
+console.log('initialState--', initialState);
+
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
@@ -182,7 +189,7 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 
 //When scrolled all the way to the bottom, add more tiles.
 function onScroll(event) { 
-  if(!isLoading) {
+  if(!isLoading && is_apiDoamin()) {
       var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
       if(closeToBottom) loadData();
   }
@@ -190,7 +197,7 @@ function onScroll(event) {
 
 
 
-//format pin grid and apply layout
+//format pin grid and apply layout to all laoded pins
 function applyLayout() {
   $('#pins-container').imagesLoaded(function() {
       // Clear our previous layout handler.
@@ -203,7 +210,29 @@ function applyLayout() {
           offset: 4,
           itemWidth: 242
       });
-	  $('#user-info').show();
+	  //show hidden static pins in tempate
+	  $('.load.hide').show();
+  });
+};
+//use to apply layout to each pin as loaded
+function applyLayout1(pinId) {
+  $("#"+pinId+'-pin').imagesLoaded(function(e) {
+      // Clear our previous layout handler.
+	  console.log('--imagesloaded---')
+      if(handler) handler.wookmarkClear();
+      
+      // Create a new layout handler.
+      handler = $('#pins-container .pin');
+      handler.wookmark({
+          autoResize: true,
+          offset: 4,
+          itemWidth: 242,
+		  show: false
+      });
+	  //show hidden static pins in tempate
+	  $('.load.hide').show();
+	  //show last pin to load
+	  $("#"+pinId+'-pin').show()
   });
 };
 //apply layout to pin grid for tag/group covers
@@ -229,12 +258,19 @@ function layoutThumbs(target) {
  * set tag / user to undefined to keep current filters.
  */
 function loadData(tag, user, reload) {
+	//make tag urlsafe
 	if(typeof tag == "string"){tag = urlSafe(tag)}
-	if (reload == undefined){reload = false};
+	//default values
+	if (reload === undefined){reload = false};
+	if (user === null){user = 'all'};
+	//loader
     isLoading = true;
     $('#loader').show();
-	console.log('----loadData()------tag:'+tag+' user: '+user)
-	var apiPrefix = inArray(url(1), apiPrefixA);
+
+	//check if the window is in apiDomain
+	var apiPrefix = is_apiDoamin();
+	
+	console.log('----loadData(): tag:'+tag+' user: '+user+' apiPrefix: '+apiPrefix+' reload: '+reload)
 	
 	//check url for current user / tag
 	if (url(2) && apiPrefix) {
@@ -249,7 +285,13 @@ function loadData(tag, user, reload) {
 		cTag = null;
 	}
 	
-	//check if new user or tag specifiled, if true set url to current except if null specified.
+	//loadData is only called automatiicaly from within a valid apiDomain
+	//if called manually we need to set the address to a valid apiDomain
+	if (!apiPrefix){
+		var nAddress = '/user/';
+	}
+	
+	//if new user or tag specifiled overide url and current user & tag acordingly.
 	if (user) {
 		nAddress += user+'/';
 		console.log('if user update url to: '+nAddress);
@@ -266,7 +308,7 @@ function loadData(tag, user, reload) {
 		nAddress += cTag+'/';
 		console.log('else if cTag update url to: '+nAddress);
 	}
-	
+
 	//add active tag to tag display div
 	if (tag){
 		$('#tags').show();
@@ -274,15 +316,7 @@ function loadData(tag, user, reload) {
 	}else{
 		$('#tags').hide();
 	}
-	
-	//updated push state for back nav and current view name
-	console.log('final url = '+nAddress);
-	console.log('curren url(path) = '+url('path'));
-	if (nAddress && nAddress != url('path')){
-		window.history.pushState(nAddress, 'Pinry: '+nAddress, nAddress);
-		console.log('PUSH STATE ADDED:'+nAddress);
-		console.log('new url(path) = '+url('path'));
-	}
+
 	//if current tag has a view convert tag name to defined view
 	av = getKey(tag, vn)
 	/*debug
@@ -296,10 +330,18 @@ function loadData(tag, user, reload) {
 	console.log('av name = '+vn[av])
 	console.log(vn[av] !== cTag)
 	 */
+	 
+	//redirect and stop script when not in apiDomain 
+	if (!apiPrefix){
+		//TODO:working but needs tags & checks
+		window.location = nAddress;
+		throw new Error('Redirecting');
+	} 
 	
+
 	//reset page and refresh pins display
 	if (reload || tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
-		console.warn('page reset')
+		console.warn('----page reset')
 		page = 0;
 		$('#pins').html('');
 	}
@@ -343,6 +385,21 @@ function loadData(tag, user, reload) {
 	if (user && user != 'all') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
 	
+	//check  initialState and set values
+	if (initialState.initial){
+		initialState.tag = tag;
+		initialState.user = user;
+	}
+	//updated push state for forward/back navigation
+	console.log('final url = '+nAddress);
+	console.log('curren url(path) = '+url('path'));
+	console.log('ok for push state:', nAddress != url('path'));
+	if (nAddress && nAddress != url('path')){
+		window.history.pushState({user:user, tag:tag}, 'Pinry: '+nAddress, nAddress);
+		console.log('PUSH STATE ADDED:'+nAddress);
+		console.log('new url(path) = '+url('path'));
+	}
+	
 	//prevent api request when not in apiPrefix domain
 	if (url(1) == apiPrefix) {
 		console.log('-ajax - 2 loaddata()');
@@ -366,21 +423,32 @@ function loadData(tag, user, reload) {
 		isLoading = false
 		$('#loader').hide();
 	}
+	console.log('--history: ', window.history.state);
 };
 
 /** Reloads page on state change 
- * 
+ *  keep below loadData
  */
+
 window.onpopstate = function(e) {
-	console.log('pop state: '+e.state);
-	//alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-	if (e.state) window.location.href = e.state;
+	console.log('--popstate called--');
+	console.log('e.state: '+e.state);
+	console.log('initialState--', initialState);
+	//reload of first page with state = null
+	if (!e.state && !initialState.initial) {
+		console.log('popstate redireccting to: ', url('path'));
+		loadData(initialState.tag, initialState.user, true);
+		//window.location.href = url('path')
+	} else {initialState.initial = false; console.log('--popstate setting initialState:', initialState);}
+	//enables typical state forward and back
+	if (e.state) loadData(e.state.tag, e.state.user, true);
 	resetForms();
 };
 /**Receives data from the API, creates HTML for images and updates the layout
  * insert: set to "prepend" to prepend existing HTML, "exclude" appends data to existing HTML.
  */
 function onLoadData(data, insert) {
+    applyLayout();//for static pins
 	data = data.objects;
 	page++;
 	var maxImages = 10 //max images to include on tag/group pin flow cover
@@ -479,8 +547,8 @@ function onLoadData(data, insert) {
 					html += '</div>';
 					}
 			//IMAGE
-					html += '<div class="img-btn touch-off"></div>';//prevent fancybox
-					html += '<a class="fancybox" rel="pins" href="'+image.image+'">';
+					html += '<div class="img-btn touch-off"></div>';//prevent fancybox & toggle options
+					html += '<a class="pin-img fancybox" rel="pins" href="'+image.image+'">';
 					html += '<img src="'+image.thumbnail+'" width="200" ></a>';
 				html += '</div>';
 			//INFO - STATS
@@ -550,12 +618,14 @@ function onLoadData(data, insert) {
 					}
 				html += '</div>'//end pin-cmnts;
 			html += '</div>'//end pin;
+
+			//inserts pin into docuement
 			if (insert=="prepend"){
 				$('#pins').prepend(html);
 			}else{
 				$('#pins').append(html);
 			}
-			
+			//
 			//hide elements as required
 			if (!image.repins[0]) $('#'+image.id+'-pin .display.repins').hide()//hide repin stat display
 			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()//hide fav stat display
@@ -563,7 +633,7 @@ function onLoadData(data, insert) {
 			if (!image.comments[0]) $('#'+image.id+'-pin .pin-cmnts').hide()//hide cmmt section
 			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()//hide comment form
 			
-			applyLayout();
+			applyLayout1(image.id);//for each pin individual pin
 		}//end typical view
 		
 		//lay out tags/group view
@@ -617,7 +687,6 @@ function onLoadData(data, insert) {
 			applyLayout();
 		}//end tag/group view
 	}//end image for loop
-
 	// for each tag add place holder images as required by min/max
 	if (av == 'tags'){
 		for (key in tags){
@@ -646,7 +715,7 @@ function onLoadData(data, insert) {
 		}
 	}
 	isLoading = false;
-	$('#loader').hide();
+	$('#loader').hide();console.log('hiding loader')
 	//Apply layout to show any static pins in template
 	applyLayout();
 	//TOUCH: DEVICE SETUP
@@ -669,7 +738,7 @@ $(document).on( 'MSPointerUp tosuchend', 'label[title]', function(e){
 	alert(e.target.title)
 });
 
-//FORM SUBMIT FUNCTIONS
+//DOCUMENT READY SETUP
 $(document).ready(new function() {
 	//TODO TEST: chanded $(document) to $(window) for ios compat
     //TODO TRY: does this need to be in doc ready? 
@@ -725,9 +794,12 @@ $(document).ready(new function() {
 				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 			}
 		} 
-	}); 
-	//load initial pin data
-    loadData();
+	});
+
+	//load initial pin data if in api prfix domain
+	if (is_apiDoamin()){
+		loadData();
+	}
 });
 
 /**On clicking an image show fancybox original.
@@ -1108,50 +1180,52 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 /**
  * Profile Functions.
  */
-// add event listeners for profile buttons
-$('#user-pins').live('click', function(event){
-	event.preventDefault();
-	loadData(null, aProfileO.id);
-});
-$('#user-tags').live('click', function(event){
-	event.preventDefault();
-	loadData(vn.tags, aProfileO.id);
-});
-$('#user-favs').live('click', function(event){
-	event.preventDefault();
-	loadData(vn.favs, aProfileO.id);
-});
-$('#user-fing').live('click', function(event){
-	event.preventDefault();
-	if (aProfileO.id) {
-		user = aProfileO.id
-	}else{
-		user = authUserO.id
-	}
-	loadData(vn.fing, user);
-});
-$('#user-cmnts').live('click', function(event){
-	event.preventDefault();
-	if (aProfileO.id) {
-		user = aProfileO.id
-	}else{
-		user = authUserO.id
-	}
-	loadData(vn.cmnts, user);
-});
-$('#user-fers').live('click', function(event){
-	event.preventDefault();
-	if (aProfileO.id) {
-		user = aProfileO.id
-	}else{
-		user = authUserO.id
-	}
-	loadData(vn.fers, user);
-});
-$('#follow').live('click', function(event){
-	follow(this, 'followers');
-});
-
+ //only use handlers in this view
+ if (av != 'pins'){
+	// add event listeners for profile buttons
+	$('#user-pins').live('click', function(event){
+		event.preventDefault();
+		loadData(null, aProfileO.id);
+	});
+	$('#user-tags').live('click', function(event){
+		event.preventDefault();
+		loadData(vn.tags, aProfileO.id);
+	});
+	$('#user-favs').live('click', function(event){
+		event.preventDefault();
+		loadData(vn.favs, aProfileO.id);
+	});
+	$('#user-fing').live('click', function(event){
+		event.preventDefault();
+		if (aProfileO.id) {
+			user = aProfileO.id
+		}else{
+			user = authUserO.id
+		}
+		loadData(vn.fing, user);
+	});
+	$('#user-cmnts').live('click', function(event){
+		event.preventDefault();
+		if (aProfileO.id) {
+			user = aProfileO.id
+		}else{
+			user = authUserO.id
+		}
+		loadData(vn.cmnts, user);
+	});
+	$('#user-fers').live('click', function(event){
+		event.preventDefault();
+		if (aProfileO.id) {
+			user = aProfileO.id
+		}else{
+			user = authUserO.id
+		}
+		loadData(vn.fers, user);
+	});
+	$('#follow').live('click', function(event){
+		follow(this, 'followers');
+	});
+}
 //welcome profile
 $('#Recent-all').live('click', function(event){
 	loadData(null, 'all');
@@ -1580,3 +1654,4 @@ $.fn.serializeObject = function () {
 	return result;
 };
 })(jQuery);
+

@@ -1,15 +1,26 @@
 {% extends "notification/base.html" %}
 
 {% load i18n %}
-{% load url from future %}
+
 
 {% block body_id %}notification-settings{% endblock %}
 
 {% block head_title %}{% trans "Notification Settings" %}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "Notification Settings" %}</h1>
-    
+    <h1>{% trans "Notification Settings" %}
+		<div class="btn-group pull-right">
+			<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+				Options
+				<span class="caret"></span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a href="{% url notification_notices_all %}">{% trans "View All Notices" %}</a></li>
+				<li><a href="{% url notification_notices_archived %}">{% trans "View Deleted Notices" %}</a></li>	
+			</ul>
+		</div>
+	</h1>
+{% load url from future %}    
     {% url "account_settings" as email_url %}
     {% if not request.user.email %}
         {% blocktrans %}
@@ -23,7 +34,7 @@
     <form method="POST" class="form" action="">
         {% csrf_token %}
 		<div class="form-table">
-			<table class="table table-striped notice_settings">
+			<table class="table notice_settings">
 				<tr>
 					<th>{% trans "Choose how you would like to be notified:" %}</th>
 					{% for header in notice_settings.column_headers %}

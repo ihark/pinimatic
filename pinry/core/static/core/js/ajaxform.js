@@ -194,8 +194,6 @@ function clear_form_field_errors(form) {
 //jquery ui & taggit
 function getTags(user) {
 	if (user){ 
-		isLoading = true
-		$('#loader').show();
 		var tags = []
 		onSuccess = function( data, ajaxStatus, xhr) {
 			if (data.objects){
@@ -204,8 +202,6 @@ function getTags(user) {
 				}
 			}
 			console.log(tags)
-			isLoading = false
-			$('#loader').hide();
 		}
 		$.ajax({
 			url: apiURL+'pintags/?user='+user,
@@ -214,8 +210,6 @@ function getTags(user) {
 			success: onSuccess,
 			error: function(jqXHR, settings) {
 				console.warn('getTags - ajax error');
-				isLoading = false
-				$('#loader').hide();
 			},
 		});
 		return tags

@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_noop as _
 '''notification 1.0
 if "notification" in settings.INSTALLED_APPS:
     from notification.models import NoticeType
-    print '----notice types'
     def create_notice_types(app, created_models, verbosity, **kwargs):
         if app == NoticeType:
             print 'creating notice types'

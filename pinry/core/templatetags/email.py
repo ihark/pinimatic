@@ -21,5 +21,4 @@ def header_generic(context, request):
     '''
 @register.inclusion_tag('email/templatetags/email_footer_generic.html', takes_context=True)
 def footer_generic(context, request):
-    print 'footer_generic', context
     return context    

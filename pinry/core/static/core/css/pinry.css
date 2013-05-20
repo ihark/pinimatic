@@ -189,11 +189,10 @@ h1, h2, h3, h4, h5, h6 {
 	}
 /* ALLAUTH FORMS*/
 .form-container.accounts {
-	
 	background-color: transparent;
 	color: #AAA;
+	width:400px;
 	text-align: center;
-	width:400px
 }
 	.form-container.accounts h1{
 		color:#444;
@@ -204,6 +203,7 @@ h1, h2, h3, h4, h5, h6 {
 		margin: -15px 0px 15px -15px;
 		border-bottom: 1px solid #AAA;
 		background-color: White;
+		text-align: left;
 	}
 	.form-container.accounts h2{
 		font-size:16px;
@@ -213,6 +213,10 @@ h1, h2, h3, h4, h5, h6 {
 		margin: 15px 0px 15px -15px;
 		border-bottom: 1px solid #AAA;
 		border-top: 1px solid #AAA;
+		text-align: left;
+	}
+	.form-container.accounts p{
+		text-align: left;
 	}
 	.form-container.accounts  label{
 
@@ -228,8 +232,13 @@ h1, h2, h3, h4, h5, h6 {
 		border: none;
 		border-bottom: 1px solid #AAA;
 	}
-	.form-container.accounts .notices-container{
+	.form-container.accounts form{
+		display:inline-block;
 		text-align: left;
+		margin-bottom: -5px;
+	}
+	.form-container.accounts .socialaccount_providers{
+		text-align: center;
 	}
 
 .socialaccount_providers{
@@ -371,6 +380,7 @@ margin: 0px 0px;
 	width: 100%;
 	position: fixed;
 	bottom: 100px;
+	display:none;
 }
 
 .ui-widget {
@@ -386,6 +396,7 @@ margin: 0px 0px;
 	
 #tags {
     padding-bottom: 5px;
+	display: none;
 }
 
 	.tag:hover {
@@ -790,44 +801,60 @@ margin: 0px 0px;
 
 }
 	.pin-detail-container{
-		width:100%;
+		max-width:900px;
+		min-width:600px;
+		margin:auto;
 
 	}
 		.pin-detail{
 			overflow:hidden;
-
+			width: auto;
 		}
 		
 		.pin-detail .pin {
-			width: auto;
-			min-width: 300px;
-
+			width: 90%;
 		}
+
 		.pin-detail .pin img{
-			width: auto;
+			height:auto;
+			min-width:100%;
 
 		}
 		
 		.user-detail{
 			width:auto;
-			margin-left:10px;
 			float:right;
+			margin-left:10px;
+			padding-left:10px;
 		}
 
-/* ACCOUNTS */
+/* NOTICES */
+.accounts .notices-form{
+	width:100%
+}
 .accounts .notices-container{
-	margin:-16px -15px;
+	margin:-17px -15px;
+	text-align: left;
 }
 .accounts .notices-container .notice{
 	padding:10px 15px;
 	border-bottom: 1px solid #555;
 	margin:0px 0px;
 }
+.accounts .notices-container .notice-options {
+	bottom: 2px;
+}
+.accounts .notices-container .notice-options .btn{
+	min-width:35px;
+}
 .unseen.notice{
 	background:rgba(124, 201, 25, 0.24);
 }
 .table-striped tbody > tr:nth-child(odd) > td, 
 .table-striped tbody > tr:nth-child(odd) > th {
+	background-color: rgba(124, 201, 25, 0.24);
+}
+.accounts th {
 	background-color: rgba(124, 201, 25, 0.24);
 }
 .form-table{
@@ -851,9 +878,7 @@ form {
 	margin-bottom: 0;
 }
 form h1 {
-	font-family: 'Monoton';
-	text-align: center;
-	font-weight: normal;
+
 	margin-bottom: 0px;
 }
 	textarea {

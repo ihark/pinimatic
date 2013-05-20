@@ -7,44 +7,40 @@
 {% block head_title %}{% trans "Log In" %}{% endblock %}
 
 {% block content %}
+<div class="accounts accounts-login">
+	<h1>{% trans "Log In" %}</h1>
 
-<h1>{% trans "Log In" %}</h1>
+	{% if socialaccount.providers  %}
+	<div style="margin-bottom:8px" >Log In with a third party account: </div>
 
-{% if socialaccount.providers  %}
-<p>Log In with a third party account: </p>
+	<div class="socialaccount_ballot">
 
-<div class="socialaccount_ballot">
+	  <div class="socialaccount_providers">
+		{% include "socialaccount/snippets/provider_list.html" %}
+	  </div>
 
-  <p class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" %}
-  </p>
-
+	</div>
+	<div style="display:none" class="social-login-extra">{% include "socialaccount/snippets/login_extra.html" %}</div>
+	{% endif %}
+	<div style="margin-bottom:8px" class="login-or">{% trans "Or, sign in manually:" %}</div>
+	<form class="login" method="POST" action="{% url 'account_login' %}">
+	  {% csrf_token %}
+	  {% for error in form.non_field_errors %}
+		<ul class="errorlist"><li>{{ error|escape }}</li></ul>
+	  {% endfor %}
+	  {% for field in form %}
+		{% if field.name != 'remember' %}
+		  {% bootstrap_field field %}
+		{% endif %}
+	  {% endfor %}
+	  {% if redirect_field_value %}
+	  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+	  {% endif %}
+	  <p><button class="btn btn-primary" type="submit">{% trans "Sign In " %}&raquo;</button><span class="pull-right">   Remeber me: {{ form.remember }}</span></p>
+	  <div><a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot your Password?" %}</a></div>
+	  <div>{% blocktrans with site.name as site_name %} <a href="{{ signup_url }}">Need a {{site_name}} account?</a>{% endblocktrans %}</div>
+	</form>
 </div>
-
-<p class="login-or">{% trans "Or, sign in manually:" %}</p>
-
-{% include "socialaccount/snippets/login_extra.html" %}
-
-{% endif %}
-
-<form class="login" method="POST" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {% for error in form.non_field_errors %}
-    <ul class="errorlist"><li>{{ error|escape }}</li></ul>
-  {% endfor %}
-  {% for field in form %}
-    {% if field.name != 'remember' %}
-      {% bootstrap_field field %}
-    {% endif %}
-  {% endfor %}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <p><button class="btn btn-primary" type="submit">{% trans "Sign In " %}&raquo;</button><span class="pull-right">   Remeber me: {{ form.remember }}</span></p>
-  <div><a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot your Password?" %}</a></div>
-  <div>{% blocktrans with site.name as site_name %} <a href="{{ signup_url }}">Need a {{site_name}} account?</a>{% endblocktrans %}</div>
-</form>
-
 
 {% endblock %}
 

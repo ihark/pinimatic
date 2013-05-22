@@ -6,6 +6,7 @@
 {% block head_title %}{% trans "Notifications" %}{% endblock %}
 
 {% block body %}
+<div class="notification notification-notices">
 {% with submit_title="Modify All" %}
     {% if all %}
 		<form method="POST" class="notices-form" action="{% url notification_toggle_all %}">
@@ -136,5 +137,6 @@
     {% else %}
         <p>{% trans "You have no notices in this view, take a look at  " %}<a href="{% url notification_notices_all %}">{% trans "ALL NOTICES" %}</p>
     {% endif %}
-{% endwith %}    
+{% endwith %}  
+</div>  
 {% endblock %}

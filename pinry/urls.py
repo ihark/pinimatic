@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 admin.autodiscover()
 handler500 = 'pinry.core.views.custom_500'
@@ -21,10 +22,13 @@ urlpatterns = patterns('',
     (r'^accounts/', include('invitation.urls')),
     (r'^accounts/', include('allauth.urls')),
     (r'^accounts/notifications/', include('notification.urls')),
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# test this
+urlpatterns += staticfiles_urlpatterns()
 
 #provide url for testing error pages
-if settings.DEBUG:
+if not settings.RACK_ENV:
     urlpatterns += patterns('',
         (r'^500/$', 'pinry.core.views.custom_500'),
         (r'^404/$', 'django.views.generic.simple.direct_to_template', {'template': '404.html'}),
@@ -42,6 +46,6 @@ if not settings.RACK_ENV:
 if not settings.RACK_ENV:
     urlpatterns += patterns('',
         url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
-            'document_root': settings.STATIC_ROOT,
+            'document_root': settings.STATIC_ROOT, 'show_indexes': True
         }),
     )    

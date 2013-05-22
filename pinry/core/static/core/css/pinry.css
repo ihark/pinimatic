@@ -847,6 +847,9 @@ margin: 0px 0px;
 .accounts .notices-container .notice-options .btn{
 	min-width:35px;
 }
+.notification-notices {
+	min-height:200px;
+}
 .unseen.notice{
 	background:rgba(124, 201, 25, 0.24);
 }

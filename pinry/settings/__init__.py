@@ -91,7 +91,7 @@ LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-"""
+""" This is now a context processor
 STATIC_PREFIX = SITE_URL: used to prepend full url to STATIC_URL when static files are hosted locally.
 - use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
 - STATIC_PREFIX MUST BE = '' on production.

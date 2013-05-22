@@ -64,7 +64,7 @@ STATIC_ROOT = S3_URL+'static/'
 TMP_ROOT = os.path.join(SITE_ROOT, 'media/tmp/')
 TMP_URL = 'http://%s/media/tmp/' % HOST_NAME
 
-'''
+''' This is now a context processor and does not need to be here???
 STATIC_PREFIX used to prepend full url to STATIC_URL when static files are hosted locally.
 - use {{STATIC_PREFIX}}{{STATIC_URL}} for static items rendered outside base site context (bookmarklet)
 - STATIC_PREFIX MUST BE = '' on production.

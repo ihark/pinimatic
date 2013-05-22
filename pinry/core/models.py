@@ -1,7 +1,6 @@
 #from pinry.core.admins import *
 
 #handle signals from third party apps
-from notification import models as notification
 from django.contrib.auth.models import User
 from ..pins.models import Pin
 from django.contrib.comments.models import Comment
@@ -18,6 +17,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
 
+
+
 site = Site.objects.get_current()
 site_name = site.name
 site_url = 'http://%s/' % site.domain
@@ -26,17 +27,12 @@ site_url = 'http://%s/' % site.domain
 
 @receiver(followed, sender=User, dispatch_uid='follow.user')
 def user_follow_handler(user, target, instance, **kwargs):
+    from notification import models as notification
     '''
     user: the user who acted
     target: the user that has been followed
     instance: the follow object
     '''
-    """
-    print '--kwargs--',kwargs
-    print '--user--',user
-    print '--target--',target
-    print '--instance--',instance
-    """
     if user != target:
         notification.send([target], "followed", {"from_user": user}, sender=user)
         '''KEEP THIS HERE AS REFERENCE FOR USING THE EMIAL SYSTEM
@@ -64,12 +60,7 @@ def pin_follow_handler(user, target, instance, **kwargs):
     target: the pin that has been followed
     instance: the follow object
     '''
-    '''
-    print '--kwargs--',kwargs
-    print '--user--',user
-    print '--target--',target
-    print '--instance--',instance
-    '''
+    from notification import models as notification
     if user != target.submitter:
         notification.send([target.submitter], "favorited", {"from_user": user}, sender=target)
         
@@ -79,12 +70,7 @@ def pin_comment_handler(sender, *args, **kwargs):
     comment = kwargs.pop('instance', None)
     user = comment.user
     target = comment.content_object
-    '''
-    print '--comment--',comment
-    print '--kwargs--',kwargs
-    print '--user--',user
-    print '--target--',target
-    '''
+    from notification import models as notification
     if user != target.submitter:
         notification.send([target.submitter], "commented", {"from_user": user}, sender=target)
 

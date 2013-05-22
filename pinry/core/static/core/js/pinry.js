@@ -38,8 +38,9 @@ var vn = { //viewname:"displayname"
 function is_apiDoamin(){
 	return inArray(url(1), apiPrefixA);
 }
-var initialState = {tag:undefined, user:undefined, initial:true}//initial state of page for loadData and onpopstate
-console.log('initialState--', initialState);
+//var initialState = {tag:undefined, user:undefined, initial:true}//stores initial state of page for loadData and onpopstate
+
+var state = {tag:undefined, user:undefined, initial:true}//state object passed to pushstate on each state change
 
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
@@ -263,6 +264,8 @@ function loadData(tag, user, reload) {
 	//default values
 	if (reload === undefined){reload = false};
 	if (user === null){user = 'all'};
+	var cTag
+	var cUser
 	//loader
     isLoading = true;
     $('#loader').show();
@@ -285,12 +288,17 @@ function loadData(tag, user, reload) {
 		cTag = null;
 	}
 	
-	//loadData is only called automatiicaly from within a valid apiDomain
-	//if called manually we need to set the address to a valid apiDomain
-	if (!apiPrefix){
-		var nAddress = '/user/';
+	//catch undefined when not in api domain
+	if (!is_apiDoamin()){
+		
+		if (user === undefined & cUser == undefined){
+			user = 'all'
+		}
+		if (tag === undefined & cTag == undefined){
+			tag = ''
+		}
 	}
-	
+
 	//if new user or tag specifiled overide url and current user & tag acordingly.
 	if (user) {
 		nAddress += user+'/';
@@ -308,7 +316,7 @@ function loadData(tag, user, reload) {
 		nAddress += cTag+'/';
 		console.log('else if cTag update url to: '+nAddress);
 	}
-
+	
 	//add active tag to tag display div
 	if (tag){
 		$('#tags').show();
@@ -330,13 +338,14 @@ function loadData(tag, user, reload) {
 	console.log('av name = '+vn[av])
 	console.log(vn[av] !== cTag)
 	 */
-	 
-	//redirect and stop script when not in apiDomain 
+	
+	
+	/* //redirect and stop script when not in apiDomain 
 	if (!apiPrefix){
 		//TODO:working but needs tags & checks
 		window.location = nAddress;
 		throw new Error('Redirecting');
-	} 
+	}  */
 	
 
 	//reset page and refresh pins display
@@ -380,22 +389,21 @@ function loadData(tag, user, reload) {
 	}else{
 		loadURL += (page*30)
 	}
-	console.log('final user: '+user);
-	console.log('final tag: '+tag);
+	
+	//set api perameters
 	if (user && user != 'all') loadURL += "&user=" + user;
     if (tag && tag !== null) loadURL += "&tag=" + tag;
 	
-	//check  initialState and set values
-	if (initialState.initial){
-		initialState.tag = tag;
-		initialState.user = user;
-	}
+	//set state object
+	state.tag = tag;
+	state.user = user;
+	console.log('state: ');console.log(state);
 	//updated push state for forward/back navigation
 	console.log('final url = '+nAddress);
 	console.log('curren url(path) = '+url('path'));
 	console.log('ok for push state:', nAddress != url('path'));
 	if (nAddress && nAddress != url('path')){
-		window.history.pushState({user:user, tag:tag}, 'Pinry: '+nAddress, nAddress);
+		window.history.pushState(state, 'Pinry: '+nAddress, nAddress);
 		console.log('PUSH STATE ADDED:'+nAddress);
 		console.log('new url(path) = '+url('path'));
 	}
@@ -423,7 +431,6 @@ function loadData(tag, user, reload) {
 		isLoading = false
 		$('#loader').hide();
 	}
-	console.log('--history: ', window.history.state);
 };
 
 /** Reloads page on state change 
@@ -431,17 +438,22 @@ function loadData(tag, user, reload) {
  */
 
 window.onpopstate = function(e) {
-	console.log('--popstate called--');
-	console.log('e.state: '+e.state);
-	console.log('initialState--', initialState);
+	console.log('---popstate called---');
 	//reload of first page with state = null
-	if (!e.state && !initialState.initial) {
-		console.log('popstate redireccting to: ', url('path'));
-		loadData(initialState.tag, initialState.user, true);
+	if (!e.state && !state.initial) {
+		console.log('popstate !e.state redireccting to undefined: ');
+		//when there is not e.state reset to user & tag to undefined (home)
+		loadData(undefined, undefined, true);
 		//window.location.href = url('path')
-	} else {initialState.initial = false; console.log('--popstate setting initialState:', initialState);}
+	} else {
+		console.log('--popstate setting initial: false');
+		state.initial = false; 
+	}
 	//enables typical state forward and back
-	if (e.state) loadData(e.state.tag, e.state.user, true);
+	if (e.state) {
+		console.log('popstate redireccting to e.state: ', e.state);
+		loadData(e.state.tag, e.state.user, true);
+	}
 	resetForms();
 };
 /**Receives data from the API, creates HTML for images and updates the layout

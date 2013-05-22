@@ -34,7 +34,8 @@ def urls(request):
 def staticPrefix(request):
     """
     STATIC_PREFIX:  Prepends the BASE_URL to STATIC_URL when in the development environment only!
-                    This must be use for all static files rendered in the bookmarklet.
+                    This must be use for all static files rendered outsite request context.
+                    IE: bookmarklet & email
                     Useage: {{STATIC_PREFIX}}{{STATIC_URL}}
                     Development server:
                         Set STATIC_URL = '/static/'

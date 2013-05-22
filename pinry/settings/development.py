@@ -10,7 +10,9 @@ print '--Development Settings Loading'
 DEBUG = True
 PUBLIC = False
 COMPRESS_ENABLED = False
+#use in templates that to dont get context processors to prfix statc path on development server
 
+EMAIL_STATIC_HOST_PORT = HTTP_DEV_PORT
 # SQLite3
 '''
 DATABASES = {

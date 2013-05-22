@@ -1,20 +1,25 @@
 {% comment %}
-context: 
-"message":full.html 
-"recipient": recipient,
-"sender": sender,
-"notice": notice_type,
-"notices_url": notices_url,
-"root_url": root_url,
-"current_site": current_site,
-"unsubscribe_link": unsub_url,
-extra_context:
-"from_user":user,
-"notice_id": Notice.id/False,
-"sender_url": root_url+sender_url,
+<!--CONTEXT: 
+	"message":full.html 
+	"recipient": recipient,
+	"sender": sender,
+	"notice": notice_type,
+	"notices_url": notices_url,
+	"root_url": root_url,
+	"current_site": current_site,
+	"unsubscribe_link": unsub_url,-->
+<!-- EXTRA CONTEXT:
+	"from_user":user,
+	"notice_id": Notice.id/False,
+	"sender_url": root_url+sender_url, -->
+<!--{% load email %}: load email tempaltetags (you muust install in your templatetags) -->
+<!--{% dev_static_prefix as DEV_STATIC_PREFIX %}: returns url to static host when STATIC_URL 
+    is defined as a path (this is required to get working urls to images in your email template. -->
 {% endcomment %}
 {% load i18n %}
 {% load email %}
+{% dev_static_prefix as DEV_STATIC_PREFIX %}
+{% load static from staticfiles %}
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width">
@@ -31,7 +36,7 @@ extra_context:
 </style>
 <!-- ipad requires min-width:100% in body to prevent right side margin -->
 <body style="margin:0; padding:0; width:100%; height:100%; min-width:100%;
-background-color:#111; background-image:url('{{root_url}}/static/core/img/backgrounds/pw_maze_black.png');
+background-color:#111; background-image:url('{{ DEV_STATIC_PREFIX }}{% static 'core/img/backgrounds/pw_maze_black.png' %}');
 font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 
 	<table width="100%" cellspacing="0" border="0" align="center" height="100%" style="border-collapse:collapse; margin:0; padding:0;
@@ -48,7 +53,7 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 							<div>{{message}}!<br>
 							{%trans "Check it out on " %} 
 							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
-							<img height="14" alt="{{current_site.name}}" src="{{root_url}}/static/core/img/logo-18.png"></a>.
+							<img height="14" alt="{{current_site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static "core/img/logo-18.png" %}"></a>.
 							</div>
 						</td>
 					</tr>

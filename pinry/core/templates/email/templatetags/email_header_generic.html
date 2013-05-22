@@ -1,7 +1,8 @@
+{% load static from staticfiles %}
 <tr height="34">
 	<th class="navbar navbar-top" style="text-align:center; vertical-align:middle; padding:0 10px;
 	border-top:1px solid #999; border-bottom:1px solid #999; background: white;">
-		<a class="brand" href="{{root_url}}"><img  height="18" alt="{{current_site.name}}" src="{{root_url}}/static/core/img/logo-18.png"></a>
+		<a class="brand" href="{{root_url}}"><img  height="18" alt="{{current_site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static "core/img/logo-18.png" %}"></a>
 	</td>
 </tr>
 

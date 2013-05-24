@@ -35,11 +35,9 @@ var vn = { //viewname:"displayname"
 	pop:"Popular"
 }
 //determines weather or ot to loadData() on page load http://domain/apiPrefix/
-function is_apiDoamin(){
+function is_apiDomain(){
 	return inArray(url(1), apiPrefixA);
 }
-//var initialState = {tag:undefined, user:undefined, initial:true}//stores initial state of page for loadData and onpopstate
-
 var state = {tag:undefined, user:undefined, initial:true}//state object passed to pushstate on each state change
 
 //TOUCH: USER AGENT DETECTION 
@@ -190,7 +188,7 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 
 //When scrolled all the way to the bottom, add more tiles.
 function onScroll(event) { 
-  if(!isLoading && is_apiDoamin()) {
+  if(!isLoading && is_apiDomain()) {
       var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
       if(closeToBottom) loadData();
   }
@@ -271,7 +269,7 @@ function loadData(tag, user, reload) {
     $('#loader').show();
 
 	//check if the window is in apiDomain
-	var apiPrefix = is_apiDoamin();
+	var apiPrefix = is_apiDomain();
 	
 	console.log('----loadData(): tag:'+tag+' user: '+user+' apiPrefix: '+apiPrefix+' reload: '+reload)
 	
@@ -289,7 +287,7 @@ function loadData(tag, user, reload) {
 	}
 	
 	//catch undefined when not in api domain
-	if (!is_apiDoamin()){
+	if (!is_apiDomain()){
 		
 		if (user === undefined & cUser == undefined){
 			user = 'all'
@@ -439,22 +437,24 @@ function loadData(tag, user, reload) {
 
 window.onpopstate = function(e) {
 	console.log('---popstate called---');
-	//reload of first page with state = null
-	if (!e.state && !state.initial) {
-		console.log('popstate !e.state redireccting to undefined: ');
-		//when there is not e.state reset to user & tag to undefined (home)
-		loadData(undefined, undefined, true);
-		//window.location.href = url('path')
-	} else {
-		console.log('--popstate setting initial: false');
-		state.initial = false; 
+	//handle forward/back in api domain
+	if (is_apiDomain()){
+		if (!e.state && !state.initial) {
+			console.log('popstate !e.state redireccting to undefined: ');
+			//when there is not e.state reset to user & tag to undefined (home)
+			loadData(undefined, undefined, true);
+			//window.location.href = url('path')
+		} else {
+			console.log('--popstate setting initial: false');
+			state.initial = false; 
+		}
+		//enables typical state forward and back
+		if (e.state) {
+			console.log('popstate redireccting to e.state: ', e.state);
+			loadData(e.state.tag, e.state.user, true);
+		}
+		resetForms();
 	}
-	//enables typical state forward and back
-	if (e.state) {
-		console.log('popstate redireccting to e.state: ', e.state);
-		loadData(e.state.tag, e.state.user, true);
-	}
-	resetForms();
 };
 /**Receives data from the API, creates HTML for images and updates the layout
  * insert: set to "prepend" to prepend existing HTML, "exclude" appends data to existing HTML.
@@ -809,7 +809,7 @@ $(document).ready(new function() {
 	});
 
 	//load initial pin data if in api prfix domain
-	if (is_apiDoamin()){
+	if (is_apiDomain()){
 		loadData();
 	}
 });

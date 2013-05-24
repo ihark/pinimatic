@@ -24,6 +24,8 @@ site_name = site.name
 site_url = 'http://%s/' % site.domain
 
 #REFERENCE: notification.send(users, label, extra_context=None, sender=None)
+#TODO: when notification is imported before  functions with DEBUG=Flase on heroku we get an import error
+#but works with DEBUG=T/F on dev server?
 
 @receiver(followed, sender=User, dispatch_uid='follow.user')
 def user_follow_handler(user, target, instance, **kwargs):
@@ -68,10 +70,13 @@ def pin_follow_handler(user, target, instance, **kwargs):
 @receiver(post_save, sender=Comment, dispatch_uid='comment.user')
 def pin_comment_handler(sender, *args, **kwargs):
     comment = kwargs.pop('instance', None)
+    print comment
     user = comment.user
     target = comment.content_object
     from notification import models as notification
+    notification.send_observation_notices_for(target, "commented", {"from_user": user}, [user])
     if user != target.submitter:
         notification.send([target.submitter], "commented", {"from_user": user}, sender=target)
+        notification.observe(target, user, "commented")
 
        

@@ -1124,45 +1124,46 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	if (authUserO && authUserO.id == aProfileO.id) {
 		var updateProfile = true;
 	}
-
+	//TODO: this was moved from onSuccess to speed it up, may be better with progress
+	if (state == "true"){
+		console.log('state == "true"')
+		count--;
+		countP--;
+		button.attr('data-state', "false");
+		icon.toggleClass(fIcon);
+		pin.attr('data-'+name, count);
+		dispText.html(count);
+		list.find('#'+authUserO.id).remove()
+		if (count == 0) {
+			disp.hide();
+		}
+		if (updateProfile){
+			aProfile.attr('data-'+name, countP);
+			dispTextP.html(countP);
+		}
+	}else if (state == "edit"){
+		console.log('state == "edit"')
+		button.attr('data-state', "true");
+		icon.toggleClass(fIcon);
+	}else{
+		console.log('state == "else"')
+		count++;
+		countP++;
+		button.attr('data-state', "true");
+		icon.toggleClass(fIcon);
+		pin.attr('data-'+name, count);
+		dispText.html(count);
+		list.append('<li id="'+authUserO.id+'" class="display '+name+' item"><a href="/user/'+authUserO.id+'/">'+authUserO.username+'</a></li>')
+		disp.show();
+		if (updateProfile){
+			aProfile.attr('data-'+name, countP);
+			dispTextP.html(countP);
+		}
+	}
 	this.onSuccess = function(result, ajaxStutus, xhr) {
 		console.log('------togglePinStatus onSuccess-------')
 		console.log('result: ',result, 'xhr: ',xhr)
-		if (state == "true"){
-			console.log('state == "true"')
-			count--;
-			countP--;
-			button.attr('data-state', "false");
-			icon.toggleClass(fIcon);
-			pin.attr('data-'+name, count);
-			dispText.html(count);
-			list.find('#'+authUserO.id).remove()
-			if (count == 0) {
-				disp.hide();
-			}
-			if (updateProfile){
-				aProfile.attr('data-'+name, countP);
-				dispTextP.html(countP);
-			}
-		}else if (state == "edit"){
-			console.log('state == "edit"')
-			button.attr('data-state', "true");
-			icon.toggleClass(fIcon);
-		}else{
-			console.log('state == "else"')
-			count++;
-			countP++;
-			button.attr('data-state', "true");
-			icon.toggleClass(fIcon);
-			pin.attr('data-'+name, count);
-			dispText.html(count);
-			list.append('<li id="'+authUserO.id+'" class="display '+name+' item"><a href="/user/'+authUserO.id+'/">'+authUserO.username+'</a></li>')
-			disp.show();
-			if (updateProfile){
-				aProfile.attr('data-'+name, countP);
-				dispTextP.html(countP);
-			}
-		}
+		
 		//exicute callback with nameSucess
 		var statusA = new Array(201, 204)
 		var stat = xhr.status
@@ -1174,6 +1175,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	console.log(url)
 	if (typeof url == "string" && url != ""){
 		//console.log('-ajax - 3 togglepin()');
+		//ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data)
 		ajax(messageTarget, false, url, true, type, $.proxy(this.onSuccess, this), null, data)
 		
 		/* $.ajax({//3
@@ -1265,7 +1267,8 @@ function follow(targetBtn, display) {
 	var count = pin.attr('data-'+name);
 	var disp = pin.find('.display.'+name)
 	var dispText = pin.find('.display.text.'+name)
-
+	
+	//TODO: ether add progress or move contents out of onFollow to speed it up
 	this.onFollow = function( result ) {
 		console.log('onFollow', result);
 		// Update the number of followers displayed.

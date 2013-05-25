@@ -84,6 +84,13 @@ USERS
 '''
 DEFAULT_USER_GROUP = 'basic'
 ''' 
+NOTIFICATION
+'''
+#KEY_WORD_TO_URL_TRANSLATIONS = {'pin':'your'}
+#NOTIFICATION_CONTENT_TYPE_TRANSLATIONS = {'user':'you'}
+NOTIFICATION_OTHER_KEY_WORDS = {'you':'/user/'}
+#NOTIFICATION_CHECK_FOR_SENDER_NAMES = {'pin':['submitter','/user/']}
+''' 
 LOCATION
 '''
 TIME_ZONE = 'America/New_York'

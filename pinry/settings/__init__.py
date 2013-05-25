@@ -3,7 +3,6 @@ import socket
 from django.contrib.messages import constants as messages
 
 print '--General Settings Loading'
-
 '''
 BASIC SETTINGS
 '''

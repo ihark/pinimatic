@@ -1,0 +1,101 @@
+{% comment %}
+<!--CONTEXT: 
+	"message":full.html 
+	"recipient": recipient,
+	"sender": sender,
+	"notice": notice_type,
+	"notices_url": notices_url,
+	"root_url": root_url,
+	"current_site": current_site,
+	"unsubscribe_link": unsub_url,-->
+<!--WEBSITE CONTEXT:
+	"added": self.added,
+    "unseen": self.unseen,
+    "archived": self.archived,
+	"sender_type": self.content_type.name, 
+	"object_id": self.object_id,
+	"notice_id": self.id?False,-->
+<!--EXTRA CONTEXT:
+	"from_user":user,
+	"sender_url": root_url+sender_url, -->
+<!--{% load email %}: load email tempaltetags (you muust install in your templatetags)
+	{% dev_static_prefix as DEV_STATIC_PREFIX %}: returns url to static host when STATIC_URL 
+    is defined as a path (this is required to get working urls to images in your email template. 
+	{% header_generic %} inserts header
+	{% footer_generic %} inserts footer
+	{% make_link string "key_word" "url" %} convert's a key_work in a string to a hyperlink with the provided url.
+	{% observed_desc notice.description sender_type sender_url as desc %} Convert a notice description to an observed description-->
+{% endcomment %}
+{% load i18n %}
+{% load email %}
+{% dev_static_prefix as DEV_STATIC_PREFIX %}
+{% load static from staticfiles %}
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width">
+<style type="text/css">
+	@import url(http://fonts.googleapis.com/css?family=Fugaz+One);
+	a{
+		text-decoration:none;
+		color: Black;
+	}
+	a:hover{
+		color: #398F00;
+		text-decoration:none;
+	}
+</style>
+<!-- ipad requires min-width:100% in body to prevent right side margin -->
+<body style="margin:0; padding:0; width:100%; height:100%; min-width:100%;
+background-color:#111; background-image:url('{{ DEV_STATIC_PREFIX }}{% static 'core/img/backgrounds/pw_maze_black.png' %}');
+font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
+
+	<table width="100%" cellspacing="0" border="0" align="center" height="100%" style="border-collapse:collapse; margin:0; padding:0;
+	font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
+		{% header_generic request %}
+		<tr>
+			<td height="100%" width="100%" style="padding:50px 30px; vertical-align:middle;">
+				<table align="center" cellspacing="0" border="0" style="margin:auto;
+				font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
+					<tr>
+						<td class="body" width="auto" style="min-width: 150px; max-width: 400px; padding: 20px 20px 20px 20px;
+						background: White; border-radius: 6px;">
+							{% blocktrans with site.name as sitename and from_user.username|capfirst as from_user %}
+							<div>Congradulations! You have been invited by {{ from_user }} to join
+							{% endblocktrans %}
+								<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
+								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>.
+							</div><br>
+							
+							{% if sender_note %}
+							<div>{{sender_note}}</div><br>
+							{% endif %}
+							
+							<div>
+								{% trans "Membership is by invitation only, so click the link below to join us now!" %}<br><br>
+								<a class="register" style="border: 1px solid #AAA; background-color:#CCC; border-radius:6px;, font-family:Arial, Helvetica, sans-serif" href="{% if invitation_key.key %}http://{{site.domain}}{% url invitation_invited invitation_key=invitation_key.key invitation_email=email%}{% endif %}">
+								{% trans "CLICK HERE TO REGISTER" %}</a><br><br>
+								<span>{% trans "Your invitation will be valid for the next" %} {{expiration_days}} {% trans "days" %}.</span>
+							</div><br>
+							<div>			
+								{% trans "All the best" %},<br>
+								<span>{% trans "The" %}</span>
+								<a class="brand" style="margin:0 2px; font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
+								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>
+								<span>{% trans "team" %}</span>
+
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		{% footer_generic request %}
+	</table>
+	
+</body>
+
+
+
+
+
+

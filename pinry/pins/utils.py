@@ -1,6 +1,7 @@
 #utilites related to pins
 import operator
 from urlparse import urlparse, urlunparse 
+from django.http import Http404 
 
 from django.db.models import Count
 from django.conf import settings
@@ -37,7 +38,10 @@ def getProfileContext(profileId):
     authUser = User.objects.values('id','username','first_name','last_name','date_joined','last_login').filter(username__exact=request.user)
     authUserJ = simplejson.dumps(list(authUser), cls = DjangoJSONEncoder)
     '''
-    profile = User.objects.get(id__exact=profileId)
+    try:
+        profile = User.objects.get(id__exact=profileId)
+    except:
+        raise Http404  
     pins = Pin.objects.filter(submitter=profile)
     pinsC = pins.count()
     tags = pins.order_by('tags__name').filter(submitter=profile).values_list('tags__name').annotate(count=Count('tags__name'))
@@ -91,8 +95,10 @@ def getProfileContext(profileId):
     return context
     
 def getPinContext(request, pinId):
-    
-    pin = Pin.objects.get(id=pinId)
+    try:
+        pin = Pin.objects.get(id=pinId)
+    except:
+        raise Http404  
     #datetime, favorite, folowing, id, user
     pin.favorites = Follow.objects.filter(favorite__id=pin.id)
     pin.favoritesC = pin.favorites.count()
@@ -105,6 +111,16 @@ def getPinContext(request, pinId):
     pin.repinsC = pin.repins.count()
     pin.srcDom = get_top_domains([pin.srcUrl], 1)[0][0]
     
+    next = Pin.objects.filter(id__gt=pinId)
+    prev = Pin.objects.filter(id__lt=pinId)
+    if next:
+        pin.next = next.order_by('id')[:1][0].id
+    else:
+        pin.next = prev.order_by('id')[:1][0].id
+    if prev:
+        pin.prev = prev.order_by('-id')[:1][0].id
+    else:
+        pin.prev = next.order_by('-id')[:1][0].id
 
     user = request.user
     user.fav = False

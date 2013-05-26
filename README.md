@@ -110,6 +110,7 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Comment on pins
  + Tag auto recognition
  + Tag auto suggest
+ + Notifications by email and website
  
 ### Current User Account Features
  + User contact form for feedback & support
@@ -117,6 +118,7 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Support for multiple Social Connections 
  + Support for multiple Email Addresses with verification & primary setting
  + Local User Accounts & Social Account Connections
+ + Notification management
 
 ### Current Admin Features 
  + Invitation Only Mode for new registrations
@@ -131,7 +133,7 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + P3P implimented (please edit the policy acording to your privacy policy)
  
 ### Roadmap
- + User Boards
+ + Public / Private pins
  + Non-image URL pinning
 
 

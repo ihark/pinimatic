@@ -129,7 +129,6 @@ function getMessages(xhr, targetForm){
 				////handle form field errors
 				} else {
 					$.each(jsonMessage[index], function (i, item) {
-						console.log('else: '+item.message)
 						apply_form_field_error(targetForm, index, item.message, item.extra_tags);
 					});
 				}

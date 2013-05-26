@@ -35,7 +35,7 @@ class ContactForm(forms.Form):
 class CustomTagWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
         attrs={'placeholder':'add new tags here'}
-        print '----CustomTagWidjget render exicuted'
+        print 'TODO: core.models.CustomTagWidget move to widget file'
         #print "widget attrs", attrs
         #print "widget value",value
         #print "widget name",name
@@ -51,10 +51,15 @@ class CustomTagField(forms.CharField):
     widget = CustomTagWidget
     def clean(self, value):
         value = super(CustomTagField, self).clean(value)
-        print '----CustomTagField form clean exicuted'
+        print 'TODO: core.models.CustomTagField move to widget file'
         if value:
             try:
-                print '----CustomTagField parse_tags exicuted'
+                #jquery.tagit compatability: make sure there is a comma if not present.
+                #This allows one mutiword tag, jquery.tagit does not put a comma after  
+                #first tag if no second tag and django-taggit will use spaces if no comma.
+                if not value.find(',')+1:
+                    value = value+','
+                    print value
                 return parse_tags(value)
             except ValueError:
                 print '****CustomTagField ValueError'
@@ -64,7 +69,7 @@ class CustomTagField(forms.CharField):
 
 class UserTagsWidget(forms.CheckboxSelectMultiple):
     def render(self, name, value, attrs=None):
-        print '----UserTagsWidget render exicuted'
+        print 'TODO: core.models.UserTagsWidget move to widget file'
         #make sure there is only one of each tag in choices
         seen = set()
         seen_add = seen.add
@@ -78,8 +83,8 @@ class UserTagsWidget(forms.CheckboxSelectMultiple):
 class UserTagsField(forms.ModelMultipleChoiceField):
     widget = UserTagsWidget
     def clean(self, value):
+        print 'TODO: core.models.UserTagsField move to widget file'
         value = super(UserTagsField, self).clean(value)
-        print '----UserTagsField form clean exicuted'
         #print '------vlue:', value
         
         return value

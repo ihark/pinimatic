@@ -574,15 +574,31 @@ margin: 0px 0px;
 	}
 		.pin-options a {
 			font-weight:bold;
+			display: block;
+			height: 100%;
+			width: 100%;
 		}
 		.pin-options i{
 			margin: 3px;
 		}
-		.pin-options .inline {
-			width:39px;
+		.pin-options .inline.option {
+			width:35px;
 			text-align:center;
 			line-height:10px;
+			overflow:hidden;
 		}
+		.pin-options .inline.option.two  {
+			width:70px;
+		}
+		.pin-options .inline.divider  {
+			border-right: 1px solid #888;
+			height: 25px;
+		}
+		.pin-options .inline.spacer  {
+			width:4px;
+		}
+		
+
 		.pin-options .btn-lg {
 			width:160px;
 			height: 32px;
@@ -593,22 +609,27 @@ margin: 0px 0px;
 			-webkit-box-shadow: 2px 2px 3px Black;
 			-moz-box-shadow: 2px 2px 3px Black;
 			cursor:pointer;
+			overflow:none;
 		}
-		
-		.pin-options .btn-lg .icon {
+		.pin-options .btn-lg .one-icon{
+			#margin-left: -5px;
+		}
+		.pin-options .btn-lg .one-icon {
 			height:30px;
 			width:35px;
 			margin:0px;
 			font-weight:bold;
 		}
-		.pin-options .btn-lg .text{
+
+		.pin-options .btn-lg .one-text{
 			line-height:30px;
-			font-size:14px;
+			text-align:center;
+			font-size:12px;
 			font-weight:bold;
-			width:118px;
+			width:114px;
 			overflow: hidden;
 			height: 28px;
-			margin: 2px 4px 2px 0px;
+			margin-right: 4px;
 			vertical-align: middle;
 			height: 100%;
 			position: relative;
@@ -898,7 +919,9 @@ form h1 {
 
 
 /* GENERAL FORMATTING */
-
+#pins.show  .pin{
+	display:block;
+}
 .container{
 	width:auto;
 	margin:auto;

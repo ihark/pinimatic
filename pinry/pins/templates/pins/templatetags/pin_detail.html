@@ -2,54 +2,71 @@
 {% load comments %}
 {% load static %}
 {% get_media_prefix as MEDIA_PREFIX %}
-<div class="pin item" id="{{pin.id}}-pin" data-favs="{{pin.favorites.length}}" data-cmnts="{{pin.comments.length}}" data-repins="{{pin.repins.length}}">
+{% get_comment_list for pin as comment_list %}
+{% get_comment_count for pin as comment_count %}
+<div class="pin item" id="{{pin.id}}-pin" data-favs="{{pin.favoritesC}}" data-cmnts="{{comment_count}}" data-repins="{{pin.repinsC}}">
 <!-- //IMAGE CONTAINER -->
 	<div class="image touch-off">
 <!-- //OPTIONS -->
 		{% if user.is_authenticated %}
 		<div class="pin-options">
-<!-- //PIN OPTIONS BUTTON -->
+	<!-- //PIN OPTIONS BUTTON -->
 			<div class="background-50 btn-lg">
 				{% if user == pin.submitter or user.is_superuser %}
-				<div id="delete" title="Delete" class="inline">
+				<div id="delete" title="Delete" class="inline option">
 					<a href="{{pinsPrefix}}/delete-pin/{{pin.id}}/">
 					<i class="icon-trash"></i>
 					<br>Delete</a></div>
-				<div id="edit" title="Edit" class="inline">
+				<div id="edit" title="Edit" class="inline option">
 					<a href="{{pinsPrefix}}/edit-pin/{{pin.id}}/">
 					<i class="icon-edit"></i>
-					<br>Edit</a></div>
+					<span>Edit</span></a></div>
 				{% endif %}
-				<div id="favs" data-state="{{userFav}}" class="inline">
+				<div id="favs" data-state="{{user.fav}}" class="inline option">
 					<a href="'/fav-pin/{{pin.id}}/">
-					{% if pin.fav %}
+					{% if user.fav %}
 					<i title="Remove Favorite" class="icon-star icon-star-empty"></i>
 					{% else %}
 					<i title="Add Favorite" class="icon-star"></i>
 					{% endif %}
 					<br>Fav</a></div>
-				{% if not user.pin and not user.repin %}
-				<div id="repins" data-state="{{userPin}}" title="Re-Pin" class="inline">
+				{% if not user.pin and not pin.repin %}
+				<div id="repins" data-state="{{pin.repins}}" title="Re-Pin" class="inline option">
 					<a href="{{pinsPrefix}}/re-pin/{{pin.id}}/">
 					<i class="icon-plus"></i><br>Add</a></div>
 				{% endif %}
-				<div id="cmnts" data-state="true" title="Comment" class="inline">
+				<div id="cmnts" data-state="True" title="Comment" class="inline option">
 					<a href="{{pinsPrefix}}/cmnt-pin/{{pin.id}}/">
 					<i class="icon-chat"></i><br>Comm</a></div>
 			</div>
-<!-- //SOURCE BUTTON -->
+	<!-- //SOURCE BUTTON -->
 			<div id="source" class="background-50 btn-lg">
 				<a target="_blank" href="{{pin.srcUrl}}">
-				<div class="inline icon"><i class="icon-bookmark"></i><br>GO</div>
-				<div class="inline text">{{pin.srcDom}}</div></a>
+				<div class="inline option one-icon"><i class="icon-bookmark"></i><br>GO</div>
+				<div class="inline option one-text">{{pin.srcDom}}</div></a>
 			</div>
-<!-- //DETAILS BUTTON -->
-			<div id="details" class="background-50 btn-lg">
-				<a href="{{pin.srcUrl}}/">
-				<div class="inline icon"><i class="icon-info-sign"></i><br>INFO</div>
-				<div class="inline text">PIN DETAILS</div></a>
+	<!-- //PIN NAVIGATION -->
+			<div id="navigation" class="background-50 btn-lg">
+				<div id="prev" title="Previous Pin" class="inline">
+					<a href="/pin/{{pin.prev}}/">
+						<div class="inline option"><i class="icon-info-sign"></i><br>Prev</div>
+					</a>
+				</div>
+				<div class="inline divider"></div>
+				<div id="large-image" title="Large Image" class="inline">
+					<a href="">
+						<div class="inline option two"><i class="icon-zoom-in"></i><br>Zoom Image</div>
+					</a>
+				</div>
+				<div class="inline divider"></div>
+				<div id="next" title="Next Pin" class="inline">
+					<a href="/pin/{{pin.next}}/">
+						<div class="inline option"><i class="icon-info-sign"></i><br>Next</div>
+					</a>
+				</div>
+				
 			</div>
-		</div>
+		</div><!-- /END OPTIONS -->
 		{% endif %}
 <!-- //IMAGE -->
 		<div class="img-btn touch-off"></div><!-- //prevent fancybox -->
@@ -63,31 +80,33 @@
 		<a class="pin-submitter" title="User\'s pins" href="/user/{{pin.submitter.id}}/">{{pin.submitter.username}}</a></li>
 	</div>
 	<!-- //favs -->
-	<div class="pin-stats pull-right dropdown">
+	
+	<div class="pin-stats pull-right dropdown display favs" {% if not pin.favorites %}style="display:none;"{% endif %}>
 		<div class="stat dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">
-		<i class="display favs icon-favs"></i><span class="display text light favs ">{{pin.favoritesC}}</span></div>
-		<ul class="display list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">
+		<i class="icon-favs"></i><span class="text light">{{pin.favoritesC}}</span></div>
+		<ul class="list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">
 		{%for fav in pin.favorites%}
 			<li id="{{fav.id}}" class="display favs item"><a href="/user/{{fav.user.id}}/">{{fav.user.username}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
 	<!-- //cmnts -->
-	<div class="pin-stats pull-right dropdown">
+	
+	<div class="pin-stats pull-right dropdown display cmnts" {% if not comment_list %}style="display:none;"{% endif %}>
 		<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">
-		<i class="display cmnts icon-cmnts"></i><span class="display text light cmnts ">{% get_comment_count for pin as comment_count %}{{comment_count}}</span></div>
-		<ul class="display list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">
-		{% get_comment_list for pin as comment_list %}
+		<i class="icon-cmnts"></i><span class="text light cmnts ">{{comment_count}}</span></div>
+		<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{% for comment in comment_list %}
 			<li id="{{cmnt.id}}" class="display cmnts item"><a href="/user/{{cmnt.user.id}}/">{{comment.user.username}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
+
 	<!-- //repin -->
-	<div class="pin-stats pull-right dropdown">
+	<div class="pin-stats pull-right dropdown display repins" {% if not pin.repins %}style="display:none;"{% endif %}>
 		<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">
-		<i class="display repins icon-plus"></i><span class="display text light repins">{{pin.repinsC}}</span></div>
-		<ul class="display list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">
+		<i class="icon-plus"></i><span class="text light repins">{{pin.repinsC}}</span></div>
+		<ul class="list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{%for repin in pin.repins%}
 			<li id="{{repin.id}}" class="display repins item"><a href="/user/{{repin.submitter.id}}/">{{repin.submitter.username}}</a></li>
 		{% endfor %}
@@ -102,24 +121,23 @@
 		<li>
 		<span>Groups: </span>
 		{% for tag in pin.tags %}
-			<span class="tag" onclick="loadData(\'' + pin.tags[tag] + '\')">{{tag}}</span>
+			<span class="tag" onclick="loadData('{{tag}}')">{{tag}}</span>
 		{% endfor %}
 		</li>
 	</div>
 <!-- //COMMENTS -->
-	{% if comment_list|length > 0 %}
-	<div class="section pin-cmnts">
+
+	<div class="section pin-cmnts display" {% if not comment_list %}style="display:none;"{% endif %}>
 			{% for comment in comment_list %}
 				<p class="pin-cmnt touch-off" data-cmnt="{{comment.id}}">
 				{% if user == comment.user or user.is_superuser %}<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>{% endif %}
 					<i class="icon-cmnts icon-gray"></i>	
 					<a href="/user/{{comment.user_id}}/">{{comment.user.username}}:</a>	
-					<span class="display text light" >{{comment.comment}}</span>	
+					<span class="text light" >{{comment.comment}}</span>	
 				</p>	
 	
 			{% endfor %}
 		
 	</div><!-- //end pin-cmnts -->
-	{% endif %}
 </div><!-- //end pin -->
 

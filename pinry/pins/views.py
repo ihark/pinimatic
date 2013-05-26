@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from PIL import Image
+from django.http import Http404
 
 from .forms import PinForm
 from .models import Pin
@@ -56,9 +57,13 @@ def recent_pins(request):
     return TemplateResponse(request, 'pins/recent_pins.html', context)
 
 def pin_detail(request, pinId):
-    pin = Pin.objects.get(id=pinId)
+    try:
+        pin = Pin.objects.get(id=pinId)
+    except:
+        raise Http404  
     profileId = pin.submitter.id
     
+    #provided for pin & profile context_processors
     context = {
             'profileId':profileId,
             'pinId':pinId,

@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from urllib import quote
 import socket
 from django.contrib.contenttypes.models import ContentType
+import re
 
 register = Library()
 
@@ -12,8 +13,8 @@ register = Library()
 @register.assignment_tag
 def dev_static_prefix():
     '''
-    provide host ip address when STATIC_IP is a path and DEBUG is true(in dev env)
-    inorder for email links to work.  Rturns '' when in production.  Prfix all relative
+    Provide host ip address when STATIC_IP is a path (in dev env) inorder for 
+    static file email links to work.  Rturns '' when in production.  Prfix all relative
     url's with {{DEV_STATE_PREFIX}} in templates to get full url's in emails.
     '''
     try:
@@ -98,7 +99,6 @@ def sender_to_link(desc, sender, url, allnames=True):
         desc = link.join(desc.split(sender_type))
     
     #also check for the sender's name if allnames=True or if sender_type in sender_names
-    print 'sender_type:', sender_type
     if allnames and sender_type not in sender_names:
         #add current sender name to list
         sender_names.update({sender_type:['self','/'+sender_type+'/']})
@@ -118,9 +118,13 @@ def sender_to_link(desc, sender, url, allnames=True):
                 
     #also check for other key words
     for key_word in other_key_words:
-        if key_word in desc:
+        #find the word only if it's not part of another word
+        rex = r'\s('+key_word+')[\s\W]+|\s('+key_word+')$'
+        found = re.search(rex,desc)
+        if found:
+            result = found.group(1) or found.group(2)
             link = '<a href="'+other_key_words[key_word]+str(sender.id)+'/">'+key_word.title()+'</a>'
-            desc = link.join(desc.split(key_word))
+            desc = link.join(desc.split(result))
 
     return desc
 

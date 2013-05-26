@@ -6,8 +6,7 @@
 
 {% block yield %}
 <div <div id="pin-detail" class="container content">
-	<div class="pin-detail-container">
-		
+	<div #id="pins" class="pin-detail-container">
 		<div class="user-detail">
 		{% user_profile request profileId %}
 		</div>
@@ -15,7 +14,7 @@
 		{% pin_detail request pinId %}
 		</div>
 		<div style="clear:both;" />
-
+	</div>
 </div>
 
 {% endblock %}

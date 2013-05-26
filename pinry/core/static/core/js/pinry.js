@@ -39,7 +39,30 @@ function is_apiDomain(){
 	return inArray(url(1), apiPrefixA);
 }
 var state = {tag:undefined, user:undefined, initial:true}//state object passed to pushstate on each state change
-
+//redirect to http when in api domain
+if (is_apiDomain()){
+	if (url('protocol') == 'https'){
+		console.log('---redirect to http-----')
+		addr = url(0)
+		port = url('port')
+		console.log(port)
+		unsecure = addr.replace(port, '5000')
+		unsecure = unsecure.replace('https', 'http')
+		console.log('unsecure',unsecure)
+		window.location = unsecure
+		throw new Error('Redirecting');
+	}
+}
+//add loading img to target's submit button or target innerHTML
+function submitProgress(target){
+	var btn = target.find("button[type='submit']")
+	if (!btn.length) btn = target;
+	var img = $('<img class="load-img">');
+	img.attr('src', STATIC_URL+'core/img/loader.gif');
+	img.css('max-height', '10px');
+	img.css('width', 'auto');
+	btn.html(img)
+}
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
@@ -256,21 +279,22 @@ function layoutThumbs(target) {
  * set tag / user to null to clear
  * set tag / user to undefined to keep current filters.
  */
-function loadData(tag, user, reload) {
+function loadData(tag, user, reload, popstate) {
 	//make tag urlsafe
 	if(typeof tag == "string"){tag = urlSafe(tag)}
 	//default values
 	if (reload === undefined){reload = false};
+	if (popstate === undefined){popstate = false};
 	if (user === null){user = 'all'};
 	var cTag
 	var cUser
 	//loader
     isLoading = true;
     $('#loader').show();
-
+	console.log('+++state: ',state)
 	//check if the window is in apiDomain
 	var apiPrefix = is_apiDomain();
-	
+
 	console.log('----loadData(): tag:'+tag+' user: '+user+' apiPrefix: '+apiPrefix+' reload: '+reload)
 	
 	//check url for current user / tag
@@ -295,6 +319,7 @@ function loadData(tag, user, reload) {
 		if (tag === undefined & cTag == undefined){
 			tag = ''
 		}
+		nAddress = '/user/'
 	}
 
 	//if new user or tag specifiled overide url and current user & tag acordingly.
@@ -341,11 +366,15 @@ function loadData(tag, user, reload) {
 	/* //redirect and stop script when not in apiDomain 
 	if (!apiPrefix){
 		//TODO:working but needs tags & checks
-		window.location = nAddress;
-		throw new Error('Redirecting');
+		
 	}  */
-	
-
+	if (!popstate  && !apiPrefix){
+		console.log('!popstate')
+		window.location = nAddress;
+		$('#pins').html('');
+		throw new Error('Redirected by loadData()');
+	}
+	console.warn('-relaod: ', reload)
 	//reset page and refresh pins display
 	if (reload || tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
 		console.warn('----page reset')
@@ -405,7 +434,7 @@ function loadData(tag, user, reload) {
 		console.log('PUSH STATE ADDED:'+nAddress);
 		console.log('new url(path) = '+url('path'));
 	}
-	
+
 	//prevent api request when not in apiPrefix domain
 	if (url(1) == apiPrefix) {
 		console.log('-ajax - 2 loaddata()');
@@ -439,20 +468,20 @@ window.onpopstate = function(e) {
 	console.log('---popstate called---');
 	//handle forward/back in api domain
 	if (is_apiDomain()){
+		if (e.state && !state.initial) {
+			console.log('popstate redireccting to e.state: ', e.state);
+			loadData(e.state.tag, e.state.user, true, true);
+		}
 		if (!e.state && !state.initial) {
 			console.log('popstate !e.state redireccting to undefined: ');
 			//when there is not e.state reset to user & tag to undefined (home)
-			loadData(undefined, undefined, true);
+			loadData(undefined, undefined, true, true);
 			//window.location.href = url('path')
 		} else {
 			console.log('--popstate setting initial: false');
 			state.initial = false; 
 		}
 		//enables typical state forward and back
-		if (e.state) {
-			console.log('popstate redireccting to e.state: ', e.state);
-			loadData(e.state.tag, e.state.user, true);
-		}
 		resetForms();
 	}
 };
@@ -470,13 +499,13 @@ function onLoadData(data, insert) {
 	for(; i<length; i++) {
 		image = data[i];
 		var html = '';
-		var userFav = false
-		var userPin = false
-		var userCmnt = false
-		var repined = false //TODO: used to determine if pin has been repined by authUser
+		var userFav = 'False'
+		var userPin = 'False'
+		var userCmnt = 'False'
+		var repined = 'False' //TODO: used to determine if pin has been repined by authUser
 		//layout for all views except for those listed below
 		if (av != 'tags'){
-			console.log('loadData() av != tags')
+			console.log('onLoadData() av != tags')
 			
 			//package pin data for js access(req for repin)
 			pinA[image.id] = {
@@ -490,21 +519,21 @@ function onLoadData(data, insert) {
 			if (authUserO){
 				for (f in image.favorites){
 					if (image.favorites[f].user.id == authUserO.id){
-						userFav = true;
+						userFav = 'True';
 					}
 				}
 				for (r in image.repins){
 					if (image.repins[r].submitter.id == authUserO.id){
-						repined = true;
+						repined = 'True';
 					}
 				}
 				for (c in image.comments){
 					if (image.comments[c].user_id == authUserO.id){
-						userCmnt = true;
+						userCmnt = 'True';
 					}
 				}
 				if (image.submitter.id == authUserO.id){
-					userPin = true
+					userPin = 'True'
 				}
 			}
 			//SETUP HTML FOR LARGE PINS DISPLAY
@@ -513,48 +542,56 @@ function onLoadData(data, insert) {
 				html += '<div class="image touch-off">';
 			//OPTIONS
 					if (authUserO.id){
-					//was used to toggle options//html += '<div class="pin-options-btn touch-off hide"><i id="optionsBtn" class="icon-cog"data-state="false" title="Show Options"></i></div>';
+					//was used to toggle options//html += '<div class="pin-options-btn touch-off hide"><i id="optionsBtn" class="icon-cog"data-state="False" title="Show Options"></i></div>';
 					html += '<div class="pin-options">';
 			//PIN OPTIONS BUTTON
 						html += '<div class="background-50 btn-lg">';
-							if (userPin || authUserO.is_superuser){
-							html += '<div id="delete" title="Delete" class="inline">'
+							if (userPin == 'True' || authUserO.is_superuser){
+							html += '<div id="delete" title="Delete" class="inline option">'
 								html += '<a href="'+pinsPrefix+'/delete-pin/'+image.id+'/">';
 								html += '<i class="icon-trash"></i>'
 								html += '<br>Delete</a></div>';
-							html += '<div id="edit" title="Edit" class="inline">'
+							html += '<div id="edit" title="Edit" class="inline option">'
 								html += '<a href="'+pinsPrefix+'/edit-pin/'+image.id+'/">';
 								html += '<i class="icon-edit"></i>'
 								html += '<br>Edit</a></div>';
 							}
-							html += '<div id="favs" data-state="'+userFav+'" class="inline">'
+							html += '<div id="favs" data-state="'+userFav+'" class="inline option">'
 								html += '<a href="'+pinsPrefix+'/fav-pin/'+image.id+'/">'
-								if (userFav) {
+								if (userFav == 'True') {
 								html += '<i title="Remove Favorite" class="icon-star icon-star-empty"></i>';
 								} else {
 								html += '<i title="Add Favorite" class="icon-star"></i>';
 								};
 								html += '<br>Fav</a></div>'
-							if (!userPin  && !repined){
-							html += '<div id="repins" data-state="'+userPin+'" title="Re-Pin" class="inline">'
+							if (userPin == 'False' && repined == 'False'){
+							html += '<div id="repins" data-state="'+userPin+'" title="Re-Pin" class="inline option">'
 								html += '<a href="'+pinsPrefix+'/re-pin/'+image.id+'/">'
 								html += '<i class="icon-plus"></i><br>Add</a></div>';
 							}
-							html += '<div id="cmnts" data-state="true" title="Comment" class="inline">'
+							html += '<div id="cmnts" data-state="True" title="Comment" class="inline option">'
 								html += '<a href="'+pinsPrefix+'/cmnt-pin/'+image.id+'/">'
 								html += '<i class="icon-chat"></i><br>Comm</a></div>';
 						html += '</div>';
 			//SOURCE BUTTON
 						html += '<div id="source" class="background-50 btn-lg">';
 							html += '<a target="_blank" href="'+image.srcUrl+'">'
-							html += '<div class="inline icon"><i class="icon-bookmark"></i><br>GO</div>';
-							html += '<div class="inline text">'+getHost(image.srcUrl)+'</div></a>';
+							html += '<div class="inline option one-icon"><i class="icon-bookmark"></i><br>GO</div>';
+							html += '<div class="inline one-text">'+getHost(image.srcUrl)+'</div></a>';
 						html += '</div>';
-			//DETAILS BUTTON
+			//PIN NAVIGATION
 						html += '<div id="details" class="background-50 btn-lg">';
-							html += '<a href="'+image.srcUrl+'/">'
-							html += '<div class="inline icon"><i class="icon-info-sign"></i><br>INFO</div>';
-							html += '<div class="inline text">PIN DETAILS</div></a>';
+							html += '<div id="info" title="Pin Details" class="inline">';
+								html += '<a href="/pin/'+image.id+'/">';
+									html += '<div class="inline option two"><i class="icon-info-sign"></i><br>Detail View</div>';
+								html += '</a>';
+							html += '</div>';
+							html += '<div class="inline divider spacer"></div>';
+							html += '<div id="large-image" title="Large Image" class="inline">';
+								html += '<a href="">';
+									html += '<div class="inline option two"><i class="icon-zoom-in"></i><br>Zoom Image</div>';
+								html += '</a>';
+							html += '</div>';
 						html += '</div>';
 					html += '</div>';
 					}
@@ -570,10 +607,10 @@ function onLoadData(data, insert) {
 					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.id+'/">'+image.submitter.username+'</a></l>';
 				html += '</div>';
 				//favs
-				html +='<div class="pin-stats pull-right dropdown">'
+				html +='<div class="pin-stats pull-right dropdown display favs">'
 					html += '<div class="stat dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display favs icon-favs"></i><span class="display text light favs ">'+image.favorites.length+'</span></div>';
-					html += '<ul class="display list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
+					html += '<i class="icon-favs"></i><span class="text light favs ">'+image.favorites.length+'</span></div>';
+					html += '<ul class="list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
 					uu = uniqueUsers(image.favorites, 'user')
 					for (u in uu){
 						html += '<li id="'+uu[u].id+'" class="display favs item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
@@ -581,10 +618,10 @@ function onLoadData(data, insert) {
 					html += '</ul>';
 				html +='</div>'
 				//cmnts
-				html +='<div class="pin-stats pull-right dropdown">'
+				html +='<div class="pin-stats pull-right dropdown display cmnts">'
 					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display cmnts icon-cmnts"></i><span class="display text light cmnts ">'+image.comments.length+'</span></div>';
-					html += '<ul class="display list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
+					html += '<i class="icon-cmnts"></i><span class="text light cmnts ">'+image.comments.length+'</span></div>';
+					html += '<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.comments, 'user')
 					for (u in uu){
 						html += '<li id="'+uu[u].id+'" class="display cmnts item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
@@ -592,10 +629,10 @@ function onLoadData(data, insert) {
 					html += '</ul>';
 				html +='</div>'
 				//repin
-				html +='<div class="pin-stats pull-right dropdown">'
+				html +='<div class="pin-stats pull-right dropdown display repins">'
 					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
-					html += '<i class="display repins icon-plus"></i><span class="display text light repins">'+image.repins.length+'</span></div>';
-					html += '<ul class="display list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">';
+					html += '<i class="icon-plus"></i><span class="text light repins">'+image.repins.length+'</span></div>';
+					html += '<ul class="list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.repins, 'submitter')
 					for (u in uu){
 						html += '<li id="'+uu[u].id+'" class="display repins item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
@@ -639,11 +676,7 @@ function onLoadData(data, insert) {
 			}
 			//
 			//hide elements as required
-			if (!image.repins[0]) $('#'+image.id+'-pin .display.repins').hide()//hide repin stat display
-			if (!image.favorites[0]) $('#'+image.id+'-pin .display.favs').hide()//hide fav stat display
-			if (!image.comments[0]) $('#'+image.id+'-pin .display.cmnts').hide()//hide cmmt stat display
-			if (!image.comments[0]) $('#'+image.id+'-pin .pin-cmnts').hide()//hide cmmt section
-			$('#'+image.id+'-pin form[name="pin-cmnt-form"]').hide()//hide comment form
+			hidePinComponents(image.id)
 			
 			applyLayout1(image.id);//for each pin individual pin
 		}//end typical view
@@ -733,6 +766,22 @@ function onLoadData(data, insert) {
 	//TOUCH: DEVICE SETUP
 	setUpTouch(touchOn)
 };
+//hide pin components with zero values
+function hidePinComponents(id){
+	pin = $('#'+id+'-pin')
+	if (pin.data('repins') == 0) $('#'+id+'-pin .display.repins').hide()//hide repin stat display
+	if (pin.data('favs') == 0) $('#'+id+'-pin .display.favs').hide()//hide fav stat display
+	if (pin.data('cmnts') == 0) $('#'+id+'-pin .display.cmnts').hide()//hide cmmt stat display
+	if (pin.data('cmnts') == 0) $('#'+id+'-pin .pin-cmnts').hide()//hide cmmt section
+	$('#'+id+'-pin form[name="pin-cmnt-form"]').hide()//hide comment form
+}
+//not currently used
+function hidePinComponentsAll(){
+	pins = $('.pin.item')
+	pins.each(function( index ) {
+		hidePinComponents(parseInt($(this).attr('id')));
+	});
+}
 
 function uniqueUsers(object,userO){
 	unique = []
@@ -823,7 +872,7 @@ $('.fancybox').fancybox({
     closeEffect: 'none'
 });
 //set up #details button to trigger fancybox on click
-$('.pin #details').live('click', function(e){
+$('.pin #large-image').live('click', function(e){
    e.preventDefault();
    fb = $(e.target).closest('.pin').find('.fancybox')
    fb.click();
@@ -919,7 +968,7 @@ $('#cmnts').live('click', function(e){
 	e.preventDefault();
 	state = $(this).attr('data-state');
 	//only open form if data-stat = true
-	if (state=="true"){
+	if (state=="True"){
 		var pin = $($(this).closest(".pin"));
 		var id = parseInt(pin.attr('id'));
 		pin.find('.pin-cmnts').append(insertCommentForm(id));
@@ -934,7 +983,7 @@ $('#cmnts').live('click', function(e){
 		//causes issue with ios (temp removed)
 		//$('body').animate({scrollTop: pin.find('form[name="pin-cmnt-form"]').offset().top-centerH}, 500);
 		//$('body').animate({scrollLeft: pin.find('form[name="pin-cmnt-form"]').offset().left-centerW}, 200);
-		$(this).attr('data-state', "false");
+		$(this).attr('data-state', "False");
 		icon = $(this).find('i');
 		icon.toggleClass('icon-chat-empty');
 	//if data-stat = false cancel comment form
@@ -952,6 +1001,8 @@ $(document).on( 'submit', '.pin form', function(e){
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
 	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
+	var pin = $(this).closest(".pin")
+	submitProgress(pin)
 });
 //Comment: toggel callback
 function cmntsSuccess(result, pin){
@@ -1116,20 +1167,21 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	if (!type){ type = 'POST'};
 	var count = pin.attr('data-'+name);
 	var disp = pin.find('.display.'+name);
-	var dispText = pin.find('.display.text.'+name);
+	var dispText = pin.find('.display.'+name+' .text');
+	console.log(dispText)
 	var countP = aProfile.attr('data-'+name);
-	var dispTextP = aProfile.find('.display.text.'+name);
-	var list = pin.find('.display.list-'+name);
+	var dispTextP = aProfile.find('.display.'+name+' .text');
+	var list = pin.find('.display .list-'+name);
 	
 	if (authUserO && authUserO.id == aProfileO.id) {
 		var updateProfile = true;
 	}
 	//TODO: this was moved from onSuccess to speed it up, may be better with progress
-	if (state == "true"){
-		console.log('state == "true"')
+	if (state == "True"){
+		console.log('state == "True"')
 		count--;
 		countP--;
-		button.attr('data-state', "false");
+		button.attr('data-state', "False");
 		icon.toggleClass(fIcon);
 		pin.attr('data-'+name, count);
 		dispText.html(count);
@@ -1143,18 +1195,19 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		}
 	}else if (state == "edit"){
 		console.log('state == "edit"')
-		button.attr('data-state', "true");
+		button.attr('data-state', "True");
 		icon.toggleClass(fIcon);
 	}else{
 		console.log('state == "else"')
 		count++;
 		countP++;
-		button.attr('data-state', "true");
+		button.attr('data-state', "True");
 		icon.toggleClass(fIcon);
 		pin.attr('data-'+name, count);
 		dispText.html(count);
 		list.append('<li id="'+authUserO.id+'" class="display '+name+' item"><a href="/user/'+authUserO.id+'/">'+authUserO.username+'</a></li>')
 		disp.show();
+		console.log(disp)
 		if (updateProfile){
 			aProfile.attr('data-'+name, countP);
 			dispTextP.html(countP);
@@ -1267,6 +1320,7 @@ function follow(targetBtn, display) {
 	var count = pin.attr('data-'+name);
 	var disp = pin.find('.display.'+name)
 	var dispText = pin.find('.display.text.'+name)
+	submitProgress(button);
 	
 	//TODO: ether add progress or move contents out of onFollow to speed it up
 	this.onFollow = function( result ) {
@@ -1274,12 +1328,11 @@ function follow(targetBtn, display) {
 		// Update the number of followers displayed.
 		console.log('count: '+count)
 		console.log('state = '+state)
-		if(state == "true") {
+		if(state == "True") {
 			button.attr('data-state', 'false');
 			button.html('Follow')
 			count--;
 			console.log('count: '+count)
-			//this.showLoader('Liking');
 		} else {
 			button.attr('data-state', 'true');
 			button.html('Un-Follow')

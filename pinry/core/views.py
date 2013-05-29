@@ -17,6 +17,8 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import requires_csrf_token
 from pinry.api.api import UserResource
 from ..core.utils import redirect_to_referer
+from django.contrib.auth.decorators import login_required
+from follow.models import Follow
 #from django.contrib.admin.views.decorators import staff_member_required
 
 
@@ -132,3 +134,49 @@ def custom_500(request):
     t = loader.get_template('500.html')
     c = RequestContext(request, {'foo': 'bar'})
     return HttpResponse(t.render(c))
+
+from pinry.pins.utils import getProfileContext, get_relationships
+from pinry.pins.models import Pin
+def relationships(request):
+    user = request.user
+    profileId = user.id
+    
+    context = {
+            'profileId':profileId,
+        }
+        
+    #get relationships
+    context.update(getProfileContext(profileId))#this may not be needed in template
+    following = context.get('following', None)
+    followers = context.get('followers', None)
+    relationships = get_relationships(user, following, followers)
+    context.update({'relationships':relationships})
+    print relationships
+    #get pin thumbs for all related users
+    for type in relationships:
+        for user in relationships[type]:
+            pins = Pin.objects.filter(submitter__exact=user)[:7]
+            user.pins = pins
+
+    return TemplateResponse(request, 'core/relationships.html', context)
+
+from django.db.models.loading import cache
+@login_required
+def unfollow(request, app, model, id, user_id=None):
+    if not user_id:
+        user_id = request.user.id
+    model = cache.get_model(app, model)
+    obj = model.objects.get(pk=id)
+    follow = Follow.objects.get_follows(obj).get(user__id=user_id)
+    if follow.user == request.user or follow.folowing == request.user:
+        follow.delete()
+    redirect_to = redirect_to_referer(request)
+    return HttpResponseRedirect(redirect_to)
+    
+@login_required
+def unfollow_by_id(request, follow_id):
+    follow =  Follow.objects.get(id=follow_id)
+    if follow.user == request.user or follow.folowing == request.user:
+        follow.delete()
+        redirect_to = redirect_to_referer(request)
+    return HttpResponseRedirect(redirect_to)

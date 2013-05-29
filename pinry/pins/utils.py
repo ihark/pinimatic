@@ -46,11 +46,12 @@ def getProfileContext(profileId):
     pinsC = pins.count()
     tags = pins.order_by('tags__name').filter(submitter=profile).values_list('tags__name').annotate(count=Count('tags__name'))
     tagsC = tags.distinct().count()
-    folowers = Follow.objects.get_follows(profile).values_list('user__username', flat=True)
-    folowersC = folowers.count()
-    folowing = Follow.objects.filter(user=profile).exclude(folowing__exact=None)
-    folowingL = folowing.values_list('folowing__username', flat=True)
-    folowingC = folowingL.count()
+    followers = Follow.objects.get_follows(profile)
+    followersC = followers.count()
+    followersL = followers.values_list('user__username', flat=True)
+    following = Follow.objects.filter(user=profile).exclude(folowing__exact=None)
+    followingL = following.values_list('folowing__username', flat=True)
+    followingC = followingL.count()
     #TODO: get folowing pins
     favs = Follow.objects.filter(user=profile).exclude(favorite__exact=None).values_list('favorite__pk', flat=True)
     favsC = favs.count()
@@ -78,10 +79,10 @@ def getProfileContext(profileId):
     context = {
             'profile': profile,
             'pinsC': pinsC,
-            'folowers': folowers,
-            'folowersC': folowersC,
-            'folowing': folowing,
-            'folowingC': folowingC,
+            'followers': followers,
+            'followersC': followersC,
+            'following': following,
+            'followingC': followingC,
             'tags': tags,
             'tagsC': tagsC,
             'favs': favs,
@@ -159,3 +160,28 @@ def getPinContext(request, pinId):
             'user': user,
         }
     return context
+
+'''
+ Determines if user is friends with test_user:
+ If you already have a query set for the user's followers and following then
+ you may include them to prevent another query.
+'''    
+def get_relationships(user, following=None, followers=None):
+    friends = []
+    if not followers and not following:
+        followers = Follow.objects.get_follows(user)
+        following = Follow.objects.filter(user=user).exclude(folowing__exact=None)
+    followersL = [follow.user for follow in followers]
+    followingL = [follow.folowing for follow in following]
+    for follow in following:
+        if follow.folowing in followersL:
+            friends.append(follow.folowing)
+            followersL.remove(follow.folowing)
+            followingL.remove(follow.folowing)
+    '''
+    friendsL = [user for user in friends]
+    followers_f = followers.exclude(user__in=friendsL)
+    following_f = following.exclude(folowing__in=friendsL)
+    '''
+    return {'friends':friends, 'followers':followersL, 'following':followingL}
+

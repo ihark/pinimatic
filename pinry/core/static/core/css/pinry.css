@@ -188,13 +188,15 @@ h1, h2, h3, h4, h5, h6 {
 	background: url("/static/vendor/file-uploader/loading.gif");
 	}
 /* ALLAUTH FORMS*/
-.form-container.accounts {
+.accounts {
 	background-color: transparent;
 	color: #AAA;
 	width:400px;
-	text-align: center;
 }
-	.form-container.accounts h1{
+	.accounts.form-container {
+		text-align: center;
+	}
+	.accounts h1{
 		color:#444;
 		font-size:24px;
 		line-height:24px;
@@ -205,7 +207,7 @@ h1, h2, h3, h4, h5, h6 {
 		background-color: White;
 		text-align: left;
 	}
-	.form-container.accounts h2{
+	.accounts h2{
 		font-size:16px;
 		line-height:16px;
 		width: 100%;
@@ -215,29 +217,29 @@ h1, h2, h3, h4, h5, h6 {
 		border-top: 1px solid #AAA;
 		text-align: left;
 	}
-	.form-container.accounts p{
+	.accounts p{
 		text-align: left;
 	}
-	.form-container.accounts  label{
+	.accounts  label{
 
 	}
-	.form-container.accounts .navbar{
+	.accounts .navbar{
 		margin:0;
 		min-width:auto;
 	}
-	.form-container.accounts .navbar-inner{
+	.accounts .navbar-inner{
 		margin:-15px -15px 15px -15px;
 		min-width:auto;
 		background:none;
 		border: none;
 		border-bottom: 1px solid #AAA;
 	}
-	.form-container.accounts form{
+	.accounts form{
 		display:inline-block;
 		text-align: left;
 		margin-bottom: -5px;
 	}
-	.form-container.accounts .socialaccount_providers{
+	.accounts .socialaccount_providers{
 		text-align: center;
 	}
 
@@ -857,7 +859,7 @@ margin: 0px 0px;
 	margin:-17px -15px;
 	text-align: left;
 }
-.accounts .notices-container .notice{
+.accounts .notice{
 	padding:10px 15px;
 	border-bottom: 1px solid #555;
 	margin:0px 0px;
@@ -896,6 +898,44 @@ table, th, td{
 	border: 1px solid #555;
 }
 
+/* relationships */
+.relationships .item{
+	margin:0 -20px;
+	padding:10px 15px;
+	border-bottom: 1px solid #555;
+}
+.relationships .item .user{
+	font-size:14px;
+	margin-right:10px;
+	width:100px;
+	overflow:hidden;
+	vertical-align:middle;
+	height:100%;
+}
+.relationships .item .btn{
+	margin-top:10px;
+}
+.item .pins{
+	height:40px;
+	width:240px;
+	overflow:hidden;
+	vertical-align:middle;
+}
+.item .pins img{
+	height:40px;
+	width:auto;
+}
+.item .avatar{
+	height:40px;
+	width:40px;
+	vertical-align:middle;
+	border: 1px solid #555;
+}
+
+.item .avatar img{
+	max-height:28px;
+	width:28px;
+}
 
 /* FORMS */
 form {
@@ -930,14 +970,33 @@ form h1 {
 .content{
 	width: auto;
 	min-width: 450px;
-	margin: 0px 30px;
+	margin: 0px 20px;
 	margin-bottom: 40px;
-	padding: 10px 20px 10px 20px;
+	padding: 0px 20px 0px 20px;
+	overflow:hidden;
+}
+.content h1{
+	margin: 0px -20px;
+	padding: 0 20px;
+	line-height: 34px;
+}
+.content h2{
+	margin: 0px -20px;
+	padding: 0 20px;
+	line-height: 34px;
+	background:rgba(124, 201, 25, 0.24);
 }
 .framed-white{
 	background: White;
 	border-radius: 6px;
 }
+.right-col{
+	margin-right: 270px;
+	margin-left: 0;
+}
+.min-onecol{
+	min-width:810px
+}	
 .width-450{
 	width: 450px;
 	margin: auto;
@@ -957,6 +1016,12 @@ form h1 {
 	background: White;
 	border-radius: 6px;
 }
+.border-only{
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	background-color: transparent;
+	min-width: auto;
+}
 .page-link{
 	position: relative;
 	top:-70px
@@ -967,7 +1032,12 @@ form h1 {
 	text-align:left;
 
 }
-
+.text-normal{
+	font-size:12px;
+	font-weight:normal;
+	font-family:font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	text-decoration: none;
+}
 .center {
 	text-align:center;
 }

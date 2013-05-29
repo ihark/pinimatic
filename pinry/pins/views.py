@@ -183,6 +183,7 @@ def delete_pin(request, pin_id=None):
     return HttpResponseRedirect(session_next(request))
 
 #TODO: This needs to be setup. Currently using api only.
+#there is a view comment/add already... what is this doing?
 def comment(request, pk=1):
     pin = Pin.objects.get(pk__exact=pk)
     

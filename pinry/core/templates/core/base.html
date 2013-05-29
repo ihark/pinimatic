@@ -56,6 +56,7 @@
 							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="">Your Pins</a></li>
 							<li><a href="{% url notification_notices %}">Your Notifications  {{notice_unseen_count}}</a></li>
 							<li class="divider"></li>
+							<li><a href="{% url core:relationships %}">Manage Relationships</a></li>
 							<li><a href="{% url socialaccount_connections %}">Social Connections</a></li>
 							<li><a href="{% url account_email %}">Manage Email Address</a></li>
 							{% if user.password == "!" %}

@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     url(r'^api/', include('pinry.api.urls')),
     url(r'', include('pinry.core.urls', namespace='core')),
     url(r'', include('pinry.pins.urls', namespace='pins')),
-    url('^', include('follow.urls')),
+    url('^', include('follow.urls', namespace='follow')),
     #TODO: is the temp dir better on amazon or heroku?
     url(r'^media/tmp/(?P<path>.*)$', 'django.views.static.serve', {
         'document_root': settings.TMP_ROOT,

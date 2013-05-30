@@ -63,7 +63,7 @@ def key_word_to_url(desc, key_word, url):
     return desc
     
 @register.simple_tag(name='sender_to_link')
-def sender_to_link(desc, sender, url, allnames=None):
+def sender_to_link(desc, sender, url, observed=None, allnames=None):
     '''
     replace a word in a string with a hyperlink
     {% sender_to_link "string" sender "url" allnames %}
@@ -94,6 +94,7 @@ def sender_to_link(desc, sender, url, allnames=None):
     #check for translations
     sender_type = map.get(sender_type, sender_type)
     
+    
     #check for sender_type
     if sender_type in desc:
         link = '<a href="'+url+'">'+sender_type.title()+'</a>'
@@ -110,7 +111,7 @@ def sender_to_link(desc, sender, url, allnames=None):
         sender_name_obj = getattr(sender, name_property, sender)
         sender_name = str(sender_name_obj)
         #set up id for url
-        id = ''#str(getattr(sender_name_obj,'id', ''))
+        id = str(getattr(sender_name_obj,'id', ''))
         if id: id = id+'/'
         if sender_name.lower() in desc.lower():
             link = '<a href="'+url_path+id+'">'+sender_name.title()+'</a>'
@@ -131,7 +132,7 @@ def sender_to_link(desc, sender, url, allnames=None):
     return desc
 
 @register.assignment_tag(name='observed_desc')
-def convert_to_observed_description(desc, sender_type, from_user):
+def convert_to_observed_description(desc, sender_type, from_user, owner=None):
     '''
     Convert a notice description to an observed description
     {% observed_desc notice.description sender_type sender_url as desc %}
@@ -139,10 +140,13 @@ def convert_to_observed_description(desc, sender_type, from_user):
     *desc must be of the form "has ___ on your sender_type"
     '''
     if sender_type in desc:
-        owner_object = str(from_user).title()+"'s "
-        desc = desc.replace('has', 'has also')
+        from_name = str(from_user).title()+"'s "
+        print from_user, owner
+        if from_user == owner:
+            from_name = 'their '
+        #desc = desc.replace('has', 'has also')
         action = desc.split('your')[0]
-        new_value = action+owner_object+sender_type
+        new_value = action+from_name+sender_type
     else:
         new_value = desc
     return new_value

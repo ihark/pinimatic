@@ -31,7 +31,7 @@
 {% load email %}
 <a href="{{root_url}}{% url pins:profile from_user.id %}">{{from_user|capfirst}}</a>
 {% if observed and alter_desc %}
-	{% observed_desc notice.description sender_type from_user as desc%}
+	{% observed_desc notice.description sender_type from_user owner as desc%}
 	{% sender_to_link desc sender sender_url %}
 {% else %}
 	{% sender_to_link notice.description sender sender_url %}

@@ -63,7 +63,7 @@ def key_word_to_url(desc, key_word, url):
     return desc
     
 @register.simple_tag(name='sender_to_link')
-def sender_to_link(desc, sender, url, allnames=True):
+def sender_to_link(desc, sender, url, allnames=None):
     '''
     replace a word in a string with a hyperlink
     {% sender_to_link "string" sender "url" allnames %}
@@ -77,13 +77,14 @@ def sender_to_link(desc, sender, url, allnames=True):
     IE: if you want to replace "you" with a url pointing the the user's profile, sepcify
     {'you':'/profile/'} and the url generated witll be '/profile/user.id/'.
     
-    NOTIFICATION_CHECK_FOR_SENDER_NAMES: Dictionary of sender.content_types to convert sender object name to urls.
-    IE: if want user.name & blog.name to be converted to urls in notices, sepcify {'sender_type':['name_property','/url_path/']}.
-    sender_type: the content_type of the sender (as a string)
-    url_path: the url path to use when making the hyperlink. ie "/user/" 
-    name_property: if the sender is the name you want to search the desc for. Specify None if the sender is the name
-    you wnat to search for. If you want to seach for sender.user sepcify 'user'.
-    url output: path to the name object's id '/url_path/name_obj.id/'
+    NOTIFICATION_CHECK_FOR_SENDER_NAMES: Dictionary of sender.content_types to convert sender 
+    object name to urls. IE: if want user.name & blog.name in your description to be converted
+    to urls in notices, sepcify {'sender_type':['name_property','/url_path/']}.
+    - sender_type: the content_type of the sender (as a string)
+    - url_path: the url path to use when making the hyperlink. ie "/user/" 
+    - name_property: if the sender is the name you want to search the desc for specify None.
+      If you want to seach for sender.user sepcify 'user'.
+    - url output: path to the name object's id '/url_path/name_obj.id/'
     '''
     sender_type = ContentType.objects.get_for_model(sender).name
     map = getattr(settings, 'NOTIFICATION_CONTENT_TYPE_TRANSLATIONS', {})
@@ -118,13 +119,14 @@ def sender_to_link(desc, sender, url, allnames=True):
                 
     #also check for other key words
     for key_word in other_key_words:
-        #find the word only if it's not part of another word
-        rex = r'\s('+key_word+')[\s\W]+|\s('+key_word+')$'
-        found = re.search(rex,desc)
-        if found:
-            result = found.group(1) or found.group(2)
-            link = '<a href="'+other_key_words[key_word]+str(sender.id)+'/">'+key_word.title()+'</a>'
-            desc = link.join(desc.split(result))
+        if key_word != sender_type:
+            #find the word only if it's not part of another word
+            rex = r'\s('+key_word+')[\s\W]+|\s('+key_word+')$'
+            found = re.search(rex,desc)
+            if found:
+                result = found.group(1) or found.group(2)
+                link = '<a href="'+other_key_words[key_word]+str(sender.id)+'/">'+key_word.title()+'</a>'
+                desc = link.join(desc.split(result))
 
     return desc
 
@@ -142,5 +144,5 @@ def convert_to_observed_description(desc, sender_type, from_user):
         action = desc.split('your')[0]
         new_value = action+owner_object+sender_type
     else:
-        new_value = ''
+        new_value = desc
     return new_value

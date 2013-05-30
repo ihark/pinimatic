@@ -16,7 +16,9 @@
 	"notice_id": self.id?False,-->
 <!--EXTRA CONTEXT:
 	"from_user":user,
-	"sender_url": root_url+sender_url, -->
+	"sender_url": root_url+sender_url,
+	"observed": observed object, (when observed notice)
+	"new" (when observed notice for new object creation)	-->
 <!--{% load email %}: load email tempaltetags (you muust install in your templatetags)
 	{% dev_static_prefix as DEV_STATIC_PREFIX %}: returns url to static host when STATIC_URL 
     is defined as a path (this is required to get working urls to images in your email template. 
@@ -28,7 +30,7 @@
 {% load i18n %}
 {% load email %}
 <a href="{{root_url}}{% url pins:profile from_user.id %}">{{from_user|capfirst}}</a>
-{% if observed %}
+{% if observed and alter_desc %}
 	{% observed_desc notice.description sender_type from_user as desc%}
 	{% sender_to_link desc sender sender_url %}
 {% else %}

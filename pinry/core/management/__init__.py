@@ -27,7 +27,8 @@ if "notification" in settings.INSTALLED_APPS:
             notification.create_notice_type("followed", _("New Follower"), _("has followed you"))
             notification.create_notice_type("favorited", _("New Favorite"), _("has favorited your pin"))
             notification.create_notice_type("commented", _("New Comment"), _("has commented on your pin"))
-            notification.create_notice_type("added", _("New Add"), _("has added your pin to their collection"))
+            notification.create_notice_type("added", _("Re-Pin"), _("has added your pin to their collection"))
+            notification.create_notice_type("new", _("New Pin"), _("has added a new pin to their collection"))
             notification.create_notice_type("system_message", _("%s Notice") % settings.SITE_NAME,
                  _("important information about %s") % settings.SITE_NAME)
     signals.post_syncdb.connect(create_notice_types, sender=notification)

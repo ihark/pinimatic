@@ -1,5 +1,8 @@
 {% load i18n %}
 {% load email %}
+{% dev_static_prefix as DEV_STATIC_PREFIX %}
+{% root_url as root_url %}
+{% load static from staticfiles %}
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width">
@@ -14,9 +17,9 @@
 		text-decoration:none;
 	}
 </style>
-<!-- ipad requires min-width:100% in body to prevent right side margin -->
+
 <body style="margin:0; padding:0; width:100%; height:100%; min-width:100%;
-background-color:#111; background-image:url('{{root_url}}/static/core/img/backgrounds/pw_maze_black.png');
+background-color:#111; background-image:url('{{ DEV_STATIC_PREFIX }}{% static 'core/img/backgrounds/pw_maze_black.png' %}');
 font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 
 	<table width="100%" cellspacing="0" border="0" align="center" height="100%" style="border-collapse:collapse; margin:0; padding:0;
@@ -28,12 +31,19 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 				font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 					<tr>
 						<td class="body" width="auto" style="min-width: 150px; padding: 20px 20px 20px 20px;
-						background: White; border-radius: 6px;">
-							<div>Hey {{recipient}},<br><br></div>
-							<div>{{message}}<br>
-							Check out their stuff on 
-							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{root_url}}/user/{{from_user.id}}/">
-							<img height="14" alt="{{current_site.name}}" src="{{root_url}}/static/core/img/logo-18.png"></a>.
+						background: White; border-radius: 6px; font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
+							<div>Hey {{recipient|capfirst}},<br><br></div>
+							{% load i18n %}{% blocktrans with message as message %}<div id="message_display">{{message}}<br>{% endblocktrans %}</div>
+							<BR>
+							<div>{% trans "Thank you for using " %}
+							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{root_url}}/">
+							<img height="14" alt="{{current_site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>!
+							</div>
+							<BR>
+							<div style="font-size:11px; font-style:italic;">
+							{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesturday may suddenly not work today.  Any 500 errors you recive will be reported to us automatically.  Howerver, plase do report any other issues, bugs, or comments" %} 
+							<a style="font-family:Arial, Helvetica, sans-serif" href="{{root_url}}{% url core:contact %}"> HERE</a>.
+							{% trans "  Thank you for your support and participation while we test and improove " %}{{site.name}}.
 							</div>
 						</td>
 					</tr>

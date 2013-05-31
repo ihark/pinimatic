@@ -1,7 +1,9 @@
-{% extends 'account/base.html' %}
+{% extends 'base.html' %}
 
 {% block body_class %}notices{% endblock %}
 
-{% block content %}
+{% block base %}
+<div class="form-container accounts notification">
 {% block body %}{% endblock %}
+</div>
 {% endblock %}

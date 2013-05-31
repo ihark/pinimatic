@@ -16,6 +16,8 @@
 				<span class="caret"></span>
 			</a>
 			<ul class="dropdown-menu">
+				<li><a href="{% url notificaton_observation_settings 'user' %}">{% trans "Individual User Notice Settings" %}</a></li>
+				<li><a href="{% url notificaton_observation_settings 'pin' %}">{% trans "Individual Pin Notice Settings" %}</a></li>
 				<li><a href="{% url notification_notices_all %}">{% trans "View All Notices" %}</a></li>
 				<li><a href="{% url notification_notices_archived %}">{% trans "View Deleted Notices" %}</a></li>	
 			</ul>

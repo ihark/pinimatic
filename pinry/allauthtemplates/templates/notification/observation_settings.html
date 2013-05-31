@@ -9,13 +9,16 @@
 
 {% block body %}
 <div class="notification notification-settings">
-    <h1>{% trans "Notification Settings" %}
+    <h1>{% trans "Notice Settings (detail)" %}
 		<div class="btn-group pull-right">
 			<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
 				Options
 				<span class="caret"></span>
 			</a>
 			<ul class="dropdown-menu">
+				<li><a href="{% url notificaton_observation_settings 'user' %}">{% trans "Individual User Notice Settings" %}</a></li>
+				<li><a href="{% url notificaton_observation_settings 'pin' %}">{% trans "Individual Pin Notice Settings" %}</a></li>
+				<li><a href="{% url notification_notice_settings %}">{% trans "Manage Notifications" %}</a></li>
 				<li><a href="{% url notification_notices_all %}">{% trans "View All Notices" %}</a></li>
 				<li><a href="{% url notification_notices_archived %}">{% trans "View Deleted Notices" %}</a></li>	
 			</ul>
@@ -37,22 +40,30 @@
 		<div class="form-table">
 			<table class="table notice_settings">
 				<tr>
-					<th>{% trans "Notice From Object" %}</th>
+					<th>{% trans "From:" %}</th>
 					{% for header in notice_settings.column_headers %}
 						<th>
-							{{ header.title }}
+							When they have {{ header.title }}s
 						</th>
 					{% endfor %}
 				</tr>
 				{% for row in notice_settings.rows %}
 					<tr class="notice-row">
 						<td class="notice_type_description">
-							<strong>{{ row.observed.content_type }}/{{ row.observed.object_id }}: </strong>
-							<span class="notice_type_description"><br>
-							{% if row.notice_type.label %}
-								{{ row.observed.user }}
+							{% if row.observed.content_type.name == "pin" %}
+								<strong>{{ row.observed.content_type|capfirst }} by {{ row.observed.observed_object.submitter|capfirst }}</strong>
+								<span class="notice_type_description"><br>
+								<a href="/pin/{{row.observed.object_id}}/">
+								<img src="{{MEDIA_URL}}{{ row.observed.observed_object.thumbnail }}"/></a>
+							{% elif row.observed.content_type.name == "user" %}
+								<strong>{{ row.observed.observed_object.username|capfirst }}</strong>
+								<span class="notice_type_description"><br>
+								<a href="/user/{{row.observed.object_id}}/">
+								<div class="avatar" ></div>
 							{% else %}
-								{{ row.observed.user }}
+								<strong>{{ row.observed.content_type }}: </strong>
+								<span class="notice_type_description"><br>
+								{{ row.observed.observed_object }}
 							{% endif %}
 							</span>
 						</td>

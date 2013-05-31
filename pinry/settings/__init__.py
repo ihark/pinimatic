@@ -148,6 +148,8 @@ API_LIMIT_PER_PAGE = 30
 '''
 EMAIL
 '''
+#TODO: impiment this in all email, currently only in admin send_email
+EMAIL_RECIPIANT_NAME = 'first_name'
 DEFAULT_FROM_EMAIL = 'Pinimatic <pinimatic@gmail.com>'
 EMAIL_USE_TLS = True
 EMAIL_PORT = '587'

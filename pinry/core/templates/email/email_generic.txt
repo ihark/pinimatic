@@ -1,3 +1,9 @@
-{% load email %}
+{% load i18n %}{% load email %}{% dev_static_prefix as DEV_STATIC_PREFIX %}{% root_url as root_url %}{% load static from staticfiles %}{% trans "Hey" %} {{recipient|capfirst}},
 
-{% block header_generic %}{% endblock %}
+{{message}}
+
+{% trans "Thank you for using " %}{{site.name}}!
+{{root_url}}
+
+
+{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesturday may suddenly not work today.  Any 500 errors you recive will be reported to us automatically.  Howerver, plase do report any other issues, bugs, or comments" %}. 

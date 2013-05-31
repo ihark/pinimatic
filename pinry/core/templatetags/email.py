@@ -5,11 +5,20 @@ from django.core.exceptions import ImproperlyConfigured
 from urllib import quote
 import socket
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 import re
 
 register = Library()
 
-#email template tags
+@register.assignment_tag
+def root_url():
+    '''
+    Provide root url for current site.
+    '''
+    current_site = Site.objects.get_current()
+    root_url = "http://%s" % unicode(current_site)
+    return root_url
+
 @register.assignment_tag
 def dev_static_prefix():
     '''
@@ -132,7 +141,7 @@ def sender_to_link(desc, sender, url, observed=None, allnames=None):
     return desc
 
 @register.assignment_tag(name='observed_desc')
-def convert_to_observed_description(desc, sender_type, from_user, owner=None):
+def convert_to_observed_description(desc, sender_type, from_user, owner):
     '''
     Convert a notice description to an observed description
     {% observed_desc notice.description sender_type sender_url as desc %}
@@ -140,13 +149,13 @@ def convert_to_observed_description(desc, sender_type, from_user, owner=None):
     *desc must be of the form "has ___ on your sender_type"
     '''
     if sender_type in desc:
-        from_name = str(from_user).title()+"'s "
+        owner_name = str(owner).title()+"'s "
         print from_user, owner
         if from_user == owner:
-            from_name = 'their '
+            owner_name = 'their '
         #desc = desc.replace('has', 'has also')
         action = desc.split('your')[0]
-        new_value = action+from_name+sender_type
+        new_value = action+owner_name+sender_type
     else:
         new_value = desc
     return new_value

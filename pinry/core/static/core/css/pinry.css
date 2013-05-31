@@ -191,10 +191,11 @@ h1, h2, h3, h4, h5, h6 {
 .accounts {
 	background-color: transparent;
 	color: #AAA;
-	width:400px;
+	
 }
 	.accounts.form-container {
 		text-align: center;
+		width:400px;
 	}
 	.accounts h1{
 		color:#444;
@@ -852,6 +853,9 @@ margin: 0px 0px;
 		}
 
 /* NOTICES */
+.notification.form-container{
+	width:500px
+}
 .accounts .notices-form{
 	width:100%
 }
@@ -872,6 +876,9 @@ margin: 0px 0px;
 }
 .notification-notices {
 	min-height:200px;
+}
+.notification-settings form{
+	width:100%;
 }
 .unseen.notice{
 	background:rgba(124, 201, 25, 0.24);
@@ -925,14 +932,14 @@ table, th, td{
 	height:40px;
 	width:auto;
 }
-.item .avatar{
+.avatar{
 	height:40px;
 	width:40px;
 	vertical-align:middle;
 	border: 1px solid #555;
 }
 
-.item .avatar img{
+.avatar img{
 	max-height:28px;
 	width:28px;
 }
@@ -956,7 +963,6 @@ form h1 {
 		width: 200px;
 		line-height: 25px;
 	}
-
 
 /* GENERAL FORMATTING */
 #pins.show  .pin{

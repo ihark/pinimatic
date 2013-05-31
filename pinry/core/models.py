@@ -37,7 +37,7 @@ def user_follow_handler(user, target, instance, **kwargs):
     instance: the follow object
     '''
     from notification import models as notification
-    notification.send_observation_notices_for(target, "followed", {"from_user": user}, [user])
+    notification.send_observation_notices_for(target, "followed", {"from_user": user, "owner": target.submitter}, [user])
     if user != target:
         notification.send([target], "followed", {"from_user": user}, sender=user)
         notification.observe(target, user, "followed")
@@ -46,7 +46,7 @@ def user_follow_handler(user, target, instance, **kwargs):
         notification.observe(target, user, "commented")
 
 @receiver(followed, sender=Pin, dispatch_uid='follow.pin')
-def pin_follow_handler(user, target, instance, **kwargs):
+def pin_favorite_handler(user, target, instance, **kwargs):
     '''
     user: the user who acted
     target: the pin that has been followed
@@ -54,9 +54,9 @@ def pin_follow_handler(user, target, instance, **kwargs):
     '''
     from notification import models as notification
     #notify pin's followers
-    notification.send_observation_notices_for(target, "favorited", {"from_user": user}, [user])
+    notification.send_observation_notices_for(target, "favorited", {"from_user": user, "owner": target.submitter}, [user])
     #notify user's followers
-    notification.send_observation_notices_for(user, "favorited", {"from_user": user}, [user], sender=target)
+    notification.send_observation_notices_for(user, "favorited", {"from_user": user, "owner": target.submitter}, [user], sender=target)
     if user != target.submitter:
         #notify pin's owner
         notification.send([target.submitter], "favorited", {"from_user": user}, sender=target)
@@ -90,6 +90,6 @@ def new_pin_handler(sender, *args, **kwargs):
     target = pin
     from notification import models as notification
     #notify user's followers
-    notification.send_observation_notices_for(user, "new", {"from_user": user}, [user], sender=target)
+    notification.send_observation_notices_for(user, "new", {"from_user": user, "owner": target.submitter}, [user], sender=target)
 
        

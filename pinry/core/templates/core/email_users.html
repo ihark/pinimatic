@@ -12,8 +12,9 @@
 				<div>
 					<label for="id_from_email" class="required">From Email:</label>
 					<select name="from_email" id="id_from_email">
-						<option value="staff_{{email_suffix}}">staff_{{email_suffix}}</option>
-						<option value="support_{{email_suffix}}">support_{{email_suffix}}</option>
+						<option value="{{from_email}}">{{from_email}}</option>
+						<option value="Support {{from_email}}">Support {{from_email}}</option>
+						<option value="IMPORTANT {{from_email}}">IMPORTANT {{from_email}}</option>
 					</select>
 				</div>
 			</div>
@@ -29,10 +30,16 @@
 					<textarea id="id_message" rows="10" cols="75" name="message"></textarea>
 				</div>
 			</div>
-			<div class="form-row field-preview">
+			<div class="form-row field-html-preview">
 				<div>
-					<label for="id_preview" class="required">Preview:</label>
-					<textarea id="id_preview" rows="10" cols="75" readonly name="preview">{{preview}}</textarea>
+					<div style="" class="required">HTML Preview:</div>
+					<div id="id_html_preview" style="width:600px; height:auto; border:1px solid Black; background-color:Black;">{{html_preview}}</div>
+				</div>
+			</div>
+			<div class="form-row field-text-preview">
+				<div>
+					<div style="" class="required">TEXT Preview:</div>
+					<textarea id="id_text_preview" style="width:600px; height:300px; border:1px solid Black;">{{text_preview}}</textarea>
 				</div>
 			</div>
 		</fieldset>
@@ -50,4 +57,14 @@
     <input type="submit" value="Send Email" />
     </div>
 </form>
+<script>
+document.getElementById('id_message').addEventListener('change', onChange, false);
+function onChange(e){
+	console.warn(e)
+	console.warn(e.target)
+	text = e.target.innerHTML
+	console.warn(e.target.innerHTML)
+	document.getElementById('message_display').innerHTML = text
+}
+</script>
 {% endblock %}

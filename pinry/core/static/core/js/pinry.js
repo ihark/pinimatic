@@ -1329,12 +1329,12 @@ function follow(targetBtn, display) {
 		console.log('count: '+count)
 		console.log('state = '+state)
 		if(state == "True") {
-			button.attr('data-state', 'false');
+			button.attr('data-state', 'False');
 			button.html('Follow')
 			count--;
 			console.log('count: '+count)
 		} else {
-			button.attr('data-state', 'true');
+			button.attr('data-state', 'True');
 			button.html('Un-Follow')
 			count++;
 			console.log('count: '+count)

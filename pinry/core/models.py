@@ -37,7 +37,7 @@ def user_follow_handler(user, target, instance, **kwargs):
     instance: the follow object
     '''
     from notification import models as notification
-    notification.send_observation_notices_for(target, "followed", {"from_user": user, "owner": target.submitter}, [user])
+    notification.send_observation_notices_for(target, "followed", {"from_user": user, "owner": target}, [user])
     if user != target:
         notification.send([target], "followed", {"from_user": user}, sender=user)
         notification.observe(target, user, "followed")

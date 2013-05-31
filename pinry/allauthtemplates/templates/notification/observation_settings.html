@@ -47,7 +47,8 @@
 						</th>
 					{% endfor %}
 				</tr>
-				{% for row in notice_settings.rows %}
+				{% if notice_settings.rows|length > 0 %}
+					{% for row in notice_settings.rows %}
 					<tr class="notice-row">
 						<td class="notice_type_description">
 							{% if row.observed.content_type.name == "pin" %}
@@ -68,14 +69,21 @@
 							</span>
 						</td>
 						{% for cell in row.cells %}
-							<td class="center">
-								{% if cell.0 %}
-								<input type="checkbox" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
-								{% endif %}
-							</td>
+						<td style="vertical-align:middle" class="center">
+							{% if cell.0 %}
+							<input type="checkbox" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
+							{% endif %}
+						</td>
 						{% endfor %}
 					</tr>
-				{% endfor %}
+					{% endfor %}
+				{% else %}
+					<tr class="notice-row">
+						<td class="notice_type_description">
+						You have no individual notifaications yet.
+						</td>
+					</tr>
+				{% endif %}
 			</table>
 		</div>
         

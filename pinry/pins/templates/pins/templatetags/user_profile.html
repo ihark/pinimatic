@@ -1,5 +1,5 @@
 {% load follow_tags %}
-<div class="pin profile" id="{{ profile.id }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ folowingC }}" data-followers="{{ folowersC }}" data-cmnts="{{ cmntsC }}">
+<div class="pin profile" id="{{ profile.id }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ followingC }}" data-followers="{{ followersC }}" data-cmnts="{{ cmntsC }}">
 	<div class="header">
 		<a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');"><h5>{{ profile.username }}</h5></a>
 		{% if request.user != profile and user.is_authenticated%}

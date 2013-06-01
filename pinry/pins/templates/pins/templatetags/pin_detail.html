@@ -48,8 +48,8 @@
 	<!-- //PIN NAVIGATION -->
 			<div id="navigation" class="background-50 btn-lg">
 				<div id="prev" title="Previous Pin" class="inline">
-					<a href="/pin/{{pin.prev}}/">
-						<div class="inline option"><i class="icon-info-sign"></i><br>Prev</div>
+					<a href="{% url pins:pin-detail pin.prev %}">
+						<div class="inline option"><i class="icon-arrow-left"></i><br>Prev</div>
 					</a>
 				</div>
 				<div class="inline divider"></div>
@@ -60,8 +60,8 @@
 				</div>
 				<div class="inline divider"></div>
 				<div id="next" title="Next Pin" class="inline">
-					<a href="/pin/{{pin.next}}/">
-						<div class="inline option"><i class="icon-info-sign"></i><br>Next</div>
+					<a href="{% url pins:pin-detail pin.next %}">
+						<div class="inline option"><i class="icon-arrow-right"></i><br>Next</div>
 					</a>
 				</div>
 				

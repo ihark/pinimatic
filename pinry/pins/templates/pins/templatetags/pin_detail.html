@@ -1,4 +1,5 @@
 {% load follow_tags %}
+{% load avatar_tags %}
 {% load comments %}
 {% load static %}
 {% get_media_prefix as MEDIA_PREFIX %}
@@ -129,13 +130,15 @@
 
 	<div class="section pin-cmnts display" {% if not comment_list %}style="display:none;"{% endif %}>
 			{% for comment in comment_list %}
-				<p class="pin-cmnt touch-off" data-cmnt="{{comment.id}}">
+				<div class="pin-cmnt touch-off" data-cmnt="{{comment.id}}">
+					<a class="avatar-pill " href="{% url pins:profile comment.user.id %}">
+						<div class="avatar inline">{% avatar comment.user 32 %}</div>
+						<div class="user inline">{{comment.user|capfirst}}</div>
+					</a>	
 				{% if user == comment.user or user.is_superuser %}<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>{% endif %}
-					<i class="icon-cmnts icon-gray"></i>	
-					<a href="/user/{{comment.user_id}}/">{{comment.user.username}}:</a>	
-					<span class="text light" >{{comment.comment}}</span>	
-				</p>	
-	
+					
+					<p class="text light" >{{comment.comment}}</p>	
+				</div>	
 			{% endfor %}
 		
 	</div><!-- //end pin-cmnts -->

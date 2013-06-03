@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     (r'^accounts/', include('invitation.urls')),
     (r'^accounts/', include('allauth.urls')),
     (r'^accounts/notifications/', include('notification.urls')),
+    (r'^avatar/', include('avatar.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # test this

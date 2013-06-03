@@ -1,7 +1,7 @@
 {% extends "notification/base.html" %}
 
 {% load i18n %}
-
+{% load avatar_tags %}
 
 {% block body_id %}notification-settings{% endblock %}
 
@@ -9,7 +9,7 @@
 
 {% block body %}
 <div class="notification notification-settings">
-    <h1>{% trans "Notice Settings (detail)" %}
+    <h1>{% trans "Notice Settings " %}({{notice_settings.rows.0.observed.content_type.name|capfirst}}s)
 		<div class="btn-group pull-right">
 			<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
 				Options
@@ -38,38 +38,41 @@
     <form method="POST" class="form" action="">
         {% csrf_token %}
 		<div class="form-table">
-			<table class="table notice_settings">
+			<table class="table observation_settings">
 				<tr>
 					<th>{% trans "From:" %}</th>
 					{% for header in notice_settings.column_headers %}
 						<th>
-							When they have {{ header.title }}s
+							{{ header.title }}s
 						</th>
 					{% endfor %}
 				</tr>
 				{% if notice_settings.rows|length > 0 %}
 					{% for row in notice_settings.rows %}
 					<tr class="notice-row">
-						<td class="notice_type_description">
+						<td class="notice_type_description" width="auto">
 							{% if row.observed.content_type.name == "pin" %}
 								<strong>{{ row.observed.content_type|capfirst }} by {{ row.observed.observed_object.submitter|capfirst }}</strong>
 								<span class="notice_type_description"><br>
 								<a href="{% url 'pins:pin-detail' row.observed.object_id %}">
 								<img src="{{MEDIA_URL}}{{ row.observed.observed_object.thumbnail }}"/></a>
 							{% elif row.observed.content_type.name == "user" %}
-								<strong>{{ row.observed.observed_object.username|capfirst }}</strong>
-								<span class="notice_type_description"><br>
-								<a href="{% url 'pins:pin-detail' row.observed.object_id %}/">
-								<div class="avatar" ></div>
+								<div class="avatar-pill vert">
+									<a href="{% url 'pins:profile' row.observed.observed_object.id %}">
+									<div class="user">{{ row.observed.observed_object.username|capfirst }}</div>
+									<div class="avatar">{% avatar user 80 %}</div>
+									</a>
+								</div>
 							{% else %}
 								<strong>{{ row.observed.content_type }}: </strong>
 								<span class="notice_type_description"><br>
 								{{ row.observed.observed_object }}
+								</span>
 							{% endif %}
-							</span>
+							
 						</td>
 						{% for cell in row.cells %}
-						<td style="vertical-align:middle" class="center">
+						<td style="vertical-align:middle" class="center" width="80px">
 							{% if cell.0 %}
 							<input type="checkbox" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
 							{% endif %}

@@ -1,6 +1,6 @@
 //Global Variables
-//STATIC_URL passed from base.html template context
-//var aProfileId passed from user_profile template tag
+//From base.html template context: STATIC_URL, MEDIA_URL, apiURL
+//From user_profile template tag: aProfileId
 var pinsURL = apiURL+'pin/?format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
@@ -1624,12 +1624,16 @@ function getValue(key, array){
 	}
 	return false;
 };
-//get host name from url
+//get host name from url and determine if it is a userupload
 function getHost(url){
 	var a = document.createElement('a');
 	a.href = url;
 	p = a.hostname.split("www.")
 	if (p[1]===undefined){h=p[0]}else{h=p[1]};
+	uploaded = MEDIA_URL.search(h)+1 || 'localhost'.search(h)+1 || '192.168.1'.search(h)+1
+	if (uploaded){
+		h = 'Uploaded'
+	}
 	return h
 }
 //get sive of current window

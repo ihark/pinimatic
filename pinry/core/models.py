@@ -44,6 +44,7 @@ def user_follow_handler(user, target, instance, **kwargs):
         notification.observe(target, user, "new")
         notification.observe(target, user, "favorited")
         notification.observe(target, user, "commented")
+        notification.observe(target, user, "avatar_updated")
 
 @receiver(followed, sender=Pin, dispatch_uid='follow.pin')
 def pin_favorite_handler(user, target, instance, **kwargs):

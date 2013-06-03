@@ -71,6 +71,7 @@ ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH =6
 ACCOUNT_ADAPTER ="pinry.core.accountadapter.AccountAdapter"
 SOCIALACCOUNT_ADAPTER ="pinry.core.accountadapter.SocialAccountAdapter"
+SOCIALACCOUNT_AVATAR_SUPPORT = 'avatar'
 '''
 INVITATIONS
 '''
@@ -253,6 +254,7 @@ INSTALLED_APPS = (
     #'allauth.socialaccount.providers.twitter',
     'invitation',
     'notification',
+    'avatar'
 )
 SOCIALACCOUNT_PROVIDERS ={ 
     'facebook':

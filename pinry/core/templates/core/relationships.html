@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %}
 {% load user_profile %}
 {% load follow_tags %}
+{% load avatar_tags %}
 {% comment %}
 <!--CONTEXT
 'profile': profile,
@@ -30,8 +31,10 @@
 		<h2>Friends <span class="text-normal">(You are following eachother)</span></h2>
 		{% for user in relationships.friends %}
 			<div class="follow item">
-				<div class="avatar inline"></div>
+				<a class="avatar-pill" href="{% url pins:profile user.id %}">
+				<div class="avatar inline">{% avatar user 40 %}</div>
 				<div class="user inline">{{user|capfirst}}</div>
+				</a>
 				<div class="pins inline">
 				{% for pin in user.pins %}
 					<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>

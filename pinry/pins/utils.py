@@ -15,11 +15,17 @@ from django.contrib.sites.models import Site
 current_site = Site.objects.get_current()
 root_url = "http://%s" % unicode(current_site)
 
-def get_top_domains(srcUrls, qty):
+def get_top_domains(srcUrls, qty=1):
+    '''
+    Return top domains in list:
+    srcUrl format: [(srcUrl,count)]
+    '''
     srcDomains = {}
     for url in srcUrls:
         p = urlparse(url[0])
         dom = p.netloc or unicode(current_site.domain)
+        if dom in current_site.domain or dom in settings.MEDIA_URL:
+            dom = "Uploaded"
         count = url[1]
         parts = p.scheme, p.netloc, '', '', '', ''
         url = urlunparse(parts)
@@ -110,7 +116,7 @@ def getPinContext(request, pinId):
     pin.tagsC = pin.tags.count()
     pin.repins = Pin.objects.filter(repin=pin)
     pin.repinsC = pin.repins.count()
-    pin.srcDom = get_top_domains([pin.srcUrl], 1)[0][0]
+    pin.srcDom = get_top_domains([(pin.srcUrl,1)], 1)[0][0]
     
     next = Pin.objects.filter(id__gt=pinId)
     prev = Pin.objects.filter(id__lt=pinId)

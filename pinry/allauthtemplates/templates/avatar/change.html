@@ -1,0 +1,36 @@
+{% extends "avatar/base.html" %}
+{% load avatar_tags %}
+
+{% block content %}
+    <h1>Profile Image</h1>
+    <div id="thumb_div" class="avatars">{% avatar user 180  %}</div>
+    <div id="choice_list" class="avatars">
+    	{% if not avatars %}
+    	    <p>Get some personality, upload an image.</p>
+    	{% else %}
+			{% for avatar in avatars %}
+    	    <form class="avatar-choice" method="POST" action="">
+				{% csrf_token %}
+				<input type="hidden" name="choice" value="{{avatar.id}}"/>
+				<div class="hover"><INPUT TYPE="image" SRC="{% avatar_choice_url avatar 90 %}" WIDTH="90"  HEIGHT="90" BORDER="0" ALT="SUBMIT!"/><span class="hover text">Make Active</span></div>
+				
+			</form>
+			<div class="avatar-delete">
+    	    	<form method="POST" action="/avatar/delete/">
+    	    		{% csrf_token %}
+    	    		<input type="hidden" name="choices" value="{{avatar.id}}"/>
+    	    		<INPUT readonly value="X" TYPE="submit" WIDTH="10px"  HEIGHT="10px" BORDER="0"></input>
+    	    	</form>
+    	    </div>
+			
+			{% endfor %}
+    	{% endif %}
+	</div>
+	<div id="fields_div" class="avatars form-actions">
+    	<form enctype="multipart/form-data" method="POST" action="">
+			{% csrf_token %}
+			<input class="btn btn-primary" type="submit" value="Upload New Image" />
+			<input type="file" name="avatar" value="Avatar Image" />
+    	</form>
+    </div>
+{% endblock %}

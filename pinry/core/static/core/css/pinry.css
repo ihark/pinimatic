@@ -954,6 +954,9 @@ table, th, td{
 .relationships .item .btn{
 	margin-top:10px;
 }
+.item .avatar-pill{
+	vertical-align:middle;
+}
 .item .pins{
 	height:40px;
 	width:240px;
@@ -1014,10 +1017,9 @@ table, th, td{
 }
 .form-container.avatars #choice_list input[type="image"]{
 	position: relative;
-	z-index:-1;
 }
 
-.form-container.avatars #choice_list .hover{
+.form-container.avatars #choice_list .hover-btn{
 	width: 90px;
 	height: 90px;
 	position: relative;
@@ -1028,19 +1030,28 @@ table, th, td{
 	background-color: transparent;
 	color: transparent;
 }
-.form-container.avatars #choice_list .hover:hover{
+.form-container.avatars #choice_list .hover-btn:hover .overlay{
 	background-color: rgba(0, 0, 0, 0.3);
 	color: #CCC;
 }
-.form-container.avatars #choice_list .hover.text{
+.form-container.avatars #choice_list .hover-btn .overlay{
+	pointer-events:none;
 	position: absolute;
-	top: 40px;
+	top: 0;
 	left:0;
 	width:100%;
+	height:100%;
 	text-align:center;
 	cursor: pointer;
 	margin: 0;
-	display: inline-block;
+	display:inline-block;
+	vertical-align: middle;
+}
+.form-container.avatars #choice_list .hover-btn .overlay .text{
+	text-align:center;
+	cursor: pointer;
+	margin-top: 40%;
+	
 }
 .avatar-delete form input{
 	background-color: rgba(0, 0, 0, 0.25);

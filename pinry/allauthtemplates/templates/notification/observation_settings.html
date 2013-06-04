@@ -60,7 +60,7 @@
 								<div class="avatar-pill vert">
 									<a href="{% url 'pins:profile' row.observed.observed_object.id %}">
 									<div class="user">{{ row.observed.observed_object.username|capfirst }}</div>
-									<div class="avatar">{% avatar user 80 %}</div>
+									<div class="avatar">{% avatar row.observed.observed_object 80 %}</div>
 									</a>
 								</div>
 							{% else %}

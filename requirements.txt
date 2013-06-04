@@ -16,6 +16,7 @@ gunicorn==0.17.2
 -e git://github.com/arctelix/django-allauth.git#egg=django-allauth
 -e git://github.com/arctelix/django-invitation.git#egg=django-invitation
 -e git://github.com/arctelix/django-notification-1.git#egg=django-notification-1
+-e git://github.com/arctelix/django-avatar.git#egg=django-avatar
 requests-oauthlib
 django-generic-aggregation
 django-picklefield

@@ -6,6 +6,8 @@ from ..pins.models import Pin
 from django.contrib.comments.models import Comment
 from django.db.models.signals import post_save
 from follow.signals import followed
+from avatar.models import Avatar
+from avatar.signals import avatar_updated
 from django.contrib.comments.signals import comment_was_posted, comment_was_flagged
 
 from django.contrib.sites.models import Site
@@ -24,8 +26,9 @@ site_name = site.name
 site_url = 'http://%s/' % site.domain
 
 #REFERENCE: notification.send(users, label, extra_context=None, sender=None)
-#           send_observation_notices_for(observed, label, xcontext=None, exclude=None)
+#           send_observation_notices_for(observed, label, xcontext=None, exclude=None, sender=None)
 #           observe(observed, observer, labels)
+
 #TODO: when notification is imported before  functions with DEBUG=Flase on heroku we get an import error
 #but works with DEBUG=T/F on dev server?
 
@@ -93,4 +96,18 @@ def new_pin_handler(sender, *args, **kwargs):
     #notify user's followers
     notification.send_observation_notices_for(user, "new", {"from_user": user, "owner": target.submitter}, [user], sender=target)
 
-       
+@receiver(avatar_updated, sender=Avatar, dispatch_uid='id')
+def avatar_updated_handler(sender, *args, **kwargs):
+    '''
+    user: the user who acted
+    target: the user that has been followed
+    instance: the follow object
+    '''
+    user = kwargs.pop('user', None)
+    target = kwargs.pop('avatar', None)
+    print '----target', target
+    print '----user', user
+    from notification import models as notification
+    #notify user's followers
+    notification.send_observation_notices_for(user, "avatar_updated", {"from_user": user, "alter_desc":False, "owner": user}, [user], sender=user)
+   

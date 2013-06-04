@@ -151,12 +151,12 @@ def relationships(request):
     followers = context.get('followers', None)
     relationships = get_relationships(user, following, followers)
     context.update({'relationships':relationships})
-    print relationships
     #get pin thumbs for all related users
-    for type in relationships:
-        for user in relationships[type]:
-            pins = Pin.objects.filter(submitter__exact=user)[:7]
-            user.pins = pins
+    if relationships:
+        for type in relationships:
+            for user in relationships[type]:
+                pins = Pin.objects.filter(submitter__exact=user)[:7]
+                user.pins = pins
 
     return TemplateResponse(request, 'core/relationships.html', context)
 

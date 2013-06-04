@@ -173,7 +173,7 @@ def getPinContext(request, pinId):
  you may include them to prevent another query.
 '''    
 def get_relationships(user, following=None, followers=None):
-    friends = []
+    friendsL = []
     if not followers and not following:
         followers = Follow.objects.get_follows(user)
         following = Follow.objects.filter(user=user).exclude(folowing__exact=None)
@@ -181,7 +181,7 @@ def get_relationships(user, following=None, followers=None):
     followingL = [follow.folowing for follow in following]
     for follow in following:
         if follow.folowing in followersL:
-            friends.append(follow.folowing)
+            friendsL.append(follow.folowing)
             followersL.remove(follow.folowing)
             followingL.remove(follow.folowing)
     '''
@@ -189,5 +189,8 @@ def get_relationships(user, following=None, followers=None):
     followers_f = followers.exclude(user__in=friendsL)
     following_f = following.exclude(folowing__in=friendsL)
     '''
-    return {'friends':friends, 'followers':followersL, 'following':followingL}
+    relationships = None
+    if friendsL or followersL or followingL:
+        relationships = {'friends':friendsL, 'followers':followersL, 'following':followingL}
+    return relationships
 

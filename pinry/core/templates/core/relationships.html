@@ -2,6 +2,7 @@
 {% load user_profile %}
 {% load follow_tags %}
 {% load avatar_tags %}
+{% load i18n %}
 {% comment %}
 <!--CONTEXT
 'profile': profile,
@@ -27,71 +28,77 @@
 	</div>
 	<div class="relationships content accounts border-only right-col">
 		<h1>Relationships</h1>
-		{% if relationships.friends|length > 0 %}
-		<h2>Friends <span class="text-normal">(You are following eachother)</span></h2>
-		{% for user in relationships.friends %}
+		{% if relationships %}
+			{% if relationships.friends|length > 0 %}
+			<h2>Friends <span class="text-normal">(You are following eachother)</span></h2>
+			{% for user in relationships.friends %}
+				<div class="follow item">
+					<a class="avatar-pill" href="{% url pins:profile user.id %}">
+					<div class="avatar inline">{% avatar user 40 %}</div>
+					<div class="user inline">{{user|capfirst}}</div>
+					</a>
+					<div class="pins inline">
+					{% for pin in user.pins %}
+						<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
+					{% endfor %}
+					</div>
+					<div class="pull-right">
+						<form action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
+							{% csrf_token %}
+							<button type="submit" class="btn btn-mini btn-danger">Un-Follow</button>
+						</form>
+					</div>
+				</div>
+			{% endfor %}
+			{% endif %}
+			{% if relationships.following|length > 0 %}
+			<h2>Following</h2>
+			{% for user in relationships.following %}
+				<div class="follow item">
+					<div class="avatar inline"></div>
+					<div class="user inline">{{user|capfirst}}</div>
+					<div class="pins inline">
+					{% for pin in user.pins %}
+						<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
+					{% endfor %}
+					</div>
+					<div class="pull-right">
+						<form action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
+							{% csrf_token %}
+							<button type="submit" class="btn btn-mini btn-danger">Un-Follow</button>
+						</form>
+					</div>
+				</div>
+			{% endfor %}
+			{% endif %}
+			{% if relationships.followers|length > 0 %}
+			<h2>Followers</h2>
+			{% for user in relationships.followers %}
+				<div class="follow item">
+					<div class="avatar inline"></div>
+					<div class="user inline">{{user|capfirst}}</div>
+					<div class="pins inline">
+					{% for pin in user.pins %}
+						<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
+					{% endfor %}
+					</div>
+					<div class="pull-right">
+						<form class="inline" action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
+							{% csrf_token %}
+							<button type="submit" class="btn btn-mini btn-primary">Follow</button>
+						</form>
+						<form class="inline" action="{% url core:unfollow 'auth' 'User' request.user.id user.id%}" method="post">
+							{% csrf_token %}
+							<button type="submit" class="btn btn-mini btn-danger">Remove</button>
+						</form>
+					</div>
+				</div>
+			{% endfor %}
+			{% endif %}
+		{% else %}
 			<div class="follow item">
-				<a class="avatar-pill" href="{% url pins:profile user.id %}">
-				<div class="avatar inline">{% avatar user 40 %}</div>
-				<div class="user inline">{{user|capfirst}}</div>
-				</a>
-				<div class="pins inline">
-				{% for pin in user.pins %}
-					<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
-				{% endfor %}
-				</div>
-				<div class="pull-right">
-					<form action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
-						{% csrf_token %}
-						<button type="submit" class="btn btn-mini btn-danger">Un-Follow</button>
-					</form>
-				</div>
+				{% trans "You currently have no relationships to manage.  Get out there and start following people." %}
 			</div>
-		{% endfor %}
-		{% endif %}
-		{% if relationships.following|length > 0 %}
-		<h2>Following</h2>
-		{% for user in relationships.following %}
-			<div class="follow item">
-				<div class="avatar inline"></div>
-				<div class="user inline">{{user|capfirst}}</div>
-				<div class="pins inline">
-				{% for pin in user.pins %}
-					<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
-				{% endfor %}
-				</div>
-				<div class="pull-right">
-					<form action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
-						{% csrf_token %}
-						<button type="submit" class="btn btn-mini btn-danger">Un-Follow</button>
-					</form>
-				</div>
-			</div>
-		{% endfor %}
-		{% endif %}
-		{% if relationships.followers|length > 0 %}
-		<h2>Followers</h2>
-		{% for user in relationships.followers %}
-			<div class="follow item">
-				<div class="avatar inline"></div>
-				<div class="user inline">{{user|capfirst}}</div>
-				<div class="pins inline">
-				{% for pin in user.pins %}
-					<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
-				{% endfor %}
-				</div>
-				<div class="pull-right">
-					<form class="inline" action="{% url follow:toggle 'auth' 'User' user.id %}?next={{request.get_full_path}} " method="post">
-						{% csrf_token %}
-						<button type="submit" class="btn btn-mini btn-primary">Follow</button>
-					</form>
-					<form class="inline" action="{% url core:unfollow 'auth' 'User' request.user.id user.id%}" method="post">
-						{% csrf_token %}
-						<button type="submit" class="btn btn-mini btn-danger">Remove</button>
-					</form>
-				</div>
-			</div>
-		{% endfor %}
 		{% endif %}
 	</div>
 </div>

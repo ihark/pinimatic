@@ -72,8 +72,8 @@ class UserResource(ModelResource):
        
     ''' depreciated in 0.9.12-alpha
     def apply_authorization_limits(self, request, object_list):
-        print '--apply_authorization_limits--'
-        print request.user.id
+        #P '--apply_authorization_limits--'
+        #P request.user.id
         result = object_list.filter(id=request.user.id)
         return result
     '''
@@ -250,7 +250,7 @@ class PinResource(ModelResource):
         authorization = DjangoAuthorization()
     '''No longer needed since comments foreign relation started working (keeping for reference)
     def obj_get_list(self, bundle, **kwargs):
-        print '--obj_get_list--'
+        #P '--obj_get_list--'
         objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
         for p in objects:
             #add comments to pin
@@ -264,7 +264,7 @@ class PinResource(ModelResource):
     '''
     
     def apply_filters(self, request, applicable_filters):
-        print '---apply_filters----'
+        #P '---apply_filters----'
         """
         An ORM-specific implementation of ``apply_filters``.
 
@@ -287,7 +287,7 @@ class PinResource(ModelResource):
     
     
     def apply_sorting(self, objects, options=None):
-        print '---apply_sorting----'
+        #P'---apply_sorting----'
         if options and "sort" in options:
             if options['sort'] == "popularity":
                 #this is wrong, need to get how many times a pin is repinned. This is counting the fact that it was repinned from another pin.
@@ -299,7 +299,7 @@ class PinResource(ModelResource):
         return super(PinResource, self).apply_sorting(objects, options)
 
     def build_filters(self, filters=None):
-        print '---build filters---'
+        #P'---build filters---'
         if filters is None:
             filters = {}
 
@@ -361,11 +361,11 @@ class PinResource(ModelResource):
     ''' no longer needed due to 0.9.11 grade
     def post_list(self, request, **kwargs):
         resp = super(PinResource, self).get_list(request, **kwargs)
-        print resp
+        #P resp
         return resp
     '''
     def obj_create(self, bundle, **kwargs):
-        print '----obj_create------'
+        #P '----obj_create------'
         repinUrl = '/api/v1/pin/'+bundle.data['repin']+'/'
         bundle = super(PinResource, self).obj_create(bundle, repinObj=repinUrl,  submitter=bundle.request.user, uImage=None, comments=[])
         messages.success(bundle.request, 'Your pin has been added.')
@@ -460,7 +460,7 @@ class CmntResource(ModelResource):
         return "application/json" 
 
     def obj_create(self, bundle, **kwargs):
-        print '----obj_create------'
+        #P '----obj_create------'
         #content_type='/api/v1/contrib/contenttype/'+bundle.data['content_type_id']+'/'
         #content_object_url = '/api/v1/pin/'+bundle.data['object_pk']+'/'
         
@@ -491,7 +491,7 @@ class PinTagResource(ModelResource):
         authorization = DjangoAuthorization()
     
     def build_filters(self, filters=None):
-        print '---build filters---'
+        #P '---build filters---'
         if filters is None:
             filters = {}
 

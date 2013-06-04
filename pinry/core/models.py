@@ -58,9 +58,9 @@ def pin_favorite_handler(user, target, instance, **kwargs):
     '''
     from notification import models as notification
     #notify pin's followers
-    notification.send_observation_notices_for(target, "favorited", {"from_user": user, "owner": target.submitter}, [user])
+    notification.send_observation_notices_for(target, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user], sender=target)
     #notify user's followers
-    notification.send_observation_notices_for(user, "favorited", {"from_user": user, "owner": target.submitter}, [user], sender=target)
+    notification.send_observation_notices_for(user, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user], sender=target)
     if user != target.submitter:
         #notify pin's owner
         notification.send([target.submitter], "favorited", {"from_user": user}, sender=target)
@@ -73,7 +73,6 @@ def pin_favorite_handler(user, target, instance, **kwargs):
 @receiver(post_save, sender=Comment, dispatch_uid='comment.user')
 def pin_comment_handler(sender, *args, **kwargs):
     comment = kwargs.pop('instance', None)
-    print comment
     user = comment.user
     target = comment.content_object
     from notification import models as notification
@@ -98,16 +97,8 @@ def new_pin_handler(sender, *args, **kwargs):
 
 @receiver(avatar_updated, sender=Avatar, dispatch_uid='id')
 def avatar_updated_handler(sender, *args, **kwargs):
-    '''
-    user: the user who acted
-    target: the user that has been followed
-    instance: the follow object
-    '''
     user = kwargs.pop('user', None)
     target = kwargs.pop('avatar', None)
-    print '----target', target
-    print '----user', user
     from notification import models as notification
     #notify user's followers
     notification.send_observation_notices_for(user, "avatar_updated", {"from_user": user, "alter_desc":False, "owner": user}, [user], sender=user)
-   

@@ -80,3 +80,6 @@ Compressing... Error: An error occured during rendering /app/pinry/pins/template
 strap/2.0.3/css/bootstrap.css' isn't accessible via COMPRESS_URL ('http://pinry.s3.amazonaws.com/static/') and can't be
 compressed
 """
+#Specify custom image url when user has no gravitar
+#AVATAR_GRAVATAR_DEFAULT = 'mm'
+#TODO:'http:'+STATIC_URL+'/vendor/avatar/img/default.jpg'

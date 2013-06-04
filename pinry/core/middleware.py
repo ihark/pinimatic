@@ -85,7 +85,7 @@ class SecureRequiredMiddleware(object):
         referer = request.META.get('HTTP_REFERER', False)
         post = request.method == 'POST' or request.REQUEST.get('save', False)
         if not post and referer and self.enabled and not request.is_ajax() and not self.is_ignored_path(request):
-            #print '----middleware: SecureRequired----'
+            #P '----middleware: SecureRequired----'
             request_path = request.get_full_path()
             request_url = request.build_absolute_uri(request_path)
             '''print '***secure requered - request_url: ',request_url
@@ -114,7 +114,7 @@ class SecureRequiredMiddleware(object):
                 '''print '----ssl method', request.method
                 print '----ssl REQUEST', request.REQUEST'''
                 return HttpResponsePermanentRedirect(unsecure_url)
-            #print 'middleware: --no redirect required'
+            #P 'middleware: --no redirect required'
         return None
     
 class Public(object):

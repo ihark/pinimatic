@@ -88,10 +88,9 @@ DEFAULT_USER_GROUP = 'basic'
 NOTIFICATION
 '''
 #KEY_WORD_TO_URL_TRANSLATIONS = {'pin':'your'}
-NOTIFICATION_CONTENT_TYPE_TRANSLATIONS = {'user':['profile picture',None]}
+NOTIFICATION_CONTENT_TYPE_TRANSLATIONS = {'user':['profile picture', None]}
 NOTIFICATION_OTHER_KEY_WORDS = {'you':'/user/'}
 #NOTIFICATION_CHECK_FOR_SENDER_NAMES = {'pin':['submitter','/user/']}
-#NOTIFICATION_OBSERVED_SPLITS = 
 ''' 
 AVATAR
 '''
@@ -102,8 +101,15 @@ AVATAR_CLEANUP_DELETED = True
 AVATAR_MAX_AVATARS_PER_USER = 4
 #Use gravatar when no avatar is selected
 AVATAR_GRAVATAR_BACKUP = True
-#Specify custom image url when user has no gravitar
-#AVATAR_GRAVATAR_DEFAULT = ''
+'''
+mm: (mystery-man) a simple, cartoon-style silhouetted outline of a person (does not vary by email hash)
+identicon: a geometric pattern based on an email hash
+monsterid: a generated 'monster' with different colors, faces, etc
+wavatar: generated faces with differing features and backgrounds
+retro: awesome generated, 8-bit arcade-style pixelated faces
+blank: a transparent PNG image (border added to HTML below for demonstration purposes)
+'''
+AVATAR_GRAVATAR_DEFAULT = 'identicon'
 ''' 
 LOCATION
 '''

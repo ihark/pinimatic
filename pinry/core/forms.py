@@ -24,7 +24,7 @@ class ContactForm(forms.Form):
         super(forms.Form, self).__init__(*args, **kwargs)
         
     def clean_honey(self):
-        #print '--form clean_repin'
+        #P '--form clean_repin'
         data = self.cleaned_data['honey']
         if data == '':
             pass
@@ -36,9 +36,9 @@ class CustomTagWidget(forms.TextInput):
     def render(self, name, value, attrs=None):
         attrs={'placeholder':'add new tags here'}
         print 'TODO: core.models.CustomTagWidget move to widget file'
-        #print "widget attrs", attrs
-        #print "widget value",value
-        #print "widget name",name
+        #P "widget attrs", attrs
+        #P "widget value",value
+        #P "widget name",name
         if value is not None and not isinstance(value, basestring):
             value = edit_string_for_tags([o.tag for o in value.select_related("tag")])
             #remove all quotes from tag values when rendered on form
@@ -75,7 +75,7 @@ class UserTagsWidget(forms.CheckboxSelectMultiple):
         seen_add = seen.add
         choices = [ x for x in self.choices if x not in seen and not seen_add(x)]
         self.choices = choices
-        #print self.choices
+        #P self.choices
         #for c in self.choices: print 'choices:', c
         
         return super(UserTagsWidget, self).render(name, value, attrs)
@@ -85,7 +85,7 @@ class UserTagsField(forms.ModelMultipleChoiceField):
     def clean(self, value):
         print 'TODO: core.models.UserTagsField move to widget file'
         value = super(UserTagsField, self).clean(value)
-        #print '------vlue:', value
+        #P '------vlue:', value
         
         return value
         

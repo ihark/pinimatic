@@ -148,8 +148,8 @@ def getPinContext(request, pinId):
     print pin
     print pin.favorites
     print pin.favoritesC
-    #print pin.comments
-    #print pin.cmntsC
+    print pin.comments
+    print pin.cmntsC
     print pin.tags
     print pin.tagsC
     print pin.repins

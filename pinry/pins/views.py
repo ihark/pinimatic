@@ -103,12 +103,12 @@ def new_pin(request, pin_id=None):
             form = redirect_to_referer(request, form)
         
     if request.method == 'POST' or save:
-        #print 'view - enterd save mode'
+        #P 'view - enterd save mode'
         form = PinForm(request.REQUEST, request.FILES, instance=pin)
         # request.FILES is for file uploader 
         #TODO: do i need request.REQUEST?
         """
-        #print all form fields for debugging
+        #P all form fields for debugging
         print 'request.FILES:',request.FILES
         print 'form.instance = '+str(form.instance.id)
         print form.data
@@ -120,17 +120,17 @@ def new_pin(request, pin_id=None):
         #end debug
         """
         if form.is_valid():
-            #print 'form is valid'
+            #P 'form is valid'
             pin = form.save(commit=False)
             pin.uImage = form.cleaned_data['uImage']
             if pin_id:
-                #print 'view - save mode - pin id exists'
+                #P 'view - save mode - pin id exists'
                 pin.edit()
             else:
                 pin.submitter = request.user
-            #print 'view - pin.save()'
+            #P 'view - pin.save()'
             pin.save()
-            #print 'view - form.save_m2m()'
+            #P 'view - form.save_m2m()'
             form.save_m2m()
             redirect_to = redirect_to_referer(request, form)
             if pin_id:
@@ -150,12 +150,12 @@ def new_pin(request, pin_id=None):
                     #form.saved_data is = form.cleaned_data for invalid forms
                     form = PinForm(form.saved_data)
                 else:
-                    #print 'view - url submitted for thumb'
+                    #P 'view - url submitted for thumb'
                     thumb = request.REQUEST['imgUrl']
-                    #print 'view - edit invalid form'
+                    #P 'view - edit invalid form'
     else:
         pass
-        #print 'view - not POST or Save'
+        #P 'view - not POST or Save'
     if not thumb:
         thumb = '/static/core/img/thumb-default.png'
     context = {

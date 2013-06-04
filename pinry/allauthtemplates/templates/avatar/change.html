@@ -12,7 +12,7 @@
     	    <form class="avatar-choice" method="POST" action="{% url avatar_change %}">
 				{% csrf_token %}
 				<input type="hidden" name="choice" value="{{avatar.id}}"/>
-				<div class="hover-btn"><INPUT TYPE="image" SRC="{% avatar_choice_url avatar%}" WIDTH="90"  HEIGHT="90" BORDER="0" ALT="SUBMIT!"/><div class="overlay"><div class="text">Make Active</div></div></div>
+				<div class="hover-btn"><INPUT TYPE="image" SRC="{% avatar_choice_url avatar %}" WIDTH="90"  HEIGHT="90" BORDER="0" ALT="SUBMIT!"/><div class="overlay"><div class="text">Make Active</div></div></div>
 				
 			</form>
 			<div class="avatar-delete">
@@ -26,16 +26,12 @@
 			{% endfor %}
     	{% endif %}
 	</div>
-	<div id="fields_div" class="avatars form-actions">
-    	<form enctype="multipart/form-data" method="POST" action="{% url avatar_add %}">
+	<div id="fields_div" class="center avatars form-actions ">
+    	<form class="center" enctype="multipart/form-data" method="POST" action="{% url avatar_change %}">
 			{% csrf_token %}
-			<input class="btn btn-primary" type="submit" value="Upload New Image" />
-			<input type="file" name="avatar" value="Avatar Image" />
-			<ul class="errorlist">
-				{% for error in errors %}
-				<li>error</li>
-				{% endfor %}
-			</ul>
+			<input type="file" name="avatar" value="Avatar Image" {% if upload_avatar_form.avatar.errors %}class="errorlist"{% endif %}/>
+			<input class="btn btn-primary btn-mini" type="submit" value="Upload New Image" />
+			{{ upload_avatar_form.non_form_errors }}
     	</form>
     </div>
 {% endblock %}

@@ -972,10 +972,8 @@ table, th, td{
 .form-container.avatars {
   width: 500px;
 }
-.form-container.avatars #fields_div form{
-	text-align:left;
-	display: block;
-	margin: 0;
+.form-container.avatars #fields_div {
+
 }
 
 .form-container.avatars #thumb_div{
@@ -1221,14 +1219,18 @@ form h1 {
 	text-align:left;
 
 }
+.center {
+	text-align:center;
+	vertical-align:middle;
+}
+input.errorlist{
+	margin:0;
+}
 .text-normal{
 	font-size:12px;
 	font-weight:normal;
 	font-family:font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-decoration: none;
-}
-.center {
-	text-align:center;
 }
 .indent p,
 .indent li,

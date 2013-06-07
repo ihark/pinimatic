@@ -1,7 +1,8 @@
 //Global Variables
 //From base.html template context: STATIC_URL, MEDIA_URL, apiURL
 //From user_profile template tag: aProfileId
-var pinsURL = apiURL+'pin/?format=json&offset='
+var perams = '?avs=15'
+var pinsURL = apiURL+'pin/'+perams+'&format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
 //var favsURL = apiURL+'favs/?format=json&'
@@ -537,7 +538,7 @@ function onLoadData(data, insert) {
 				}
 			}
 			//SETUP HTML FOR LARGE PINS DISPLAY
-			html += '<div class="pin item" id="'+image.id+'-pin" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'" data-repins="'+image.repins.length+'">';
+			html += '<div class="pin item" id="'+image.id+'-pin" data-perams="'+perams+'" data-favs="'+image.favorites.length+'" data-cmnts="'+image.comments.length+'" data-repins="'+image.repins.length+'">';
 			//IMAGE CONTAINER
 				html += '<div class="image touch-off">';
 			//OPTIONS
@@ -603,8 +604,9 @@ function onLoadData(data, insert) {
 			//INFO - STATS
 				//submitter
 				html += '<div class="pin-info">';
-					html += '<l><span class="">By: </span>'
-					html += '<a class="pin-submitter" title="User\'s pins" href="/user/'+image.submitter.id+'/">'+image.submitter.username+'</a></l>';
+					html += '<a class="avatar-pill avatar" title="User\'s pins" href="/user/'+image.submitter.id+'/">'
+					html += '<img src="'+image.submitter.avatar+'"/>'
+					html += '<div class="user">'+image.submitter.username+'</div></a>'
 				html += '</div>';
 				//favs
 				html +='<div class="pin-stats pull-right dropdown display favs">'
@@ -613,7 +615,7 @@ function onLoadData(data, insert) {
 					html += '<ul class="list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">';
 					uu = uniqueUsers(image.favorites, 'user')
 					for (u in uu){
-						html += '<li id="'+uu[u].id+'" class="display favs item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+						html += '<li id="'+uu[u].id+'" class="display favs item"><a class="avatar" href="/user/'+uu[u].id+'/"><img src="'+uu[u].avatar+'"/>'+uu[u].username+'</a></li>';
 					}
 					html += '</ul>';
 				html +='</div>'
@@ -624,7 +626,7 @@ function onLoadData(data, insert) {
 					html += '<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.comments, 'user')
 					for (u in uu){
-						html += '<li id="'+uu[u].id+'" class="display cmnts item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+						html += '<li id="'+uu[u].id+'" class="display cmnts item"><a class="avatar" href="/user/'+uu[u].id+'/"><img class="avatar" src="'+uu[u].avatar+'"/>'+uu[u].username+'</a></li>';
 					}
 					html += '</ul>';
 				html +='</div>'
@@ -635,7 +637,7 @@ function onLoadData(data, insert) {
 					html += '<ul class="list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.repins, 'submitter')
 					for (u in uu){
-						html += '<li id="'+uu[u].id+'" class="display repins item"><a href="/user/'+uu[u].id+'/">'+uu[u].username+'</a></li>';
+						html += '<li id="'+uu[u].id+'" class="display repins item"><a class="avatar" href="/user/'+uu[u].id+'/"><img class="avatar" src="'+uu[u].avatar+'"/>'+uu[u].username+'</a></li>';
 					}
 					html += '</ul>';
 				html +='</div>';
@@ -661,7 +663,7 @@ function onLoadData(data, insert) {
 							for (cmnt in image.comments) {
 								//TODO: get user object from CmntResource instead or build one so user vars are consistant.
 								//console.log(image.comments[cmnt])
-								html += insertComment(image.comments[cmnt].username, image.comments[cmnt].user_id, image.comments[cmnt].comment, parseInt(image.comments[cmnt].id))
+								html += insertComment(image.comments[cmnt])
 							}
 						}
 					}
@@ -966,7 +968,7 @@ function repinsSuccess(result, pin){
 //Options > Comment: on click open form
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
-	state = $(this).attr('data-state');
+	var state = $(this).attr('data-state');
 	//only open form if data-stat = true
 	if (state=="True"){
 		var pin = $($(this).closest(".pin"));
@@ -995,22 +997,21 @@ $('#cmnts').live('click', function(e){
 //Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
-	data = $(this).serializeObject()
-	console.log(data)
+	var data = $(this).serializeObject()
+	var pin = $(this).closest(".pin")
 	//TODO: validate comment exist here with max length
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
 	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
-	var pin = $(this).closest(".pin")
 	submitProgress(pin)
 });
 //Comment: toggel callback
 function cmntsSuccess(result, pin){
 	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
 	if(result && cmnt.length > 0){//edit comment
-		cmnt.replaceWith(insertComment(result.username , result.user_id ,result.comment, result.id))//relace edited comment div with new comment
+		cmnt.replaceWith(insertComment(result))//relace edited comment div with new comment
 	}else if (result){//new comment
-		pin.find('.pin-cmnts').append(insertComment(result.username , result.user_id ,result.comment, result.id))//append new comment to end of comments
+		pin.find('.pin-cmnts').append(insertComment(result))//append new comment to end of comments
 	}else{//on delete
 		pin.find('#cmnts').attr('data-state',true)
 		pin.find('#cmnts i').toggleClass('icon-chat-empty');
@@ -1025,7 +1026,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	console.log('click cancel');
 	cancelCmnt(this)
 	//pcfp = pcf.parent('.pin-cmnt')
-	//cmntp.replaceWith(insertComment(result.username , result.user_id ,result.comment))//relace edited comment div with new comment
+	//cmntp.replaceWith(insertComment(result))//relace edited comment div with new comment
 });
 //Comment: cancel form (for post & edit)
 function cancelCmnt(target){
@@ -1087,23 +1088,51 @@ $(document).on('click', '.pin-cmnt .edit', function(e){
 });
 
 //Comment: insert comment
-function insertComment(username, userid, cmntT, cmntId){
+function insertComment(comment){
+	username = comment.user.username
+	userid = comment.user.id
+	cmntT = comment.comment
+	cmntId = comment.id
+	avatar = comment.user.avatar
+	
 	var html = ""
 	if (!cmntId){cmntId=""};
-	html += '<p class="pin-cmnt'
+	html += '<div class="pin-cmnt';
 		if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
 	html += ' data-cmnt='+cmntId+'>';
-	if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
-	html += '<i class="icon-cmnts icon-gray"></i>';
-	html += '<a href="/user/'+userid+'">' +username+': </a>';
-	html += '<span class="display text light" >'+cmntT+'</span>';
-	html += '</p> ';
+	html += '<a class="avatar-pill" href="/user/'+userid+'">' 
+		html += '<div class="avatar"><img class="avatar" src="'+avatar+'"/></div>';
+		html += '<div class="user">'+capFirst(username)+':</div>';
+	html += '</a>';	
+		if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
+	html += '<p class="display text light" >'+cmntT+'</p>';
+	html += '</div> ';
+	return html
+}
+//Comment: insert commentL
+function insertCommentL(comment){
+	username = comment.user.username
+	userid = comment.user.id
+	cmntT = comment.comment
+	cmntId = comment.id
+	avatar = comment.user.avatar
+	if (!cmntId){cmntId=""};
+	html += '<div class="pin-cmnt'
+	if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
+	html +=' data-cmnt='+cmntId+'>';
+		html += '<a class="avatar-pill" href="/user/'+userid+'">';
+			html += '<div class="avatar inline">{% avatar comment.user 32 %}</div>';
+			html += '<div class="user inline">'+capFirst(username)+'</div>';
+		html += '</a>';
+		if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
+		html += '<p class="text light" >'+cmntT+'</p>';
+	html += '</div>';
 	return html
 }
 //Comment: insert comment form
 function insertCommentForm(pinId, cmntT, cmntId){
 	var html = ""
-	html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">';
+	html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">'
 		html += '<div id="div_comment" class="">'
 			html += '<label id="comment_label" class="control-label" for="comment"></label>'
 			html += '<span class="help-inline control-label"></span>'
@@ -1113,9 +1142,6 @@ function insertCommentForm(pinId, cmntT, cmntId){
 				html += '<textarea id="id_comment" placeholder="Enter your comment here." name="comment">'
 				if(cmntT){html += cmntT}
 				html +='</textarea>'
-				//html += '<input type="hidden" name="object_pk" value='+pinId+' id="id_object_pk">'
-				//html += '<input type="hidden" name="content_type_id" value="10" id="id_content_type_id">'
-				//html += '<input type="hidden" name="content_type" value="/api/v1/contrib/contenttype/10/" id="id_content_type">'
 				html += '<input type="hidden" name="content_object" value="/api/v1/pin/'+pinId+'/" id="id_content_object">'
 				html += '<input type="hidden" name="site_id" value=1 id="id_site_id">'
 			html += '</div>'
@@ -1149,6 +1175,16 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	var name = button.attr('id');
 	var state = button.attr('data-state');
 	var pin = $($(targetBtn).closest(".pin"));
+	var p = pin.data('perams')
+	console.log('P =',p)
+	//if url is an array break up [url,perams]
+	console.warn(url)
+	if (url && typeof(url)=='object'){
+		p = url[1]
+		url = url[0]
+		console.warn(url)
+		console.warn(p)
+	}
 	//if no url set to pin url and current pin id
 	if (url === undefined){
 		url = ""
@@ -1162,7 +1198,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		url = url
 	//
 	}else if (id){
-		url = url+id+'/'
+		url = url+id
 	}
 	if (!type){ type = 'POST'};
 	var count = pin.attr('data-'+name);
@@ -1225,11 +1261,10 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 			window[name+'Success'](result, pin);
 		}
 	}
-	console.log(url)
 	if (typeof url == "string" && url != ""){
 		//console.log('-ajax - 3 togglepin()');
 		//ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data)
-		ajax(messageTarget, false, url, true, type, $.proxy(this.onSuccess, this), null, data)
+		ajax(messageTarget, false, url+p, true, type, $.proxy(this.onSuccess, this), null, data)
 		
 		/* $.ajax({//3
 			url: pinsPrefix+url,
@@ -1241,7 +1276,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 				console.warn('togglePinStat() - ajax error');
 			},
 		}); */
-	}
+	}else{console.warn('togglePinStat failed due to bad url')}
 }
 
 /**
@@ -1683,6 +1718,9 @@ function kill(type){
 function unkill(type){
  console.warn('unkill', type)
  window.document.body.removeEventListener(type, k, true);
+}
+function capFirst(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 //jquery function to format form data as assoc.array
 (function($){

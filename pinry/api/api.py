@@ -12,6 +12,9 @@ from tastypie.authorization import DjangoAuthorization
 
 from pinry.pins.models import Pin
 from follow.models import Follow
+from avatar.models import Avatar
+from avatar.util import get_default_avatar_url
+
 from django.http import HttpResponse
 from django.utils import simplejson
 
@@ -30,13 +33,16 @@ from tastypie.validation import CleanedDataFormValidation
 
 from django.core.files.storage import default_storage
 from tastypie.serializers import Serializer
+from django.core.urlresolvers import reverse
+
+from pinry.core.templatetags.email import smartdate
 
 
 #resource path = pinry.api.api.SomeResource
 
 class UserResource(ModelResource):
     #follows = fields.ToManyField('pinry.api.api.FavsResource', 'following', full=True)
-
+    avatar = fields.ToManyField('pinry.api.api.AvatarResource', attribute=lambda bundle: Avatar.objects.filter(user=bundle.obj, primary=True), null=True, full=True)
     class Meta:
         always_return_data = True
         queryset = User.objects.all()
@@ -48,14 +54,7 @@ class UserResource(ModelResource):
 
         #authentication = BasicAuthentication()
         authorization = DjangoAuthorization()
-    '''
-    def dehydrate(self, bundle):
-        #dehydrate follows for only favorites
-        for f in bundle.data['follows'][:]:
-            if f.data['id'] == None:
-                bundle.data['follows'].remove(f)
-        return bundle
-    '''
+
     def determine_format(self, request): 
         return "application/json" 
     
@@ -63,6 +62,7 @@ class UserResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         result =  object_list.filter(id=bundle.request.user.id)
         return result
+    #handle anonomus users
     def alter_list_data_to_serialize(self, request, bundle):
         try:
             bundle['objects'][0]
@@ -70,13 +70,69 @@ class UserResource(ModelResource):
             bundle['objects']=[{'id':'null', 'username':'anonymous'}]
         return bundle
        
-    ''' depreciated in 0.9.12-alpha
-    def apply_authorization_limits(self, request, object_list):
-        #P '--apply_authorization_limits--'
-        #P request.user.id
-        result = object_list.filter(id=request.user.id)
-        return result
-    '''
+    def dehydrate(self, bundle):
+        #make sure all users have an avatar and avatar = url
+        avatar = bundle.data['avatar']
+        if not avatar:
+            size = bundle.request.GET.get('avs', 40)
+            bundle.data['avatar'] = get_default_avatar_url(bundle.obj, size)
+        else:
+            bundle.data['avatar'] = avatar[0].data['url']
+        return bundle
+        
+class AvatarResource(ModelResource):
+    user = fields.ForeignKey(UserResource, 'user', null=True)
+    
+    class Meta:
+        always_return_data = True
+        queryset = Avatar.objects.all()
+        resource_name = 'avatars'
+        include_resource_uri = True
+        allowed_methods = ['get']
+        fields = ['id','primary']
+        filtering = {
+            'primary': ALL,
+            'user': ALL_WITH_RELATIONS,
+            'size': ALL,
+        }
+        serializer = Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
+
+        #authentication = BasicAuthentication()
+        authorization = DjangoAuthorization()
+
+    def determine_format(self, request): 
+        return "application/json" 
+    
+    def alter_list_data_to_serialize(self, request, bundle):
+        #for obj in bundle['objects']:
+            #del obj.data['user']
+        return bundle
+       
+    def alter_detail_data_to_serialize(self, request, bundle):
+        #del bundle.data['user']
+        return bundle
+    
+    def build_filters(self, filters=None):
+        if filters is None:
+            filters = {}
+
+        orm_filters = super(AvatarResource, self).build_filters(filters)
+        
+        if 'p' in filters:
+            orm_filters['primary__exact'] = 'true'
+        
+        if 'user' in filters:
+            orm_filters['user__id__exact'] = filters['user']
+
+        return orm_filters
+    
+    def dehydrate(self, bundle):
+        size = bundle.request.GET.get('avs', 40)
+        avatar = bundle.obj
+        bundle.data['url'] = avatar.avatar_url(int(size))
+        #bundle.data['user'] = {'username':avatar.user.username.title(), 'id':avatar.user.id, 'url':reverse('pins:profile',kwargs={'profileId': avatar.user.id})}
+        return bundle
+    
 #not currently used due to solution in pin resource    
 class RepinsResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user', null=True, full=True)
@@ -290,7 +346,7 @@ class PinResource(ModelResource):
         #P'---apply_sorting----'
         if options and "sort" in options:
             if options['sort'] == "popularity":
-                #this is wrong, need to get how many times a pin is repinned. This is counting the fact that it was repinned from another pin.
+                #TODO: this is wrong, need to get how many times a pin is repinned. This is counting the fact that it was repinned from another pin.
                 for p in objects:
                     p.popularity = p.fav_count+(p.repin_count*1.25)
 
@@ -339,6 +395,11 @@ class PinResource(ModelResource):
     
     def dehydrate_tags(self, bundle):
         return map(str, bundle.obj.tags.all())
+    
+    
+    def dehydrate_published(self, bundle):
+        
+        return {'long':bundle.obj.smartdate(), 'short':bundle.obj.smartdate('short')}
         
     def hydrate_tags(self, bundle):
         #if one tagsUser is recieved convert string to a list
@@ -408,8 +469,6 @@ class CmntResource(ModelResource):
     content_object = GenericForeignKeyField({
         Pin: PinResource,
     }, 'content_object')
-    username = fields.CharField(attribute = 'user__username', null=True)
-    user_id = fields.CharField(attribute = 'user__id', null=True)
     validation = CleanedDataFormValidation(form_class=CommentForm)
     
     class Meta:
@@ -440,15 +499,23 @@ class CmntResource(ModelResource):
 
     def alter_list_data_to_serialize(self, request, bundle):
         for obj in bundle['objects']:
-            del obj.data['user']
+            del obj.data['user'].data['email']
+            del obj.data['user'].data['is_active']
+            del obj.data['user'].data['is_staff']
+            del obj.data['user'].data['is_superuser']
+            del obj.data['user'].data['last_login']
+            del obj.data['user'].data['last_name']
+            del obj.data['user'].data['first_name']
+            del obj.data['user'].data['date_joined']
             del obj.data['site_id']
+            del obj.data['content_object']
             #del obj.data['object_pk']
             #del obj.data['content_type_id']
-            del obj.data['content_object']
+            
         return bundle
        
     def alter_detail_data_to_serialize(self, request, bundle):
-        del bundle.data['user']
+        #del bundle.data['user']
         del bundle.data['site_id']
         del bundle.data['content_object']
         #DO NOT BLOCK THE BELOW. they need to be serialized for object creation with GFK!

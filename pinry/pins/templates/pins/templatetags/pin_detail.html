@@ -2,10 +2,14 @@
 {% load avatar_tags %}
 {% load comments %}
 {% load static %}
+{% load humanize %}
+{% load i18n %}
+{% load tz %}
 {% get_media_prefix as MEDIA_PREFIX %}
 {% get_comment_list for pin as comment_list %}
 {% get_comment_count for pin as comment_count %}
-<div class="pin item" id="{{pin.id}}-pin" data-favs="{{pin.favoritesC}}" data-cmnts="{{comment_count}}" data-repins="{{pin.repinsC}}">
+{% load email %}
+<div class="pin item" id="{{pin.id}}-pin" data-perams="?avs=32" data-favs="{{pin.favoritesC}}" data-cmnts="{{comment_count}}" data-repins="{{pin.repinsC}}">
 <!-- //IMAGE CONTAINER -->
 	<div class="image touch-off">
 <!-- //OPTIONS -->
@@ -77,8 +81,13 @@
 <!-- //INFO - STATS -->
 	<!-- //submitter -->
 	<div class="pin-info">
-		<li><span class="">By: </span>
-		<a class="pin-submitter" title="User\'s pins" href="/user/{{pin.submitter.id}}/">{{pin.submitter.username}}</a></li>
+		<a class="avatar-pill " href="{% url pins:profile pin.submitter.id %}">
+			<div class="avatar">{% avatar pin.submitter 32 %}</div>
+			<div class="avatar-right">
+				<div class="user">By: {{pin.submitter|capfirst}}</div>
+				<div class="date light h-light">{{pin.published|smartdate}}</div>
+			</div>
+		</a>	
 	</div>
 	<!-- //favs -->
 	
@@ -87,7 +96,7 @@
 		<i class="icon-favs"></i><span class="text light">{{pin.favoritesC}}</span></div>
 		<ul class="list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">
 		{%for fav in pin.favorites%}
-			<li id="{{fav.id}}" class="display favs item"><a href="/user/{{fav.user.id}}/">{{fav.user.username}}</a></li>
+			<li id="{{fav.id}}" class="display favs item"><a class="avatar" href="/user/{{fav.user.id}}/">{% avatar pin.submitter 15 %}{{fav.user|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
@@ -98,7 +107,7 @@
 		<i class="icon-cmnts"></i><span class="text light cmnts ">{{comment_count}}</span></div>
 		<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{% for comment in comment_list %}
-			<li id="{{cmnt.id}}" class="display cmnts item"><a href="/user/{{cmnt.user.id}}/">{{comment.user.username}}</a></li>
+			<li id="{{cmnt.id}}" class="display cmnts item"><a class="avatar" href="/user/{{cmnt.user.id}}/">{% avatar comment.user 15 %}{{comment.user|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
@@ -109,7 +118,7 @@
 		<i class="icon-plus"></i><span class="text light repins">{{pin.repinsC}}</span></div>
 		<ul class="list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{%for repin in pin.repins%}
-			<li id="{{repin.id}}" class="display repins item"><a href="/user/{{repin.submitter.id}}/">{{repin.submitter.username}}</a></li>
+			<li id="{{repin.id}}" class="display repins item"><a href="/user/{{repin.submitter.id}}/">{% avatar repin.submitter 15 %}{{repin.submitter|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
@@ -132,12 +141,15 @@
 			{% for comment in comment_list %}
 				<div class="pin-cmnt touch-off" data-cmnt="{{comment.id}}">
 					<a class="avatar-pill " href="{% url pins:profile comment.user.id %}">
-						<div class="avatar inline">{% avatar comment.user 32 %}</div>
-						<div class="user inline">{{comment.user|capfirst}}</div>
+						<div class="avatar">{% avatar comment.user 32 %}</div>
+							<div class="avatar-right">
+							<div class="user">{{comment.user|capfirst}}</div>
+							<div class="date light h-light">{{comment.submit_date|smartdate:"long" }}</div>
+						</div>
 					</a>	
 				{% if user == comment.user or user.is_superuser %}<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>{% endif %}
 					
-					<p class="text light" >{{comment.comment}}</p>	
+					<p class="display text light" >{{comment.comment}}</p>	
 				</div>	
 			{% endfor %}
 		

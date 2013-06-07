@@ -163,3 +163,108 @@ def convert_to_observed_description(desc, sender_type, from_user, owner):
     else:
         new_value = desc
     return new_value
+
+
+from datetime import datetime, timedelta
+from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.template.defaultfilters import date as get_date_str
+from django.utils import timezone as tz
+import re
+@register.filter(name='smartdate', is_safe=True)
+def smartdate(datetime_obj, style='long', timezone=None, this_ym=False, filters=[]):
+    '''
+    Convert date time object to a friendly format based on how old it is.
+    style: determines output format
+           -long: verbose friendly most readable
+           -short: friendly readable but short
+           -dot: as short as possible with dot seperators
+    timezone: cusomizes output based on provided timezone or sysem timzone
+    this_ym: Determines formatting cut of.
+             True, this yaar number & this month number 
+             False, 365 days from post and 28 days post
+    filters = Supply list of filters to modify the output string
+              ie [r'(find)', replace]
+    '''
+    #determine style
+    long=False
+    short=False
+    dot=False
+    if style == 'long': long=True
+    if style == 'short': short=True
+    if style == 'dot': dot=True
+    if not datetime_obj:
+        return
+    if not timezone: timezone = tz.get_current_timezone()
+    #Convert all datetime objects to timezone aware, UTC = timezone -0
+    epochutc_lt = tz.make_aware(datetime.utcfromtimestamp(0), timezone)
+    now_lt = tz.make_aware(datetime.now(), timezone)
+    date_lt = tz.localtime(datetime_obj, timezone)
+    
+    #calulate delta_days from epoch
+    now_days = (now_lt - epochutc_lt).days
+    date_days = (date_lt - epochutc_lt).days
+    delta_days = now_days - date_days
+
+    #check date for markers
+    is_today = delta_days == 0
+    is_yesturday = delta_days == 1
+    is_last7days = delta_days < 7
+    is_last28days = delta_days < 28
+    is_last365days = delta_days < 365
+    is_this_year = now_lt.year == date_lt.year
+    is_this_month = now_lt.month == date_lt.month and is_this_year
+    
+    #create filters [r'(find)', replace]
+    f_ampm = [r'(\s)([a,p])\.(m)\.', r'\1\2\3']
+    f_hours = [r'(hours)', 'hrs']
+    #add filters to always run
+    p_filters = [f_ampm]
+    
+    rex_f_ampm = r'(\s)([a,p])\.(m)\.'
+    rex_r_ampm = r'\1\2\3'
+    rex_f_hours = r'(hours)'
+    rex_r_hours = 'hrs'
+    
+    format = None
+    #format: today
+    if is_today:
+        if long: date_str = naturaltime(date_lt)
+        if short: 
+            date_str = naturaltime(date_lt)
+            p_filters.append(f_hours)
+        if dot: format = "P"
+    #format: yesturday
+    elif is_yesturday:
+        if long: format = "\\Y\\e\\s\\t\\e\\r\\d\\a\\y \\a\\t P"
+        if short: format = "\\Y\\e\\s\\t\\ A"
+        if dot: format = "\\Y\\e\\s\\t\\.A"
+    #format: during last seven days
+    elif is_last7days:
+        if long: format = "\\O\\n l \\a\\t P"
+        if short: format = "D A"
+        if dot: format = "D.A"
+    #format: this month or last 28 days
+    elif is_this_month and this_ym or is_last28days and not this_ym:
+        if long: format = "\\O\\n \T\h\e jS \\a\\t P"
+        if short: format = "\T\h\e jS A"
+        if dot: format = "jS.A"
+    #format: This Year or last 365 days
+    elif is_this_year and this_ym or is_last365days and not this_ym:
+        if long: format = '\\O\\n N jS \\a\\t P'
+        if short: format = "M jS"
+        if dot: format = "M.jS"
+    else:
+        if long: format = '\\O\\n N jS \\o\\f Y'
+        if short: format = "M Y"
+        if dot: format = "M.Y"
+    print format
+    #convert format to date_str
+    if format:
+        date_str = get_date_str(date_lt, format)
+    #filter date_str
+    all_filters = p_filters + filters
+    for filter in all_filters:
+        date_str = re.sub(filter[0], filter[1], date_str)
+
+    return date_str
+

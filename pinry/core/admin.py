@@ -13,7 +13,7 @@ from django.contrib.sites.models import Site
 
 
 class PinAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'admin_thumb', 'submitter', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
+    list_display = ['pk', 'admin_thumb', 'submitter', 'smartdate', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
 
 admin.site.register(Pin, PinAdmin)
 '''KEEP THIS HERE AS REFERENCE FOR USING THE EMIAL SYSTEM

@@ -3,6 +3,7 @@
 {% load follow_tags %}
 {% load avatar_tags %}
 {% load i18n %}
+{% load email %}
 {% comment %}
 <!--CONTEXT
 'profile': profile,
@@ -34,8 +35,11 @@
 			{% for user in relationships.friends %}
 				<div class="follow item">
 					<a class="avatar-pill" href="{% url pins:profile user.id %}">
-					<div class="avatar inline">{% avatar user 40 %}</div>
-					<div class="user inline">{{user|capfirst}}</div>
+						<div class="avatar">{% avatar user 40 %}</div>
+						<div class="avatar-right">
+							<div class="user">{{user|capfirst}}</div>
+							<div class="date light h-light">{% trans "LSO" %}: {{user.last_login|smartdate:"short"}}</div>
+						</div>
 					</a>
 					<div class="pins inline">
 					{% for pin in user.pins %}
@@ -55,8 +59,13 @@
 			<h2>Following</h2>
 			{% for user in relationships.following %}
 				<div class="follow item">
-					<div class="avatar inline"></div>
-					<div class="user inline">{{user|capfirst}}</div>
+					<a class="avatar-pill" href="{% url pins:profile user.id %}">
+						<div class="avatar">{% avatar user 40 %}</div>
+						<div class="avatar-right">
+							<div class="user">{{user|capfirst}}</div>
+							<div class="date light h-light">{% trans "LSO" %}: {{user.last_login|smartdate:"short"}}</div>
+						</div>
+					</a>
 					<div class="pins inline">
 					{% for pin in user.pins %}
 						<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>
@@ -75,8 +84,13 @@
 			<h2>Followers</h2>
 			{% for user in relationships.followers %}
 				<div class="follow item">
-					<div class="avatar inline"></div>
-					<div class="user inline">{{user|capfirst}}</div>
+					<a class="avatar-pill" href="{% url pins:profile user.id %}">
+						<div class="avatar">{% avatar user 40 %}</div>
+						<div class="avatar-right">
+							<div class="user">{{user|capfirst}}</div>
+							<div class="date light h-light">{% trans "LSO" %}: {{user.last_login|smartdate:"short"}}</div>
+						</div>
+					</a>
 					<div class="pins inline">
 					{% for pin in user.pins %}
 						<a class="inline" href="{% url pins:pin-detail pin.id %}"><img src="{{MEDIA_URL}}{{pin.thumbnail}}" alt=""/></a>

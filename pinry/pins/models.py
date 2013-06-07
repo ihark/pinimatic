@@ -12,6 +12,8 @@ from django.core.files.storage import default_storage
 from pinry.core.utils import delete_upload
 from django.contrib.comments.models import Comment
 from django.contrib.contenttypes import generic
+from datetime import datetime
+from pinry.core.templatetags.email import smartdate
 
 from follow import utils
 
@@ -23,7 +25,7 @@ class Pin(models.Model):
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to=settings.IMAGES_PATH)
     thumbnail = models.ImageField(upload_to='pins/pin/thumbnails/', max_length=100)
-    published = models.DateTimeField(auto_now_add=True)
+    published = models.DateTimeField(default=datetime.now)#auto_now_add=True
     tags = TaggableManager()
     repin = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
     comments = generic.GenericRelation(Comment,
@@ -41,6 +43,9 @@ class Pin(models.Model):
         return '<img height="50px" src="%s"/>' % self.thumbnail.url
     admin_thumb.allow_tags = True
     
+    def smartdate(self, style='long', timezone=None, this_ym=False):
+        return smartdate(self.published, style, timezone, this_ym)
+        
     def edit(self, *args, **kwargs):
         print 'model - pin.edit()'
         exPin = Pin.objects.get(pk=self.pk)

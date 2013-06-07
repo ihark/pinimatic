@@ -2,6 +2,7 @@
 {% load humanize %}
 {% load i18n %}
 {% load tz %}
+{% load email %}
 
 {% block head_title %}{% trans "Notifications" %}{% endblock %}
 
@@ -69,18 +70,9 @@
 					<div class="notice">
 					{% endif %}
 						<div class="notice_text inline">{{ notice.render }}</div><br>
-						{% comment %}<!-- TODO: make this time display logic a template tag for comments and notices-->{% endcomment %}
-						{% if notice.added|localtime|naturalday == 'today' %}
-						<div class="notice_time inline">{{ notice.added|naturaltime }}</div>
-						{% elif notice.added|localtime|naturalday == 'yesterday' %}
-						<div class="notice_time inline">{{ notice.added|localtime|naturalday }}{{ notice.added|date:" \a\t P"}}</div>
-						{% elif notice.added|date:"U"  > week_ago|date:"U" %}
-						<div class="notice_time inline">{{ notice.added|date:"l \a\t P"}}</div>
-						{% else %}
-						<div class="notice_time inline">{{ notice.added|date:"\o\n \t\h\e jS \a\t P"}}</div>
-						{% endif %}
+						<div class="notice_time inline">{{ notice.added|smartdate }}</div>
 						<div class="notice-options inline pull-right">
-							{%comment%} archive=recyclebin notices are subject to deletion acording to plicy{%endcomment%}
+							{%comment%}<!--  archive=recyclebin notices are subject to deletion acording to plicy -->{%endcomment%}
 							{% if archived %}
 							<div class="notice-archive inline">
 								<a title="Remove from trash now" href="{% url notification_toggle_archived notice.id %}" class="btn btn-mini btn-warning">{% trans "Un-Trash" %}
@@ -120,16 +112,7 @@
 				<div class="notice">
 				{% endif %}
 					<span class="notice_message">{{ notice.render }}</span>
-					{% comment %}<!-- TODO: make this time display logic a template tag for comments and notices-->{% endcomment %}
-					{% if notice.added|localtime|naturalday == 'today' %}
-					<div class="notice_time inline">{{ notice.added|naturaltime }}</div>
-					{% elif notice.added|localtime|naturalday == 'yesterday' %}
-					<div class="notice_time inline">{{ notice.added|localtime|naturalday }}{{ notice.added|date:" \a\t P"}}</div>
-					{% elif notice.added|date:"U"  > last_week|date:"U" %}
-					<div class="notice_time inline">{{ notice.added|date:"l \a\t P"}}</div>
-					{% else %}
-					<div class="notice_time inline">{{ notice.added|date:"\o\n \t\h\e jS \a\t P"}}</div>
-					{% endif %}
+					<div class="notice_time inline">{{ notice.added|smartdate }}</div>
 				</div>
 			{% endfor %}
 			</div>

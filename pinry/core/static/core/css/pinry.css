@@ -541,23 +541,23 @@ margin: 0px 0px;
 	.pin-stats {
 		float: right;
 		width: auto;
-		text-align: right;
 		line-height: 14px;
 		margin-top: 2px;
 	}
 	.pin-stats > .dropdown-menu{
-	min-width: 70px;
-	max-width: 100px;
+		min-width: 70px;
+		max-width: 100px;
 	}
+	
 	.pin-stats > ul > li > a{
 		line-height:10px;
-		text-align:center;
+		text-align:left;
 		cursor: pointer;
+		padding:0;
+		width: 100%;
+		display: inline-block;
 	}
-	.pin-stats > ul > li > a:hover{
-		color: #398F00;
-		background-image: linear-gradient(to bottom, rgb(234, 238, 240), rgb(227, 232, 235));
-	}
+	
 	.pin-stats > .stat{
 		width:auto;
 		display:inline-block;
@@ -724,10 +724,12 @@ margin: 0px 0px;
 		vertical-align: top;
 		float: right;
 	}
-	.pin-cmnts {
+	.section.pin-cmnts {
 		font-size: 11px;
 		cursor: default;
+		padding-bottom: 15px;
 	}
+
 		.pin-cmnt .options {
 			display: none;
 			float:right;
@@ -843,32 +845,19 @@ margin: 0px 0px;
 		.pin-detail .pin {
 			width: 100%;
 		}
-
-		.pin-detail .pin img{
+		
+		.pin-detail .pin .image img{
 			height:auto;
 			min-width:100%;
+		}
 
+		.pin .pin-cmnt .text{
+			line-height: 16px;
 		}
-		.pin-detail .avatar-pill{
-			float: left;
-			margin:2px 3px 3px 0;
-		}
-		.pin-detail .avatar-pill .avatar{
-			margin-right:0px;
-		}
-		.pin-detail .avatar-pill .user{
-			width:60px;
-			margin:0 4px;
-			text-align:center;
-			vertical-align:middle;
-			overflow:hidden;
-			word-wrap:break-word;
-			max-height:32px;
-		}
-		.pin-detail .pin-cmnt {
+		.pin-cmnt {
 			clear: both;
 		}
-		.pin-detail .pin-cmnt .text{
+		.pin-detail .pin .pin-cmnt .text{
 			line-height: 17px;
 		}
 		.user-detail{
@@ -953,9 +942,6 @@ table, th, td{
 }
 .relationships .item .btn{
 	margin-top:10px;
-}
-.item .avatar-pill{
-	vertical-align:middle;
 }
 .item .pins{
 	height:40px;
@@ -1080,52 +1066,103 @@ table, th, td{
 .avatar-delete:hover form input{
 	background-color: rgba(0, 0, 0, 0.5);
 }
+/* avatar */
 .avatar{
-	margin:5px 5px 5px 0;
-	vertical-align:middle;
-}
-
-.avatar-pill{
-	width:auto;
-	display:inline-block;
-	border-radius:4px;
-	background-color:rgba(204, 204, 204, 0.25);
-	overflow:hidden;
-}
-.avatar-pill.vert{
-	width:80px;
-}
-.avatar-pill.vert .avatar{
 	margin:0;
 }
-.avatar-pill .avatar{
-	margin:0 10px 0 0;
-}
-.avatar-pill .user{
-	text-align:center;
+	.avatar.profile{
+		position: relative;
+		width: 100%;
+		height: auto;
+		padding: 0;
+		margin: 0;
+		margin-bottom: 15px;
+	}
+	.avatar img,
+	img.avatar {
+		height: 100%;
+		width: auto;
+		vertical-align: middle;
+	}
+	.pin-stats > .dropdown-menu .avatar img{
+			margin:2px 5px;
+	}
+	.pin-stats > .dropdown-menu .avatar {
+		margin:0;
+	}
+
+/* avaar-pill */
+.avatar-pill{
 	width:auto;
-	max-width:100%;
-	margin:0 4px;
+	border-radius:4px;
+	background-color:rgba(204, 204, 204, 0.25);
+	float: left;
+	margin:0;
+	margin-right:2px;
 	overflow:hidden;
-	word-wrap:break-word;
 }
-.avatar.profile{
-	position: relative;
-	width: 100%;
-	height: auto;
-	padding: 0;
-	margin: 0;
-	margin-bottom: 15px;
-}
-.avatar img{
-	height:auto;
-	width:auto;
-	max-width:auto;
-	max-height:auto;
-}
+	.pin .avatar-pill{
+		margin-top:2px;
+		border-radius:3px;
+		border:1px solid #CCC;
+		background-color:rgba(204, 204, 204, 0.25);
+	}
+	.item .avatar-pill{
+		vertical-align:middle;
+	}
+	.avatar-pill.vert{
+		width:80px;
+	}
+		.avatar-pill .avatar,
+		.avatar-pill img{
+			float:left;
+		}
+		.avatar-right{
+			float:right;
+		}
+		.avatar-pill .user{
+			text-align:left;
+			width:auto;
+			max-width:100%;
+			margin:0 4px;
+			word-wrap:break-word;
+			overflow:hidden;
+			height:15px;
+		}
+		.avatar-pill .date{
+			text-align:left;
+			width:auto;
+			max-width:100%;
+			margin:0 4px;
+			word-wrap:break-word;
+			overflow:hidden;
+			height:15px;
+			font-size:.95em;
+		}
+		.pin .avatar-pill .user{
+			max-width:60px;
+			height:15px;
+		}
+		.pin-info .avatar-pill .user{
+			max-width:130px;
+			height:15px;
+		}
+		.pin-detail .pin .avatar-pill .user{
+			width:auto;
+			max-width:200px;
+			height:16px;
+			line-height:16px;
+		}
+			.pin .avatar-pill .user:hover{
+				width:auto;
+				max-width:180px;
+			}
+			.pin-detail .pin .avatar-pill .user:hover{
+				width:auto;
+				max-width:200px;
+			}
+		
 
-
-/* FORMS */
 form {
 	margin-bottom: 0;
 }
@@ -1250,13 +1287,26 @@ input.errorlist{
 .white{
 	color: White;
 }
+.h-white:hover *{
+	color: White;
+}
 .light{
+	color: #777;
+}
+.h-light:hover *{
 	color: #777;
 }
 .dark{
 	color: Black;
 }
+.h-dark:hover *{
+	color: Black;
+}
+}
 .black{
+	color: Black;
+}
+.h-black:hover *{
 	color: Black;
 }
 .expand{
@@ -1316,7 +1366,7 @@ input.errorlist{
 	border-top: 1px solid #ccc;
 	margin: 0px -15px;
 	padding: 5px 15px 5px 15px;
-	line-height: 16px;
+	line-height: 14px;
 }
 .catagories a{
 float: left;

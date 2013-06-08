@@ -1,1 +1,9 @@
-<img src="{{ url }}" alt="{{ alt }}" width="{{ size }}" height="{{ size }}" />
+{% load email %}
+<a class="avatar-pill " href="{% url pins:profile user.id %}">
+	<div class="avatar"><img src="{{ url }}" alt="{{ alt }}" width="{{ size }}" height="{{ size }}" /></div>
+		<div class="avatar-right">
+		<div class="user">{{user|capfirst}}</div>
+		<div class="line2 light h-light">{{line2}}</div>
+	</div>
+</a>
+

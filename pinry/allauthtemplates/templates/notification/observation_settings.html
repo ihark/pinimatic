@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load avatar_tags %}
-
+{% load email %}
 {% block body_id %}notification-settings{% endblock %}
 
 {% block head_title %}{% trans "Notification Settings" %}{% endblock %}
@@ -42,8 +42,8 @@
 				<tr>
 					<th>{% trans "From:" %}</th>
 					{% for header in notice_settings.column_headers %}
-						<th>
-							{{ header.title }}s
+						<th width="15px">
+							<div class="rotate-width"><div class="rotate-height">{{ header.title }}s</div></div>
 						</th>
 					{% endfor %}
 				</tr>
@@ -57,12 +57,9 @@
 								<a href="{% url 'pins:pin-detail' row.observed.object_id %}">
 								<img src="{{MEDIA_URL}}{{ row.observed.observed_object.thumbnail }}"/></a>
 							{% elif row.observed.content_type.name == "user" %}
-								<div class="avatar-pill vert">
-									<a href="{% url 'pins:profile' row.observed.observed_object.id %}">
-									<div class="user">{{ row.observed.observed_object.username|capfirst }}</div>
-									<div class="avatar">{% avatar row.observed.observed_object 80 %}</div>
-									</a>
-								</div>
+								{% with row.observed.observed_object.last_login|smartdate as date %}
+								{% avatar row.observed.observed_object 40 line2="LS: "|add:date %}
+								{% endwith %}
 							{% else %}
 								<strong>{{ row.observed.content_type }}: </strong>
 								<span class="notice_type_description"><br>
@@ -72,7 +69,7 @@
 							
 						</td>
 						{% for cell in row.cells %}
-						<td style="vertical-align:middle" class="center" width="80px">
+						<td style="vertical-align:middle" class="center" width="15px">
 							{% if cell.0 %}
 							<input type="checkbox" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
 							{% endif %}

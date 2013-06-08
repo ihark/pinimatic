@@ -42,7 +42,7 @@
 					<th>{% trans "Choose how you would like to be notified:" %}</th>
 					{% for header in notice_settings.column_headers %}
 						<th>
-							{{ header.title }}
+							<div class="rotate-width"><div class="rotate-height">{{ header.title }}</div></div>
 						</th>
 					{% endfor %}
 				</tr>

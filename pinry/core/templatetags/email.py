@@ -257,7 +257,6 @@ def smartdate(datetime_obj, style='long', timezone=None, this_ym=False, filters=
         if long: format = '\\O\\n N jS \\o\\f Y'
         if short: format = "M Y"
         if dot: format = "M.Y"
-    print format
     #convert format to date_str
     if format:
         date_str = get_date_str(date_lt, format)

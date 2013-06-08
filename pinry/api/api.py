@@ -69,7 +69,7 @@ class UserResource(ModelResource):
         except:
             bundle['objects']=[{'id':'null', 'username':'anonymous'}]
         return bundle
-       
+        
     def dehydrate(self, bundle):
         #make sure all users have an avatar and avatar = url
         avatar = bundle.data['avatar']
@@ -398,8 +398,7 @@ class PinResource(ModelResource):
     
     
     def dehydrate_published(self, bundle):
-        
-        return {'long':bundle.obj.smartdate(), 'short':bundle.obj.smartdate('short')}
+        return {'l':bundle.obj.smartdate(), 's':bundle.obj.smartdate('short'), 'd':bundle.obj.smartdate('dot')}
         
     def hydrate_tags(self, bundle):
         #if one tagsUser is recieved convert string to a list
@@ -525,7 +524,10 @@ class CmntResource(ModelResource):
 
     def determine_format(self, request): 
         return "application/json" 
-
+    
+    def dehydrate_submit_date(self, bundle):
+        return {'l':smartdate(bundle.obj.submit_date, 'long'), 's':smartdate(bundle.obj.submit_date, 'short'), 'd':smartdate(bundle.obj.submit_date, 'dot')}   
+    
     def obj_create(self, bundle, **kwargs):
         #P '----obj_create------'
         #content_type='/api/v1/contrib/contenttype/'+bundle.data['content_type_id']+'/'

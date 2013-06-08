@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load tz %}
 {% load email %}
-
+{% load avatar_tags %}
 {% block head_title %}{% trans "Notifications" %}{% endblock %}
 
 {% block body %}
@@ -69,34 +69,37 @@
 					{% else %}
 					<div class="notice">
 					{% endif %}
-						<div class="notice_text inline">{{ notice.render }}</div><br>
-						<div class="notice_time inline">{{ notice.added|smartdate }}</div>
-						<div class="notice-options inline pull-right">
-							{%comment%}<!--  archive=recyclebin notices are subject to deletion acording to plicy -->{%endcomment%}
-							{% if archived %}
-							<div class="notice-archive inline">
-								<a title="Remove from trash now" href="{% url notification_toggle_archived notice.id %}" class="btn btn-mini btn-warning">{% trans "Un-Trash" %}
-								<input type="hidden" name="{{notice.id}}-archived" value="True">
-								<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-archived" value="False"{% if not notice.archived %}checked{% endif %}></span></a>
+						<div class="notice_avatar">{% avatar user 40 "img" %}</div>
+						<div class="notice_message_div">
+							<div class="notice-options">
+								{%comment%}<!--  archive=recyclebin notices are subject to deletion acording to plicy -->{%endcomment%}
+								{% if archived %}
+								<div class="notice-archive inline">
+									<a title="Remove from trash now" href="{% url notification_toggle_archived notice.id %}" class="btn btn-mini btn-warning">{% trans "Un-Trash" %}
+									<input type="hidden" name="{{notice.id}}-archived" value="True">
+									<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-archived" value="False"{% if not notice.archived %}checked{% endif %}></span></a>
+								</div>
+								{%comment%}permanent delete{%endcomment%}
+								<div class="notice-delete inline">
+									<a title="delete this notice now" href="{% url notification_delete notice.id %}" class="btn btn-mini btn-danger">{% trans "Delete" %}
+									<input type="hidden" name="{{notice.id}}-delete" value="False">
+									<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-delete" value="True"</span></a>
+								</div>
+								{% else %}
+								<div class="notice-unseen inline">
+									<a title="toogle seen for this notice now" href="{% url notification_toggle_unseen notice.id %}" class="btn btn-mini">Seen
+									<input type="hidden" name="{{notice.id}}-unseen" value="True">
+									<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-unseen" value="False"{% if not notice.unseen %}checked{% endif %}></span></a>
+								</div>
+								<div class="notice-archive inline">
+									<a title="Move to trash bin now (will be deleted when more than 30 days old)" href="{% url notification_toggle_archived notice.id %}" class="btn btn-mini btn-warning">{% trans "Trash" %}
+									<input type="hidden" name="{{notice.id}}-archived" value="False">
+									<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-archived" value="True"{% if notice.archived %}checked{% endif %}></span></a>
+								</div>
+								{% endif %}
 							</div>
-							{%comment%}permanent delete{%endcomment%}
-							<div class="notice-delete inline">
-								<a title="delete this notice now" href="{% url notification_delete notice.id %}" class="btn btn-mini btn-danger">{% trans "Delete" %}
-								<input type="hidden" name="{{notice.id}}-delete" value="False">
-								<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-delete" value="True"</span></a>
-							</div>
-							{% else %}
-							<div class="notice-unseen inline">
-								<a title="toogle seen for this notice now" href="{% url notification_toggle_unseen notice.id %}" class="btn btn-mini">Seen
-								<input type="hidden" name="{{notice.id}}-unseen" value="True">
-								<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-unseen" value="False"{% if not notice.unseen %}checked{% endif %}></span></a>
-							</div>
-							<div class="notice-archive inline">
-								<a title="Move to trash bin now (will be deleted when more than 30 days old)" href="{% url notification_toggle_archived notice.id %}" class="btn btn-mini btn-warning">{% trans "Trash" %}
-								<input type="hidden" name="{{notice.id}}-archived" value="False">
-								<span title="Applied when {% blocktrans %}{{submit_title}}{% endblocktrans %} is clicked" class="notice_mark"><input type="checkbox" name="{{notice.id}}-archived" value="True"{% if notice.archived %}checked{% endif %}></span></a>
-							</div>
-							{% endif %}
+							<span class="notice_text">{{ notice.render }}</span>
+							<span class="notice_time">{{ notice.added|smartdate }}</span>
 						</div>
 					</div>
 				{% endfor %}
@@ -111,8 +114,11 @@
 				{% else %}
 				<div class="notice">
 				{% endif %}
-					<span class="notice_message">{{ notice.render }}</span>
-					<div class="notice_time inline">{{ notice.added|smartdate }}</div>
+					<div class="notice_avatar inline">{% avatar user 40 "img" %}</div>
+					<div class="notice_message_div inline">
+						<span class="notice_message">{{ notice.render }}</span><br>
+						<span class="notice_time ">{{ notice.added|smartdate }}</span>
+					</div>
 				</div>
 			{% endfor %}
 			</div>

@@ -1,5 +1,6 @@
 #utilites related to pins
 import operator
+import httplib
 from urlparse import urlparse, urlunparse 
 from django.http import Http404 
 
@@ -194,3 +195,11 @@ def get_relationships(user, following=None, followers=None):
         relationships = {'friends':friendsL, 'followers':followersL, 'following':followingL}
     return relationships
 
+def url_exists(url):
+    url_s = urlparse.urlsplit(url)
+    httplib.HTTPConnection.debuglevel = 1
+    conn = httplib.HTTPConnection(url_s.netloc)
+    conn.request('HEAD', url_s.path)
+    response = conn.getresponse()
+    conn.close()
+    return response.status in (200, 301, 302)

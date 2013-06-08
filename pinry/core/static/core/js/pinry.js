@@ -621,7 +621,7 @@ function onLoadData(data, insert) {
 				html +='</div>'
 				//cmnts
 				html +='<div class="pin-stats pull-right dropdown display cmnts">'
-					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">'
+					html += '<div class="stat dropdown-toggle" id="" role="button" data-toggle="closed" data-target="pin-cmnts">'
 					html += '<i class="icon-cmnts"></i><span class="text light cmnts ">'+image.comments.length+'</span></div>';
 					html += '<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">';
 					uu = uniqueUsers(image.comments, 'user')
@@ -649,7 +649,7 @@ function onLoadData(data, insert) {
 				html += '<div class="pin-tags section">';
 				if (image.tags) {
 					html += '<l>';
-					html += '<span>Groups: </span>'
+					/* html += '<span>Groups: </span>' */
 					for (tag in image.tags) {
 						html += '<span class="tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
 					}
@@ -774,7 +774,7 @@ function hidePinComponents(id){
 	if (pin.data('repins') == 0) $('#'+id+'-pin .display.repins').hide()//hide repin stat display
 	if (pin.data('favs') == 0) $('#'+id+'-pin .display.favs').hide()//hide fav stat display
 	if (pin.data('cmnts') == 0) $('#'+id+'-pin .display.cmnts').hide()//hide cmmt stat display
-	if (pin.data('cmnts') == 0) $('#'+id+'-pin .pin-cmnts').hide()//hide cmmt section
+	/*if (pin.data('cmnts') == 0)*/ $('#'+id+'-pin .pin-cmnts').hide()//hide cmmt section
 	$('#'+id+'-pin form[name="pin-cmnt-form"]').hide()//hide comment form
 }
 //not currently used
@@ -902,8 +902,32 @@ $(document).on('click', '.pin.item .image.touch-on', function(e){
 	target = $(e.target).closest('.pin').find('.pin-options');
 	toggleTouchHover(target, true)
 });
-//Options > Comment: TOUCH: handler to toggle options hover for touch devices
+/*Pinstats > dropdown-toggle: for all pin stats that are set up
+* dropdown-toggle needs the following data attributes to funtion
+* -data-toggle="open/closed"
+* -data-target="class_name" specify name of .pin class to toggle show()/hide().
+*/
+$(document).on( 'click', '.dropdown-toggle', function(e){
+	e.preventDefault();
+	e.stopPropagation();
+	clicked = $(e.target)
+	toggle = clicked.closest('.dropdown-toggle')
+	console.log('toggle',toggle)
+	state = toggle.data('toggle')
+	item = toggle.closest('.item')
+	target = item.find('.'+toggle.data('target'))
+	console.log(toggle)
+	if (state=='open'){
+		toggle.data('toggle', 'closed')
+		target.hide()
+	}else{
+		toggle.data('toggle', 'open')
+		target.show()
+	}
+	applyLayout()
+});
 
+//Options > Comment: TOUCH: handler to toggle options hover for touch devices
 $(document).on( 'MSPointerDown touchstart', '.pin-cmnt.touch-on .display', function(e){
 	e.preventDefault();
 	var cmnt = $(this).closest('.pin-cmnt')
@@ -968,13 +992,15 @@ function repinsSuccess(result, pin){
 //Options > Comment: on click open form
 $('#cmnts').live('click', function(e){
 	e.preventDefault();
+	var pin = $($(this).closest(".pin"));
 	var state = $(this).attr('data-state');
+	var toggle = pin.find('.cmnts .dropdown-toggle')
 	//only open form if data-stat = true
 	if (state=="True"){
-		var pin = $($(this).closest(".pin"));
 		var id = parseInt(pin.attr('id'));
-		pin.find('.pin-cmnts').append(insertCommentForm(id));
+		pin.find('.pin-cmnts').append(insertCommentForm(pin));
 		pin.find('.pin-cmnts').show();
+		toggle.data('toggle', 'open');
 		applyLayout();
 		//scroll to comment form
 		ws = getWindowSize();
@@ -994,6 +1020,7 @@ $('#cmnts').live('click', function(e){
 	}
 });
 
+
 //Comment: submit form
 $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
@@ -1009,9 +1036,9 @@ $(document).on( 'submit', '.pin form', function(e){
 function cmntsSuccess(result, pin){
 	cmnt = (pin.find('.pin-cmnt[data-cmnt='+result.id+']'))
 	if(result && cmnt.length > 0){//edit comment
-		cmnt.replaceWith(insertComment(result))//relace edited comment div with new comment
+		cmnt.replaceWith(insertComment(result,pin))//relace edited comment div with new comment
 	}else if (result){//new comment
-		pin.find('.pin-cmnts').append(insertComment(result))//append new comment to end of comments
+		pin.find('.pin-cmnts').append(insertComment(result,pin))//append new comment to end of comments
 	}else{//on delete
 		pin.find('#cmnts').attr('data-state',true)
 		pin.find('#cmnts i').toggleClass('icon-chat-empty');
@@ -1026,7 +1053,7 @@ $(document).on( 'click', '.pin form .cancel.btn', function(e){
 	console.log('click cancel');
 	cancelCmnt(this)
 	//pcfp = pcf.parent('.pin-cmnt')
-	//cmntp.replaceWith(insertComment(result))//relace edited comment div with new comment
+	//cmntp.replaceWith(insertComment(result,pin))//relace edited comment div with new comment
 });
 //Comment: cancel form (for post & edit)
 function cancelCmnt(target){
@@ -1042,7 +1069,7 @@ function cancelCmnt(target){
 	console.log(cmntE);
 	console.log(opt);
 	pcf.remove();
-	button.attr('data-state', 'true');
+	button.attr('data-state', 'True');
 	icon = button.find('i');
 	icon.toggleClass('icon-chat-empty');
 	//if there are no existing comments hide the comment section
@@ -1077,74 +1104,72 @@ $(document).on('click', '.pin-cmnt .edit', function(e){
 	button.attr('data-state', 'edit');
 	icon = button.find('i');
 	icon.toggleClass('icon-chat-empty');
-	var pinId = parseInt(pin.attr('id'));
 	cmnt = $(this).closest(".pin-cmnt")
-	cmntId = parseInt(cmnt.attr('data-cmnt'))//get comment id
-	cmntT = cmnt.find('.display.text').html()//get comment text
 	cmnt.children().hide()//hide existing comment
-	cmnt.append(insertCommentForm(pinId, cmntT, cmntId))//add comment form
+	cmnt.append(insertCommentForm(pin, cmnt))//add comment form
 	applyLayout()
 	pin.css('z-index', 1000);
 });
-
-//Comment: insert comment
-function insertComment(comment){
-	username = comment.user.username
-	userid = comment.user.id
-	cmntT = comment.comment
-	cmntId = comment.id
-	avatar = comment.user.avatar
+function getPinData(pin){
+	data = {}
+	//get perams
+	var p = pin.data('perams')
+	var avs_p=/avs=(\d{1,2})/;
+	data['avs'] = parseInt(p.match(avs_p)[1])
+	//other
+	var id = parseInt(pin.attr('id'));
+	data['id'] = id
 	
+	return data
+}
+//Comment: insert comment
+function insertComment(comment,pin){
+	if (pin){
+		pinData = getPinData(pin)
+		avs = pinData.avs
+	}else{avs = undefined;}
+	if (avs > 20){ line2=comment.submit_date.l }else{line2=undefined;}
+	var username = comment.user.username
+	var userid = comment.user.id
+	var cmntT = comment.comment
+	var cmntId = comment.id
 	var html = ""
 	if (!cmntId){cmntId=""};
 	html += '<div class="pin-cmnt';
 		if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
 	html += ' data-cmnt='+cmntId+'>';
-	html += '<a class="avatar-pill" href="/user/'+userid+'">' 
-		html += '<div class="avatar"><img class="avatar" src="'+avatar+'"/></div>';
-		html += '<div class="user">'+capFirst(username)+':</div>';
-	html += '</a>';	
+	html += avatar(comment.user, avs, line2)
 		if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
 	html += '<p class="display text light" >'+cmntT+'</p>';
 	html += '</div> ';
 	return html
 }
-//Comment: insert commentL
-function insertCommentL(comment){
-	username = comment.user.username
-	userid = comment.user.id
-	cmntT = comment.comment
-	cmntId = comment.id
-	avatar = comment.user.avatar
-	if (!cmntId){cmntId=""};
-	html += '<div class="pin-cmnt'
-	if (touchOn){html += ' touch-on"'}else{ html += ' touch-off"'}
-	html +=' data-cmnt='+cmntId+'>';
-		html += '<a class="avatar-pill" href="/user/'+userid+'">';
-			html += '<div class="avatar inline">{% avatar comment.user 32 %}</div>';
-			html += '<div class="user inline">'+capFirst(username)+'</div>';
-		html += '</a>';
-		if (userid == authUserO.id || authUserO.is_superuser){html += '<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>'}
-		html += '<p class="text light" >'+cmntT+'</p>';
-	html += '</div>';
-	return html
-}
-//Comment: insert comment form
-function insertCommentForm(pinId, cmntT, cmntId){
+
+/* Comment: insert comment form 
+   -pin:jquery pin object
+   -cmnt:jquery comment object
+*/
+
+function insertCommentForm(pin, cmnt){
+	pinData = getPinData(pin);
+	if (cmnt){
+		var cmntId = parseInt(cmnt.attr('data-cmnt'))//get comment id
+		var cmntT = cmnt.find('.display.text').html()//get comment text
+	}
+	console.warn('pinData.avs ',pinData.avs)
 	var html = ""
 	html += '<form action="" enctype="multipart/form-data" method="post" name="pin-cmnt-form" class="pin-cmnt-form form">'
-		html += '<div id="div_comment" class="">'
-			html += '<label id="comment_label" class="control-label" for="comment"></label>'
-			html += '<span class="help-inline control-label"></span>'
-			html += '<div class="controls">'
-				console.log(cmntId)
-				if (cmntId){html += '<input type="hidden" name="id" id="id_id" value='+cmntId+'>'}
+		html += avatar(authUserO, pinData.avs);
+		html += '<div id="wraper">'
+			html += '<div class="fields">'
 				html += '<textarea id="id_comment" placeholder="Enter your comment here." name="comment">'
 				if(cmntT){html += cmntT}
 				html +='</textarea>'
-				html += '<input type="hidden" name="content_object" value="/api/v1/pin/'+pinId+'/" id="id_content_object">'
+				if (cmntId){html += '<input type="hidden" name="id" id="id_id" value='+cmntId+'>'}
+				html += '<input type="hidden" name="content_object" value="/api/v1/pin/'+pinData.id+'/" id="id_content_object">'
 				html += '<input type="hidden" name="site_id" value=1 id="id_site_id">'
 			html += '</div>'
+			html += '<span style="display:none;" class="help-inline control-label"></span>'
 			html += '<button href="" class="cancel btn btn-mini">Cancel</button>'
 			html += '<button type="submit" class="btn btn-mini btn-primary">Post</button>'
 		html += '</div>'
@@ -1167,6 +1192,10 @@ function insertCommentForm(pinId, cmntT, cmntId){
 *  3) pin.profile: must have:data-xxx="qty of stat" 
 *  -must have: class="display text xxx" to dispay the current count
 *  4) Callback: if functtion xxxSuccess(result) is defined it will be triggerd result = returned data
+*  
+*  attributes:
+*  -data: serialized data to submit with ajax
+*  -messageTarget: taget object to display any messages returnd by server
 */
 
 function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
@@ -1621,7 +1650,19 @@ function toggleHover(target, self){
 		aTouchHover = target;
 	}
 }
-//reset all froms on page
+//returns avatar pill as html string
+function avatar(user, size, line2){
+	var html = ""
+	html += '<a class="avatar-pill" href="/user/'+user.id+'">' 
+		html += '<div class="avatar"><img height:'+size+'px;" class="avatar" src="'+user.avatar+'"/></div>';
+		html += '<div class="avatar-right">';
+			html += '<div class="user">'+capFirst(user.username)+':</div>';
+			if (size > 30 && line2){html += '<div class="line2">'+line2+':</div>';}
+		html += '</div>';	
+	html += '</a>';	
+	return html
+}
+//reset all forms on page
 function resetForms(){
 	console.warn('****resetForms()')
 	forms = $('form')

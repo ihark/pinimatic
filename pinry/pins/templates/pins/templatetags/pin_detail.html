@@ -81,13 +81,7 @@
 <!-- //INFO - STATS -->
 	<!-- //submitter -->
 	<div class="pin-info">
-		<a class="avatar-pill " href="{% url pins:profile pin.submitter.id %}">
-			<div class="avatar">{% avatar pin.submitter 32 %}</div>
-			<div class="avatar-right">
-				<div class="user">By: {{pin.submitter|capfirst}}</div>
-				<div class="date light h-light">{{pin.published|smartdate}}</div>
-			</div>
-		</a>	
+	{% avatar pin.submitter 32 line2=pin.published|smartdate %}
 	</div>
 	<!-- //favs -->
 	
@@ -96,20 +90,22 @@
 		<i class="icon-favs"></i><span class="text light">{{pin.favoritesC}}</span></div>
 		<ul class="list-favs dropdown-menu dm-caret" role="menu" aria-labelledby="dLabel">
 		{%for fav in pin.favorites%}
-			<li id="{{fav.id}}" class="display favs item"><a class="avatar" href="/user/{{fav.user.id}}/">{% avatar pin.submitter 15 %}{{fav.user|capfirst}}</a></li>
+			<li id="{{fav.id}}" class="display favs item"><a class="avatar" href="/user/{{fav.user.id}}/">{% avatar pin.submitter 15 'img' %}{{fav.user|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
 	<!-- //cmnts -->
 	
 	<div class="pin-stats pull-right dropdown display cmnts" {% if not comment_list %}style="display:none;"{% endif %}>
-		<div class="stat dropdown-toggle" id="" role="button" data-toggle="dropdown" data-target="#">
+		<div class="stat dropdown-toggle" id="" role="button" data-toggle="open" data-target="pin-cmnts">
 		<i class="icon-cmnts"></i><span class="text light cmnts ">{{comment_count}}</span></div>
+		{%comment%}<!-- TODO: need to convert list to set so users are unique -->
 		<ul class="list-cmnts dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{% for comment in comment_list %}
-			<li id="{{cmnt.id}}" class="display cmnts item"><a class="avatar" href="/user/{{cmnt.user.id}}/">{% avatar comment.user 15 %}{{comment.user|capfirst}}</a></li>
+			<li id="{{cmnt.id}}" class="display cmnts item"><a class="avatar" href="/user/{{cmnt.user.id}}/">{% avatar comment.user 15 'img' %}{{comment.user|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
+		{%endcomment%}
 	</div>
 
 	<!-- //repin -->
@@ -118,7 +114,7 @@
 		<i class="icon-plus"></i><span class="text light repins">{{pin.repinsC}}</span></div>
 		<ul class="list-repins dropdown-menu dm-caret" role="menu" aria-labelledby="">
 		{%for repin in pin.repins%}
-			<li id="{{repin.id}}" class="display repins item"><a href="/user/{{repin.submitter.id}}/">{% avatar repin.submitter 15 %}{{repin.submitter|capfirst}}</a></li>
+			<li id="{{repin.id}}" class="display repins item"><a href="/user/{{repin.submitter.id}}/">{% avatar repin.submitter 15 'img' %}{{repin.submitter|capfirst}}</a></li>
 		{% endfor %}
 		</ul>
 	</div>
@@ -140,13 +136,7 @@
 	<div class="section pin-cmnts display" {% if not comment_list %}style="display:none;"{% endif %}>
 			{% for comment in comment_list %}
 				<div class="pin-cmnt touch-off" data-cmnt="{{comment.id}}">
-					<a class="avatar-pill " href="{% url pins:profile comment.user.id %}">
-						<div class="avatar">{% avatar comment.user 32 %}</div>
-							<div class="avatar-right">
-							<div class="user">{{comment.user|capfirst}}</div>
-							<div class="date light h-light">{{comment.submit_date|smartdate:"long" }}</div>
-						</div>
-					</a>	
+					{% avatar comment.user 32 line2=comment.submit_date|smartdate %}
 				{% if user == comment.user or user.is_superuser %}<span class="options"><i class="edit icon-edit"></i><i class="delete icon-trash"></i></span>{% endif %}
 					
 					<p class="display text light" >{{comment.comment}}</p>	

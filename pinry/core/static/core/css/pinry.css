@@ -555,7 +555,6 @@ margin: 0px 0px;
 		cursor: pointer;
 		padding:0;
 		width: 100%;
-		display: inline-block;
 	}
 	
 	.pin-stats > .stat{
@@ -787,8 +786,34 @@ margin: 0px 0px;
 		line-height: 18px;
 	}
 	.pin .pin-cmnt-form {
-		
+
 	}
+		.pin .pin-cmnt-form  .wraper{
+			float:left;
+			width:100%;
+		}
+		.pin .pin-cmnt-form  .fields{
+			margin-left:45px;
+		}
+			.pin-detail .pin .pin-cmnt-form  .fields{
+				margin-left:120px;
+			}
+		.pin-cmnt-form  .avatar-pill {
+			width:40px;
+		}
+			.pin-detail .pin .pin-cmnt-form  .avatar-pill {
+				width:120px;
+				font-size:13px;
+			}
+		.pin .pin-cmnt-form  textarea{
+			height:50px;
+			margin-top:2px;
+		}
+			.pin-detail .pin .pin-cmnt-form  textarea{
+				height:40px;
+				font-size:13px;
+				width:100%
+			}
 	
 
 	.pin.group {
@@ -859,6 +884,7 @@ margin: 0px 0px;
 		}
 		.pin-detail .pin .pin-cmnt .text{
 			line-height: 17px;
+			min-height: 32px;
 		}
 		.user-detail{
 			width:auto;
@@ -875,16 +901,34 @@ margin: 0px 0px;
 	width:100%
 }
 .accounts .notices-container{
-	margin:-17px -15px;
+	margin:-15px -15px;
 	text-align: left;
 }
 .accounts .notice{
-	padding:10px 15px;
+	padding:0;
 	border-bottom: 1px solid #555;
 	margin:0px 0px;
 }
+.accounts .notice_avatar{
+	padding:0;
+	margin-right:5px;
+	float:left;
+	margin-right:-100%;
+}
+.accounts .notice_message_div{
+	width: 100%;
+	height: 37px;
+	margin-left: 45px;
+	margin-right: 140px;
+	padding-top: 3px;
+	vertical-align: middle;
+	line-height: 17px;
+	overflow: hidden;
+}
 .accounts .notices-container .notice-options {
-	bottom: 2px;
+	float: right;
+	margin-right: 50px;
+	margin-top: 8px;
 }
 .accounts .notices-container .notice-options .btn{
 	min-width:35px;
@@ -1089,6 +1133,7 @@ table, th, td{
 	}
 	.pin-stats > .dropdown-menu .avatar {
 		margin:0;
+		margin-right: 5px;
 	}
 
 /* avaar-pill */
@@ -1110,9 +1155,6 @@ table, th, td{
 	.item .avatar-pill{
 		vertical-align:middle;
 	}
-	.avatar-pill.vert{
-		width:80px;
-	}
 		.avatar-pill .avatar,
 		.avatar-pill img{
 			float:left;
@@ -1129,23 +1171,20 @@ table, th, td{
 			overflow:hidden;
 			height:15px;
 		}
-		.avatar-pill .date{
+		.avatar-pill .line2{
 			text-align:left;
 			width:auto;
 			max-width:100%;
 			margin:0 4px;
 			word-wrap:break-word;
 			overflow:hidden;
-			height:15px;
 			font-size:.95em;
 		}
 		.pin .avatar-pill .user{
 			max-width:60px;
-			height:15px;
 		}
 		.pin-info .avatar-pill .user{
 			max-width:130px;
-			height:15px;
 		}
 		.pin-detail .pin .avatar-pill .user{
 			width:auto;
@@ -1153,6 +1192,7 @@ table, th, td{
 			height:16px;
 			line-height:16px;
 		}
+
 			.pin .avatar-pill .user:hover{
 				width:auto;
 				max-width:180px;
@@ -1161,7 +1201,27 @@ table, th, td{
 				width:auto;
 				max-width:200px;
 			}
-		
+.avatar-pill-vert{
+		width:60px;
+		height:auto;
+	}
+	.avatar-pill-vert .avatar-pill{
+		width:60px;
+		height:auto;
+	}
+	.avatar-pill-vert .avatar{
+		height:60px;
+	}
+	.avatar-pill-vert .user{
+		width: auto;
+		height: auto;
+		max-width: 52px;
+		line-height: 14px;
+		margin-top: 2px;
+	}
+	.avatar-pill-vert .avatar-right{
+		float:left;
+	}		
 
 form {
 	margin-bottom: 0;
@@ -1185,6 +1245,30 @@ form h1 {
 /* GENERAL FORMATTING */
 #pins.show  .pin{
 	display:block;
+}
+.rotate-width {
+	overflow: hidden;
+	height: 120px;
+	width: 20px;
+}
+.rotate-height {
+  width: 120px;
+  margin: -10px 50% 0 50%;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+
+  /* also accepts left, right, top, bottom coordinates; not required, but a good idea for styling */
+  -webkit-transform-origin: 0;
+  -moz-transform-origin: 0;
+  -ms-transform-origin: 0;
+  -o-transform-origin: 0;
+  transform-origin: 0;
+
+  /* Should be unset in IE9+ I think. */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 .container{
 	width:auto;

@@ -914,9 +914,12 @@ $(document).on( 'click', '.dropdown-toggle', function(e){
 	toggle = clicked.closest('.dropdown-toggle')
 	console.log('toggle',toggle)
 	state = toggle.data('toggle')
-	item = toggle.closest('.item')
-	target = item.find('.'+toggle.data('target'))
-	console.log(toggle)
+	pin = toggle.closest('.pin')
+	console.warn(pin)
+	toggle_t = toggle.data('target')
+	if (toggle_t !='#'){
+		target = pin.find('.'+toggle_t)
+	}
 	if (state=='open'){
 		toggle.data('toggle', 'closed')
 		target.hide()

@@ -77,9 +77,9 @@ def pin_comment_handler(sender, *args, **kwargs):
     target = comment.content_object
     from notification import models as notification
     #notify pin followers
-    notification.send_observation_notices_for(target, "commented", {"from_user": user, "owner":target.submitter}, [user])
+    notification.send_observation_notices_for(target, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user], sender=target)
     #notify user's followers
-    notification.send_observation_notices_for(user, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user], sender=target)
+    notification.send_observation_notices_for(user, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user, target.submitter], sender=target)
     if user != target.submitter:
         #notify pin's owner
         notification.send([target.submitter], "commented", {"from_user": user}, sender=target)

@@ -1,7 +1,7 @@
 //Global Variables
 //From base.html template context: STATIC_URL, MEDIA_URL, apiURL
 //From user_profile template tag: aProfileId
-var perams = '?avs=15'
+var perams = '?avs=16'
 var pinsURL = apiURL+'pin/'+perams+'&format=json&offset='
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
@@ -606,7 +606,7 @@ function onLoadData(data, insert) {
 				html += '<div class="pin-info">';
 					html += '<a class="avatar-pill avatar" title="User\'s pins" href="/user/'+image.submitter.id+'/">'
 					html += '<img src="'+image.submitter.avatar+'"/>'
-					html += '<div class="user">'+image.submitter.username+'</div></a>'
+					html += '<div class="avatar-right user">'+image.submitter.username+'</div></a>'
 				html += '</div>';
 				//favs
 				html +='<div class="pin-stats pull-right dropdown display favs">'

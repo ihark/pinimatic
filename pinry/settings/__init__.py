@@ -91,6 +91,8 @@ NOTIFICATION
 NOTIFICATION_CONTENT_TYPE_TRANSLATIONS = {'user':['profile picture', None]}
 NOTIFICATION_OTHER_KEY_WORDS = {'you':'/user/'}
 #NOTIFICATION_CHECK_FOR_SENDER_NAMES = {'pin':['submitter','/user/']}
+OBSRVATION_DELETE_CONTENT_TYPES = {'follow':'folowing'}
+OBSRVATION_AUTO_DELETE = True
 ''' 
 AVATAR
 '''

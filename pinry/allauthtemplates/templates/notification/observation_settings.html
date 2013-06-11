@@ -9,15 +9,17 @@
 
 {% block body %}
 <div class="notification notification-settings">
-    <h1>{% trans "Notice Settings " %}({{notice_settings.rows.0.observed.content_type.name|capfirst}}s)
+	{% with notice_settings.rows.0.observed.content_type.name|capfirst as detial %}
+    <h1>{% trans "Notice Settings " %}{% if detail %}({{detail}}s){% endif %}
+	{% endwith %}
 		<div class="btn-group pull-right">
 			<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
 				Options
 				<span class="caret"></span>
 			</a>
 			<ul class="dropdown-menu">
-				<li><a href="{% url notificaton_observation_settings 'user' %}">{% trans "Individual User Notice Settings" %}</a></li>
-				<li><a href="{% url notificaton_observation_settings 'pin' %}">{% trans "Individual Pin Notice Settings" %}</a></li>
+				<li><a href="{% url notificaton_observation_settings 'user' %}">{% trans "Followed User Notice Settings" %}</a></li>
+				<li><a href="{% url notificaton_observation_settings 'pin' %}">{% trans "Favorite Pin Notice Settings" %}</a></li>
 				<li><a href="{% url notification_notice_settings %}">{% trans "Manage Notifications" %}</a></li>
 				<li><a href="{% url notification_notices_all %}">{% trans "View All Notices" %}</a></li>
 				<li><a href="{% url notification_notices_archived %}">{% trans "View Deleted Notices" %}</a></li>	
@@ -50,21 +52,26 @@
 				{% if notice_settings.rows|length > 0 %}
 					{% for row in notice_settings.rows %}
 					<tr class="notice-row">
-						<td class="notice_type_description" width="auto">
+						<td class="observation_description" width="auto">
 							{% if row.observed.content_type.name == "pin" %}
-								<strong>{{ row.observed.content_type|capfirst }} by {{ row.observed.observed_object.submitter|capfirst }}</strong>
-								<span class="notice_type_description"><br>
+								<div class="observation_settings_pin">
 								<a href="{% url 'pins:pin-detail' row.observed.object_id %}">
-								<img src="{{MEDIA_URL}}{{ row.observed.observed_object.thumbnail }}"/></a>
+								<img src="{{MEDIA_URL}}{{ row.observed.observed_object.thumbnail }}"/>
+								</a>
+								<strong>By: {{ row.observed.observed_object.submitter|capfirst }}</strong>
+								</div>
 							{% elif row.observed.content_type.name == "user" %}
+								<div class="observation_settings_user">
 								{% with row.observed.observed_object.last_login|smartdate as date %}
 								{% avatar row.observed.observed_object 40 line2="LS: "|add:date %}
 								{% endwith %}
+								</div>
 							{% else %}
+								<div class="observation_settings_gen">
 								<strong>{{ row.observed.content_type }}: </strong>
-								<span class="notice_type_description"><br>
+								<br>
 								{{ row.observed.observed_object }}
-								</span>
+								</div>
 							{% endif %}
 							
 						</td>
@@ -80,7 +87,7 @@
 				{% else %}
 					<tr class="notice-row">
 						<td class="notice_type_description">
-						You have no individual notifaications yet.
+						You don't have any notice settings to manage yet.
 						</td>
 					</tr>
 				{% endif %}

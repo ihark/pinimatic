@@ -46,9 +46,17 @@
 			</div>
 	<!-- //SOURCE BUTTON -->
 			<div id="source" class="background-50 btn-lg">
-				<a target="_blank" href="{{pin.srcUrl}}">
-				<div class="inline option one-icon"><i class="icon-bookmark"></i><br>GO</div>
-				<div class="inline option one-text">{{pin.srcDom}}</div></a>
+				<div id="prev" title="Previous Pin" class="inline">
+					<a target="_blank" href="{{pin.srcUrl}}" title="Go to the source URL of this pin">
+						<div class="inline option two"><i class="icon-bookmark"></i><br>Go To URL</div>
+					</a>
+				</div>
+				<div class="inline divider"></div>
+				<div id="make-avatar" title="Make this pin your profile picture" class="inline">
+					<a type="submit" href="{% url make_avatar pin.image.url %}">
+						<div class="inline option two"><i class="icon-picture"></i><br>Prof. Img</div>
+					</a>
+				</div>
 			</div>
 	<!-- //PIN NAVIGATION -->
 			<div id="navigation" class="background-50 btn-lg">

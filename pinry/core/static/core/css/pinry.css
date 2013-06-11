@@ -586,7 +586,7 @@ margin: 0px 0px;
 		.pin-options .inline.option {
 			width:35px;
 			text-align:center;
-			line-height:10px;
+			line-height:11px;
 			overflow:hidden;
 		}
 		.pin-options .inline.option.two  {
@@ -863,8 +863,12 @@ margin: 0px 0px;
 		.pin-detail *{
 			font-size: 13px;
 		}
+		.pin-options *{
+			font-size: 10px;
+			font-size: 10px;
+		}
 		.pin-detail .pin-options *{
-			font-size: 11px;
+			font-size: 10px;
 		}
 		
 		.pin-detail .pin {
@@ -945,6 +949,13 @@ margin: 0px 0px;
 table.observation_settings {
 	font-size: 12px;
 }
+.observation_description .avatar-pill {
+	font-size: 14px;
+}
+.observation_settings_pin img{
+	max-height:50px;
+	max-width:200px;
+}
 .unseen.notice{
 	background:rgba(124, 201, 25, 0.24);
 }
@@ -1022,7 +1033,7 @@ table, th, td{
   text-align: middle;
   display: inline-block;
   width: 230px;
-  height:185px;
+  height:190px;
   overflow-y:auto;
 }
 .form-container.avatars .avatar-choice{
@@ -1152,6 +1163,9 @@ table, th, td{
 		border:1px solid #CCC;
 		background-color:rgba(204, 204, 204, 0.25);
 	}
+	.pin .pin-cmnt .avatar-pill{
+		margin-top:0px;
+	}
 	.item .avatar-pill{
 		vertical-align:middle;
 	}
@@ -1178,7 +1192,7 @@ table, th, td{
 			margin:0 4px;
 			word-wrap:break-word;
 			overflow:hidden;
-			font-size:.95em;
+			font-size:.85em;
 		}
 		.pin .avatar-pill .user{
 			max-width:60px;
@@ -1186,11 +1200,17 @@ table, th, td{
 		.pin-info .avatar-pill .user{
 			max-width:130px;
 		}
-		.pin-detail .pin .avatar-pill .user{
+		.avatar-pill.s32 .user{
 			width:auto;
 			max-width:200px;
-			height:16px;
-			line-height:16px;
+			height:18px;
+			line-height:18px;
+		}
+		.avatar-pill.s40 .user{
+			width:auto;
+			max-width:200px;
+			height:20px;
+			line-height:20px;
 		}
 
 			.pin .avatar-pill .user:hover{

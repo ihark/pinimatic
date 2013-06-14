@@ -1,9 +1,15 @@
+
 {% extends 'base.html' %}
-{% block title %}avatar{% endblock %}
+{% load user_profile %}
 {% block body_class %}notices{% endblock %}
 
 {% block base %}
-<div class="form-container accounts avatars">
-{% block content %}{% endblock %}
+<div class="container col-2">
+	<div class="left static">
+		{% user_profile request user.id %}
+	</div>
+	<div class="border-only accounts avatars col-center">
+		{% block content %}{% endblock %}
+	</div>
 </div>
 {% endblock %}

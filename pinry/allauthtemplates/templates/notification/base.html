@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
-
+{% load user_profile %}
 {% block body_class %}notices{% endblock %}
 
 {% block base %}
-<div class="form-container accounts notification">
-{% block body %}{% endblock %}
+
+<div class="container col-2">
+	<div class="left static">
+		{% user_profile request user.id %}
+	</div>
+	<div class="border-only accounts notification col-center">
+		{% block body %}{% endblock %}
+	</div>
 </div>
 {% endblock %}

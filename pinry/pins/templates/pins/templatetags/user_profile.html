@@ -5,12 +5,12 @@
 		{% if request.user != profile and user.is_authenticated%}
 			<button id="follow" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="True" {% else %}data-state ="False" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
 		{% endif %}
-		<a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');"><h5 class="">{{ profile.username }}</h5></a>
+		<a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');"><h5 class="">{{ profile|capfirst }}</h5></a>
 		<div class="avatar profile">
 			{% if request.user == profile %}
 			<div class="avatar-change-btn"><a href="{% url avatar_change %}"><i class="icon-edit"></i></a></div>
 			{% endif %}
-			{% avatar user 210 "img" %}
+			{% avatar profile 210 "img" %}
 		</div>
 		
 	</div>

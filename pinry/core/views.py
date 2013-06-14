@@ -155,7 +155,7 @@ def relationships(request):
     if relationships:
         for type in relationships:
             for user in relationships[type]:
-                pins = Pin.objects.filter(submitter__exact=user)[:7]
+                pins = Pin.objects.filter(submitter__exact=user)[:20]
                 user.pins = pins
 
     return TemplateResponse(request, 'core/relationships.html', context)

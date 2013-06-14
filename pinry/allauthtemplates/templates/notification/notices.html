@@ -60,7 +60,7 @@
 				{% if date.grouper != this_month %}
 				<h2 class="notice_date">{{ date.grouper }}</h2>
 				{% else %}
-				<h2 style="margin-top:-16px" class="notice_date">This Month</h2>
+				<h2 class="notice_date">This Month</h2>
 				{% endif %}
 				<div class="notices-container">
 				{% for notice in date.list %}
@@ -98,7 +98,7 @@
 								</div>
 								{% endif %}
 							</div>
-							<span class="notice_text">{{ notice.render }}</span>
+							<span class="notice_message">{{ notice.render }}</span>
 							<span class="notice_time">{{ notice.added|smartdate }}</span>
 						</div>
 					</div>

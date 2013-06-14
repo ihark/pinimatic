@@ -5,16 +5,15 @@
 {% block title %}Pin Detail{% endblock %}
 
 {% block yield %}
-<div <div id="pin-detail" class="container content">
-	<div #id="pins" class="pin-detail-container">
-		<div class="user-detail">
-		{% user_profile request profileId %}
-		</div>
-		<div class="pin-detail">
-		{% pin_detail request pinId %}
-		</div>
-		<div style="clear:both;" />
+<div id="pin-detail" class="container col-2">
+	
+	<div class="left static">
+	{% user_profile request profileId %}
 	</div>
+	<div class="right fluid">
+	{% pin_detail request pinId %}
+	</div>
+
 </div>
 
 {% endblock %}

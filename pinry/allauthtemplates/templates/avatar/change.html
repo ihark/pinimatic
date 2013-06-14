@@ -2,8 +2,8 @@
 {% load avatar_tags %}
 
 {% block content %}
-    <h1>Profile Image</h1>
-    <div id="thumb_div" class="avatars">{% avatar user 210 "img" %}</div>
+    <h1>Profile Image<a class="btn btn-mini pull-right" href="{% url avatar_get_social %}">Get Images From Social Connnections</a></h1>
+    <div id="thumb_div" class="avatars">{% avatar user 210 "img" %}<div class="pull-ul">Current</div></div>
     <div id="choice_list" class="avatars">
     	{% if not avatars %}
     	    <p>Get some personality, upload an image.</p>
@@ -16,23 +16,31 @@
 				
 			</form>
 			<div class="avatar-delete">
-    	    	<form method="POST" action="/avatar/delete/">
+    	    	<form method="POST" action="{% url avatar_delete %}">
     	    		{% csrf_token %}
     	    		<input type="hidden" name="choices" value="{{avatar.id}}"/>
-    	    		<INPUT readonly value="X" TYPE="submit" WIDTH="10px"  HEIGHT="10px" BORDER="0"></input>
+					<input type="hidden" name="next" value="{% url avatar_change %}?url={{ upload_avatar_form.url.value }}&next={{next}}" />
+    	    		<INPUT class="X" title="Delete" readonly value="X" TYPE="submit" WIDTH="10px"  HEIGHT="10px" BORDER="0"></input>
     	    	</form>
     	    </div>
 			
 			{% endfor %}
     	{% endif %}
 	</div>
-	<div id="fields_div" class="center avatars form-actions ">
-    	<form class="center" enctype="multipart/form-data" method="POST" action="{% url avatar_change %}">
+	<form class="center" enctype="multipart/form-data" method="POST" action="{% url avatar_change %}">
+		<div id="fields_div" class="avatars">
+		
 			{% csrf_token %}
-			<input type="file" name="avatar" value="Avatar Image" {% if upload_avatar_form.avatar.errors %}class="errorlist"{% endif %}/>
-			<input class="btn btn-primary btn-mini" type="submit" value="Upload New Image" />
-			{{ upload_avatar_form.non_form_errors }}
-    	</form>
-		<a class="btn btn-primary btn-mini" href="{% url get_social_avatars %}">Get From Social</a>
-    </div>
+			{{ upload_avatar_form.non_field_errors }}
+			{{ upload_avatar_form.url.errors }}
+			<span>URL </span>{{ upload_avatar_form.url}}
+			{{ upload_avatar_form.avatar.errors }}
+			<span>or Upload </span>{{ upload_avatar_form.avatar}}
+		
+		</div>
+		<div class="form-actions" >
+			<input class="btn btn-primary" type="submit" value="Upload New Image" />
+			<a class="btn" href="{{next}}">Finished</a>
+		</div>
+	</form>
 {% endblock %}

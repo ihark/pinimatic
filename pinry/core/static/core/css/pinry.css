@@ -2,6 +2,9 @@
 input[type="radio"], input[type="checkbox"] {
   margin: 0px 2px 2px 0px;
 }
+input.errorlist{
+	margin:0;
+}
 body{
  margin-top:0
 }
@@ -56,6 +59,7 @@ a:hover{
   padding: 10px 15px 10px 15px;
   margin: 0px 0px -15px -15px;
 }
+
 .form-container .form-header{
   width: 100%;
   padding: 5px 15px 5px 15px;
@@ -196,6 +200,7 @@ h1, h2, h3, h4, h5, h6 {
 	.accounts.form-container {
 		text-align: center;
 		width:400px;
+		padding:0;
 	}
 	.accounts h1{
 		color:#444;
@@ -238,7 +243,7 @@ h1, h2, h3, h4, h5, h6 {
 	.accounts form{
 		display:inline-block;
 		text-align: left;
-		margin-bottom: -5px;
+		#margin-bottom: -10px;
 	}
 	.accounts .socialaccount_providers{
 		text-align: center;
@@ -856,10 +861,6 @@ margin: 0px 0px;
 		min-width:600px;
 		margin:auto;
 	}
-		.pin-detail{
-			width: auto;
-			margin-right:300px;
-		}
 		.pin-detail *{
 			font-size: 13px;
 		}
@@ -871,11 +872,12 @@ margin: 0px 0px;
 			font-size: 10px;
 		}
 		
-		.pin-detail .pin {
-			width: 100%;
+		.pin-detail.pin {
+			float: none;
+			width: auto;
 		}
 		
-		.pin-detail .pin .image img{
+		.pin-detail img{
 			height:auto;
 			min-width:100%;
 		}
@@ -892,26 +894,40 @@ margin: 0px 0px;
 		}
 		.user-detail{
 			width:auto;
+			float:left;
+		}
+		.user-detail.right{
+			width:auto;
 			float:right;
-			margin-left:10px;
-			padding-left:10px;
 		}
 
 /* NOTICES */
-.notification.form-container{
-	width:500px
+.accounts.notification{
+	width:400px
 }
+
 .accounts .notices-form{
 	width:100%
 }
 .accounts .notices-container{
-	margin:-15px -15px;
+	margin:0px -15px;
 	text-align: left;
 }
-.accounts .notice{
+.notice{
 	padding:0;
 	border-bottom: 1px solid #555;
 	margin:0px 0px;
+}
+.accounts .notice a{
+	font-weight: 600;
+	color:#CCC;
+}
+.accounts .notice a.btn{
+	font-weight: 600;
+	color:#333333;
+}
+.accounts .notice a:hover{
+	color:#398F00;
 }
 .accounts .notice_avatar{
 	padding:0;
@@ -929,6 +945,10 @@ margin: 0px 0px;
 	line-height: 17px;
 	overflow: hidden;
 }
+.notice_time{
+	font-size:.85em;
+	color:#777;
+}
 .accounts .notices-container .notice-options {
 	float: right;
 	margin-right: 50px;
@@ -939,9 +959,11 @@ margin: 0px 0px;
 }
 .notification-notices {
 	min-height:200px;
+	width:450px;
 }
-.notification-settings form{
-	width:100%;
+
+.notification-settings {
+	line-height: 0px;
 }
 .notification-settings form{
 	width:100%;
@@ -967,7 +989,7 @@ table.observation_settings {
 	background-color: rgba(124, 201, 25, 0.24);
 }
 .form-table{
-	margin: -16px -15px -20px -15px;
+	margin: 0px -15px -20px -15px;
 }
 /* TABLES */
 th{
@@ -981,66 +1003,80 @@ table, th, td{
 	border: 1px solid #555;
 }
 
-/* relationships */
-.relationships .item{
-	margin:0 -20px;
-	padding:10px 15px;
+/* item-cont: fluid width, button at right  */
+.item-cont {
 	border-bottom: 1px solid #555;
+	margin: 0 -15px;
 }
-.relationships .item .user{
-	font-size:14px;
-	margin-right:10px;
-	width:100px;
-	overflow:hidden;
-	vertical-align:middle;
-	height:100%;
+.item-cont .item{
+	margin-right: 120px;
+	padding: 10px 15px;
+	white-space: nowrap;
+	overflow: hidden;
 }
-.relationships .item .btn{
-	margin-top:10px;
+.item-cont .item-btn{
+	margin-top: 15px;
+	margin-right: 15px;
+	float: right;
 }
-.item .pins{
-	height:40px;
-	width:240px;
-	overflow:hidden;
-	vertical-align:middle;
+.item-cont .item .pins{
+	height: 40px;
+	width: auto;
+	vertical-align: middle;
 }
-.item .pins img{
+.item-cont .item .pins img{
 	height:40px;
 	width:auto;
 }
+
+
 /* AVATARS */
 
-.form-container.avatars {
+.avatars {
   width: 500px;
 }
-.form-container.avatars #fields_div {
-
+.avatars #fields_div {
+	padding:10px 15px;
+	border-top:1px solid #CCC;
+	margin:0 -15px;
+	width: 100%;
+	background-color: rgba(255, 255, 255, 0.15);
 }
 
-.form-container.avatars #thumb_div{
+.avatars #fields_div input[type="text"] {
+	width:163px;
+	height:14px;
+	line-height:24px;
+	margin-bottom:0px;
+}
+.avatars #fields_div input[type="file"] {
+	width:170px;
+}
+
+.avatars #thumb_div{
   vertical-align: top;
-  margin-top: 10px;
-  margin-bottom: 25px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   margin-right: 30px;
   display: inline-block;
   text-align: center;
   width:185px;
   height:185px;
 }
-.form-container.avatars #choice_list{
+.avatars #choice_list{
   vertical-align: top;
-  margin-top: 10px;
-  text-align: middle;
+  margin-top: 15px;
+  text-align: center;
   display: inline-block;
   width: 230px;
   height:190px;
   overflow-y:auto;
 }
-.form-container.avatars .avatar-choice{
+.avatars .avatar-choice{
 	margin:0 0 5px 0;
 }
 
-.form-container.avatars #thumb_div img{
+.avatars #thumb_div img{
   width:200px;
 }
 
@@ -1054,11 +1090,11 @@ table, th, td{
 	margin: 0;
 	display: inline-block;
 }
-.form-container.avatars #choice_list input[type="image"]{
+.avatars #choice_list input[type="image"]{
 	position: relative;
 }
 
-.form-container.avatars #choice_list .hover-btn{
+.avatars #choice_list .hover-btn{
 	width: 90px;
 	height: 90px;
 	position: relative;
@@ -1069,11 +1105,11 @@ table, th, td{
 	background-color: transparent;
 	color: transparent;
 }
-.form-container.avatars #choice_list .hover-btn:hover .overlay{
+.avatars #choice_list .hover-btn:hover .overlay{
 	background-color: rgba(0, 0, 0, 0.3);
 	color: #CCC;
 }
-.form-container.avatars #choice_list .hover-btn .overlay{
+.avatars #choice_list .hover-btn .overlay{
 	pointer-events:none;
 	position: absolute;
 	top: 0;
@@ -1086,22 +1122,13 @@ table, th, td{
 	display:inline-block;
 	vertical-align: middle;
 }
-.form-container.avatars #choice_list .hover-btn .overlay .text{
+.avatars #choice_list .hover-btn .overlay .text{
 	text-align:center;
 	cursor: pointer;
 	margin-top: 40%;
 	
 }
-.avatar-delete form input{
-	background-color: rgba(0, 0, 0, 0.25);
-	border: none;
-	color: White;
-	width: auto;
-	height: auto;
-	line-height: 16px;
-	margin: 0;
-	cursor: pointer;
-}
+
 .avatar-change-btn{
 	position: absolute;
 	text-align:right;
@@ -1156,7 +1183,13 @@ table, th, td{
 	margin:0;
 	margin-right:2px;
 	overflow:hidden;
+	font-weight: normal;
+	text-decoration: none;
 }
+	a.avatar-pill {
+		font-weight: normal;
+		text-decoration: none;
+	}
 	.pin .avatar-pill{
 		margin-top:2px;
 		border-radius:3px;
@@ -1256,12 +1289,6 @@ form h1 {
 		resize: vertical;
 	}
 	
-	input[type="file"] {
-		height: 25px;
-		width: 200px;
-		line-height: 25px;
-	}
-
 /* GENERAL FORMATTING */
 #pins.show  .pin{
 	display:block;
@@ -1295,42 +1322,57 @@ form h1 {
 	margin:auto;
 	padding: 0px 25px 25px 25px;
 }
+.p-med{
+    padding:15px;
+}
 .content{
 	width: auto;
 	min-width: 450px;
 	margin: 0px 20px;
 	margin-bottom: 40px;
-	padding: 0px 20px 0px 20px;
+	padding: 0px 15px;
 	overflow:hidden;
-}
-.content h1{
-	margin: 0px -20px;
-	padding: 0 20px;
-	line-height: 34px;
-}
-.content h2{
-	margin: 0px -20px;
-	padding: 0 20px;
-	line-height: 34px;
-	background:rgba(124, 201, 25, 0.24);
 }
 .framed-white{
 	background: White;
 	border-radius: 6px;
 }
-.right-col{
-	margin-right: 270px;
-	margin-left: 0;
-}
-.min-onecol{
-	min-width:810px
+.col-2{
+	min-width:750px
 }	
+	.col-2 .fluid.right{
+		margin-left: 270px;
+		margin-right: 0;
+	}
+
+	.col-2 .fluid.left{
+		margin-right: 270px;
+		margin-left: 0;
+	}
+	.col-2 .col-center{
+		margin:auto;
+		overflow: hidden;
+		width:450px;
+	}
+	.col-2 .static.left{
+		float:left;
+		width:auto;
+	}
+	.col-2 .static.right{
+		float:right;
+		width:auto;
+	}
+
 .width-450{
 	width: 450px;
 	margin: auto;
 }
 .width-600{
 	max-width: 600px;
+	margin: auto;
+}
+.width-700f{
+	width: 700px;
 	margin: auto;
 }
 
@@ -1349,6 +1391,20 @@ form h1 {
 	border-radius: 6px;
 	background-color: transparent;
 	min-width: auto;
+	padding: 0 15px;
+	overflow: hidden;
+}
+.border-only .form-actions{
+	padding: 10px 15px;
+	margin: 0 -15px;
+	width: 100%;
+	text-align: right;
+}
+.border-only h1{
+	margin:0 -15px;
+}
+.border-only h2{
+	margin:0 -15px;
 }
 .page-link{
 	position: relative;
@@ -1362,11 +1418,28 @@ form h1 {
 }
 .center {
 	text-align:center;
+	width: 100%;
+}
+* input.X{
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight:bold;
+	font-size: 12px;
+	line-height: 16px;
+	background-color: rgba(0, 0, 0, 0.25);
+	border: none;
+	color: White;
+	width: auto;
+	height: auto;
+	margin: 0;
+	cursor: pointer;
+}
+.pull-ul{
+	position:relative;
+	text-align:left;
+	top:-100%;
+	left:5px;
 }
 
-input.errorlist{
-	margin:0;
-}
 .text-normal{
 	font-size:12px;
 	font-weight:normal;
@@ -1523,3 +1596,62 @@ overflow: hidden;
 .touch-off{
 
 }
+/* File Uplaod button */
+input[type="file"] {
+		height: 22px;
+		width: 200px;
+		line-height: 22px;
+		background: white;
+		padding: 1px;
+		border-radius:4px;
+		font-size: 12px;
+	}
+/* This only works in chrome (not used) */
+	.imgup-btn {
+		width: auto;
+		overflow:hidden;
+		display: inline-block;
+		border: 1px solid #bbbbbb;
+		-webkit-border-radius: 4px;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+		border-color: #c5c5c5;
+		border-color: rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
+		
+	}
+	.imgup-btn  input[type="file"] {
+		width: 200px;
+		height: 22px;
+		margin-left: -83px;
+		display: inline-block;
+		margin-bottom: 0;
+		font-size: 12px;
+		line-height: 22px;
+		color: #333333;
+		text-align: center;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+		vertical-align: middle;
+		cursor: pointer;
+		background-color: #f5f5f5;
+		background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+		background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+		background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+		background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+		background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+		background-repeat: repeat-x;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+		filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+		-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+		-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	}
+	.imgup-btn:hover input[type="file"]{
+		color: #333333;
+		text-decoration: none;
+		background-position: 0 -15px;
+		background-color: #e6e6e6;
+		-webkit-transition: background-position 0.1s linear;
+		-moz-transition: background-position 0.1s linear;
+		-o-transition: background-position 0.1s linear;
+		transition: background-position 0.1s linear;
+	}

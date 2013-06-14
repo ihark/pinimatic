@@ -52,7 +52,7 @@
 				{% if notice_settings.rows|length > 0 %}
 					{% for row in notice_settings.rows %}
 					<tr class="notice-row">
-						<td class="observation_description" width="auto">
+						<td class="observation_description" width="100%">
 							{% if row.observed.content_type.name == "pin" %}
 								<div class="observation_settings_pin">
 								<a href="{% url 'pins:pin-detail' row.observed.object_id %}">
@@ -76,9 +76,9 @@
 							
 						</td>
 						{% for cell in row.cells %}
-						<td style="vertical-align:middle" class="center" width="15px">
+						<td style="vertical-align:middle" class="center">
 							{% if cell.0 %}
-							<input type="checkbox" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
+							<input type="checkbox" title="{{ cell.2 }}" name="{{ cell.0 }}" {% if cell.1 %}checked="yes"{% endif %} />
 							{% endif %}
 						</td>
 						{% endfor %}

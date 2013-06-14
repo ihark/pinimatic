@@ -9,7 +9,7 @@
 {% get_comment_list for pin as comment_list %}
 {% get_comment_count for pin as comment_count %}
 {% load email %}
-<div class="pin item" id="{{pin.id}}-pin" data-perams="?avs=32" data-favs="{{pin.favoritesC}}" data-cmnts="{{comment_count}}" data-repins="{{pin.repinsC}}">
+<div class="pin-detail pin item fluid-right" id="{{pin.id}}-pin" data-perams="?avs=32" data-favs="{{pin.favoritesC}}" data-cmnts="{{comment_count}}" data-repins="{{pin.repinsC}}">
 <!-- //IMAGE CONTAINER -->
 	<div class="image touch-off">
 <!-- //OPTIONS -->
@@ -53,7 +53,7 @@
 				</div>
 				<div class="inline divider"></div>
 				<div id="make-avatar" title="Make this pin your profile picture" class="inline">
-					<a type="submit" href="{% url make_avatar pin.image.url %}">
+					<a type="submit" href="{% url avatar_make pin.image.url %}">
 						<div class="inline option two"><i class="icon-picture"></i><br>Prof. Img</div>
 					</a>
 				</div>

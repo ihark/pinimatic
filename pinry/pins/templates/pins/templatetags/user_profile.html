@@ -1,11 +1,32 @@
 {% load follow_tags %}
 {% load avatar_tags %}
+{% load i18n %}
 <div class="pin profile" id="{{ profile.id }}-profile" data-profile="{{ profile.username }}" data-pins="{{ pinsC }}" data-tags="{{ tagsC }}" data-favs="{{ favsC }}" data-following="{{ followingC }}" data-followers="{{ followersC }}" data-cmnts="{{ cmntsC }}">
 	<div class="header">
-		{% if request.user != profile and user.is_authenticated%}
+		{% if user.is_authenticated and  request.user != profile %}
 			<button id="follow" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="True" {% else %}data-state ="False" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
+		{% elif request.user == profile %}
+			<a class="dropdown pull-right">
+				<div class="dropdown-toggle" data-toggle="dropdown" href="#">
+					<i class="icon-cog"></i>
+				</div>
+				<ul class="dropdown-menu top dm-caret">
+					<li><a href="{% url avatar_change %}">Profile Picture</a></li>
+					<li><a href="{% url core:relationships %}">Relationships</a></li>
+					<li><a href="{% url notification_notice_settings %}">{% trans "Notification Settings" %}</a></li></span>
+					<li><a href="{% url socialaccount_connections %}">Social Networks</a></li>
+					<li><a href="{% url account_email %}">Email Addresses</a></li>
+					{% if user.password == "!" %}
+						<li><a href="{% url account_set_password %}">Set Password</a></li>
+						{% else %}
+						<li><a href="{% url account_change_password %}">Change Password</a></li>
+					{% endif %}
+				</ul>
+			</a>
 		{% endif %}
-		<a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');"><h5 class="">{{ profile|capfirst }}</h5></a>
+		<div class="profile-name inline">
+			<h5 class=""><a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');">{{ profile|capfirst }}</a></h5>
+		</div>
 		<div class="avatar profile">
 			{% if request.user == profile %}
 			<div class="avatar-change-btn"><a href="{% url avatar_change %}"><i class="icon-edit"></i></a></div>

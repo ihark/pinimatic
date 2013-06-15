@@ -60,9 +60,9 @@ def pin_favorite_handler(user, target, instance, **kwargs):
     '''
     from notification import models as notification
     #notify pin's followers
-    notification.send_observation_notices_for(target, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user, target.submitter], sender=target)
+    sent = notification.send_observation_notices_for(target, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user, target.submitter], sender=target)
     #notify user's followers
-    notification.send_observation_notices_for(user, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user, target.submitter], sender=target)
+    notification.send_observation_notices_for(user, "favorited", {"from_user": user, "owner": target.submitter, "alter_desc":True}, [user, target.submitter]+sent, sender=target)
     if user != target.submitter:
         #notify pin's owner
         notification.send([target.submitter], "favorited", {"from_user": user}, sender=target)
@@ -79,13 +79,14 @@ def pin_comment_handler(sender, *args, **kwargs):
     target = comment.content_object
     from notification import models as notification
     #notify pin followers
-    notification.send_observation_notices_for(target, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user, target.submitter], sender=target)
+    sent = notification.send_observation_notices_for(target, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user, target.submitter], sender=target)
     #notify user's followers
-    notification.send_observation_notices_for(user, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user, target.submitter], sender=target)
+    notification.send_observation_notices_for(user, "commented", {"from_user": user, "alter_desc":True, "owner":target.submitter}, [user, target.submitter]+sent, sender=target)
     if user != target.submitter:
         #notify pin's owner
         notification.send([target.submitter], "commented", {"from_user": user}, sender=target)
-        #make comment user observe new comments for pin
+        #make comment user observe new comments for pin.
+        #(trying wihtout)if not is_observing(target, user, ["commented"]):
         notification.observe(target, user, "commented")
         
 @receiver(post_save, sender=Pin, dispatch_uid='id')

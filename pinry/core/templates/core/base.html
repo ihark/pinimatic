@@ -2,6 +2,7 @@
 {% load re_pin %}
 {% load compress %}
 {% load i18n %}
+{% load avatar_tags %}
 
 <!DOCTYPE html>
 <html>
@@ -49,16 +50,15 @@
 				<ul class="nav pull-right">
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							{{ user }}
-							<b class="caret"></b>
+							<div class="avatar nav">{% avatar user 20 "img" %}</div>{{ user|capfirst }}<span class="icon-notice led {{notice_unseen}}"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="">Your Pins</a></li>
-							<li><a href="{% url notification_notices %}">Your Notifications  {{notice_unseen_count}}</a></li>
+							<li><a id="user-profile-btn" data-user="{{ user }}" href="{% url pins:user %}{{ user.id }}/" onclick="">Your Collection</a></li>
+							<li><a href="{% url notification_notices %}">Notifications<span class="icon-notice {{notice_unseen}}">{{notice_unseen_count}}</span></a></li>
 							<li class="divider"></li>
-							<li><a href="{% url core:relationships %}">Manage Relationships</a></li>
-							<li><a href="{% url socialaccount_connections %}">Social Connections</a></li>
-							<li><a href="{% url account_email %}">Manage Email Address</a></li>
+							<li><a href="{% url core:relationships %}">Relationships</a></li>
+							<li><a href="{% url socialaccount_connections %}">Social Networks</a></li>
+							<li><a href="{% url account_email %}">Email Address</a></li>
 							{% if user.password == "!" %}
 								<li><a href="{% url account_set_password %}">Set Password</a></li>
 								{% else %}
@@ -79,7 +79,6 @@
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							Get Started
-							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
 						<li><a href="#new-pin" data-toggle="modal">Add A New Pin</a></li>

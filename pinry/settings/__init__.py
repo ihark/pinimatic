@@ -93,6 +93,14 @@ NOTIFICATION_OTHER_KEY_WORDS = {'you':'/user/'}
 #NOTIFICATION_CHECK_FOR_SENDER_NAMES = {'pin':['submitter','/user/']}
 OBSRVATION_DELETE_CONTENT_TYPES = {'follow':'folowing'}
 OBSRVATION_AUTO_DELETE = True
+NOTICE_TYPES = [("followed", "New Follower", "has followed you"),
+                ("favorited", "New Favorite", "has favorited your pin"),
+                ("commented","New Comment", "has commented on your pin"),
+                ("added", "Re-Pin", "has added your pin to their collection"),
+                ("new", "New Pin","has added a new pin to their collection"),
+                ("avatar_updated", "New Profile Picture", "has changed their profile picture"),
+                ("system_message", "%s Notice" % SITE_NAME, "important information about %s" % SITE_NAME)]
+
 ''' 
 AVATAR
 '''

@@ -67,7 +67,7 @@ class UserResource(ModelResource):
         try:
             bundle['objects'][0]
         except:
-            bundle['objects']=[{'id':'null', 'username':'anonymous'}]
+            bundle['objects']=[{'id':'', 'username':'anonymous'}]
         return bundle
         
     def dehydrate(self, bundle):

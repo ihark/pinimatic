@@ -8,7 +8,7 @@ print '--Development Settings Loading'
 
 # quick toggles to overide init
 DEBUG = True
-PUBLIC = False
+PUBLIC = True
 COMPRESS_ENABLED = False
 #use in templates that to dont get context processors to prfix statc path on development server
 

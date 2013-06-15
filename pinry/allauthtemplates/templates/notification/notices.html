@@ -69,7 +69,7 @@
 					{% else %}
 					<div class="notice">
 					{% endif %}
-						<div class="notice_avatar">{% avatar user 40 "img" %}</div>
+						<div class="notice_avatar">{% avatar notice.data.from_user 40 "img" %}</div>
 						<div class="notice_message_div">
 							<div class="notice-options">
 								{%comment%}<!--  archive=recyclebin notices are subject to deletion acording to plicy -->{%endcomment%}
@@ -114,7 +114,7 @@
 				{% else %}
 				<div class="notice">
 				{% endif %}
-					<div class="notice_avatar inline">{% avatar user 40 "img" %}</div>
+					<div class="notice_avatar inline">{% avatar notice.data.from_user 40 "img" %}</div>
 					<div class="notice_message_div inline">
 						<span class="notice_message">{{ notice.render }}</span><br>
 						<span class="notice_time ">{{ notice.added|smartdate }}</span>

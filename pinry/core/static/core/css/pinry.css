@@ -1154,6 +1154,7 @@ table, th, td{
 /* avatar */
 .avatar{
 	margin:0;
+	height:auto;
 }
 	.avatar.nav{
 		border-radius:4px;
@@ -1174,7 +1175,7 @@ table, th, td{
 	}
 	.avatar img,
 	img.avatar {
-		height: 100%;
+		height: auto;
 		width: auto;
 		float: left;
 		vertical-align: middle;
@@ -1218,6 +1219,8 @@ table, th, td{
 		.avatar-pill .avatar,
 		.avatar-pill img{
 			float:left;
+			height:auto;
+			width:auto;
 		}
 		.avatar-right{
 			float:right;
@@ -1596,7 +1599,7 @@ overflow: hidden;
 		border:1px solid White;
 		color:rgb(92, 138, 33);
 		background-color: rgba(124, 201, 25, 0.66);
-		box-shadow: rgba(124, 201, 25, 0.5) 0 -1px 7px 1px, inset #4D7400 0 -1px 9px, #7D0 0 2px 12px;
+		box-shadow: rgba(124, 201, 25, 0.5) 0 -1px 7px 1px, inset #4D7400 0 -1px 3px, #7D0 0 2px 12px;
 	}
 		.icon-notice.unseen.led:empty{
 			margin: 3px 5px;

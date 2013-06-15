@@ -6,14 +6,14 @@
 		{% if user.is_authenticated and  request.user != profile %}
 			<button id="follow" class="btn btn-mini follow" {% if request.user|is_following:profile %}data-state ="True" {% else %}data-state ="False" {% endif %}type="button">{% if request.user|is_following:profile %}Un-Follow{% else %}Follow{% endif %}</button>
 		{% elif request.user == profile %}
-			<a class="dropdown pull-right">
-				<div class="dropdown-toggle" data-toggle="dropdown" href="#">
+			<div class="dropdown pull-right">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
 					<i class="icon-cog"></i>
-				</div>
+				</a>
 				<ul class="dropdown-menu top dm-caret">
 					<li><a href="{% url avatar_change %}">Profile Picture</a></li>
 					<li><a href="{% url core:relationships %}">Relationships</a></li>
-					<li><a href="{% url notification_notice_settings %}">{% trans "Notification Settings" %}</a></li></span>
+					<li><a href="{% url notification_notice_settings %}">{% trans "Notification Settings" %}</a></li>
 					<li><a href="{% url socialaccount_connections %}">Social Networks</a></li>
 					<li><a href="{% url account_email %}">Email Addresses</a></li>
 					{% if user.password == "!" %}
@@ -22,7 +22,7 @@
 						<li><a href="{% url account_change_password %}">Change Password</a></li>
 					{% endif %}
 				</ul>
-			</a>
+			</div>
 		{% endif %}
 		<div class="profile-name inline">
 			<h5 class=""><a href="{% url core:home %}user/{{ profile.id }}" onclick="loadData(undefined, '{{ profile.id }}');">{{ profile|capfirst }}</a></h5>

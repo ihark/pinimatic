@@ -1,0 +1,15 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signed Out" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Signed Out" %}</h1>
+{% blocktrans %}
+<p>Don't forget to install the {{site_name}}
+bookmarklet so you can post new
+things from any webpage.</p>
+<p>Check back often for more great features.</p>
+{% endblocktrans %}
+{% endblock %}

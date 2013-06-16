@@ -57,8 +57,7 @@ LOGIN & LOGOUT
 ALLOW_NEW_REGISTRATIONS = True
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
-# TODO: Not working possible version issue: 
-ACCOUNT_LOGOUT_REDIRECT_URL ='/login/'
+ACCOUNT_LOGOUT_REDIRECT_URL ='/loggedout/'
 ''' 
 ALLAUTH
 '''

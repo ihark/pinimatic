@@ -555,7 +555,6 @@ margin: 0px 0px;
 	}
 	
 	.pin-stats > ul > li > a{
-		line-height:10px;
 		text-align:left;
 		cursor: pointer;
 		padding:0;
@@ -1046,7 +1045,7 @@ table, th, td{
 }
 
 .avatars #fields_div input[type="text"] {
-	width:163px;
+	width:162px;
 	height:14px;
 	line-height:24px;
 	margin-bottom:0px;
@@ -1177,6 +1176,7 @@ table, th, td{
 	img.avatar {
 		height: auto;
 		width: auto;
+		min-width: auto;
 		float: left;
 		vertical-align: middle;
 	}

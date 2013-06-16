@@ -1,15 +1,22 @@
 {% extends "account/base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 
-{% block head_title %}{% trans "Signed Out" %}{% endblock %}
+{% block head_title %}{% trans "Sign Out" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Signed Out" %}</h1>
-{% blocktrans %}
-<p>Don't forget to install the {{site_name}}
-bookmarklet so you can post new
-things from any webpage.</p>
-<p>Check back often for more great features.</p>
-{% endblocktrans %}
+<h1>{% trans "Sign Out" %}</h1>
+
+<p>{% trans 'Are you sure you want to sign out?' %}</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+  {% csrf_token %}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{redirect_field_name}}" value="{{redirect_field_value}}"/>
+  {% endif %}
+  <button class="btn btn-danger" type="submit">{% trans 'Sign Out' %}</button>
+</form>
+
+
 {% endblock %}

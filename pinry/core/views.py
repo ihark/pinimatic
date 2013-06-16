@@ -34,31 +34,9 @@ def help(request):
 def private(request):
     return TemplateResponse(request, 'core/private.html', None)
 
-#not used switched to allauth
-def register(request):
-   
-    if not settings.ALLOW_NEW_REGISTRATIONS:
-        messages.error(request, "The admin of this service is not "
-                                "allowing new registrations.")
-        return HttpResponseRedirect(reverse('pins:recent-pins'))
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            user.groups.add(Group.objects.get(name=settings.DEFAULT_USER_GROUP))
-            user.save()
-            messages.success(request, 'Thank you for registering, you can now '
-                                      'login.')
-            return HttpResponseRedirect(reverse('core:login'))
-    else:
-        form = UserCreationForm()
-
-    return TemplateResponse(request, 'core/register.html', {'form': form})
-
-@login_required
-def logout_user(request):
-    logout(request)
-    messages.success(request, 'You have successfully logged out.')
+def logged_out(request):
+    messages.info(request, "Thank you for participating in our pre-beta test! Let us know if there is anyting we can do to make things better.  \
+                            New features are constatly being rolled out so check back often for more great stuff.")
     return HttpResponseRedirect(reverse('core:home'))
     
 

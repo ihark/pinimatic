@@ -111,6 +111,9 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Tag auto recognition
  + Tag auto suggest
  + Notifications by email and website
+ + Make any pin your avatar in one click.
+ + Pin detail view.
+ + Zoom images view.
  
 ### Current User Account Features
  + User contact form for feedback & support
@@ -119,6 +122,8 @@ of the most requested functionality easily. (Pinimatic/settings/__init__.py)
  + Support for multiple Email Addresses with verification & primary setting
  + Local User Accounts & Social Account Connections
  + Notification management
+ + Avatars with gravatar support. Create by url, upload, or get from social networks.
+ 
 
 ### Current Admin Features 
  + Invitation Only Mode for new registrations

@@ -25,7 +25,7 @@ class Pin(models.Model):
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to=settings.IMAGES_PATH)
     thumbnail = models.ImageField(upload_to='pins/pin/thumbnails/', max_length=100)
-    published = models.DateTimeField(default=datetime.now)#auto_now_add=True
+    published = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
     repin = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
     comments = generic.GenericRelation(Comment,

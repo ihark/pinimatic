@@ -90,7 +90,7 @@ NOTIFICATION
 NOTIFICATION_CONTENT_TYPE_TRANSLATIONS = {'user':['profile picture', None]}
 NOTIFICATION_OTHER_KEY_WORDS = {'you':'/user/'}
 #NOTIFICATION_CHECK_FOR_SENDER_NAMES = {'pin':['submitter','/user/']}
-OBSRVATION_DELETE_CONTENT_TYPES = {'follow':'folowing'}
+OBSRVATION_DELETE_CONTENT_TYPES = {'follow':['folowing', 'favorite']}
 OBSRVATION_AUTO_DELETE = True
 NOTICE_TYPES = [("followed", "New Follower", "has followed you"),
                 ("favorited", "New Favorite", "has favorited your pin"),

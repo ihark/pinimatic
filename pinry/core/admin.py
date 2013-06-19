@@ -11,28 +11,15 @@ from django.contrib.admin import helpers
 from django.template.loader import render_to_string, get_template
 from django.contrib.sites.models import Site
 
+from django.utils.html import strip_tags
+from django.utils.safestring import mark_safe
+from django.contrib import messages
+
 
 class PinAdmin(admin.ModelAdmin):
     list_display = ['pk', 'admin_thumb', 'submitter', 'smartdate', 'published', 'description', 'imgName', 'imgUrl', 'srcUrl']
 
 admin.site.register(Pin, PinAdmin)
-'''KEEP THIS HERE AS REFERENCE FOR USING THE EMIAL SYSTEM
-subject = "You have a new follower on %s." %settings.SITE_NAME 
-from_email, to_email = 'from@example.com', [target.email]
-# text_content = 'Hey %s,\n\nYou were followed by %s!\n\
-    # html_content = 'Hey %s,<br><br>You were followed by %s!\n\
-    text_content = get_template('email/email_generic.txt')
-html_content = get_template('email/email_generic.html')
-c = Context({ 'actor': user, 'target': target, 'site_name':site_name, 
-              'site_url': site_url
-            })
-text_content = text_content.render(c)
-html_content = html_content.render(c)
-msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-msg.attach_alternative(html_content, "text/html")
-msg.send()
-'''
-
 
 def send_email(self, request, queryset):
     current_site = Site.objects.get_current()
@@ -47,17 +34,21 @@ def send_email(self, request, queryset):
                 context = {'recipient': recipient,
                            'first_name': u.first_name,
                            'last_name': u.last_name,
-                           'message':message,
+                           'message':mark_safe(message),
+                           'preform':True,
                            'site': current_site,}
-                email_body = render_to_string('email/email_generic.txt',context)
                 html_content = render_to_string('email/email_generic.html',context)
+                context.update({'message':mark_safe(strip_tags(message))})
+                email_body = render_to_string('email/email_generic.txt',context)
+                
                 msg = EmailMultiAlternatives(subject, email_body, from_email,[u.email])
                 msg.attach_alternative(html_content, "text/html")
                 try:
                     msg.send()
-                    self.message_user(request, "Mail sent successfully")
                 except:
-                    self.message_user(request, "There was a problem sending the email to: "+str(u)+" at:"+ u.email)
+                    messages.error(request, "Mail to %s : %s failed" % (str(u),u.email))
+                    #self.message_user(request, "There was a problem sending the email to: "+str(u)+" at:"+ u.email)
+                messages.success(request, "Mail has been sent")
         else:
             self.message_user(request, "No Recipiants were selected")
     else:
@@ -68,14 +59,16 @@ def send_email(self, request, queryset):
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
             'html_preview': render_to_string('email/email_generic.html',
                            {'recipient': 'recipient',
-                            'message':'--your messeage above will be inserted here--',
+                            'preform':True,
+                            'message':'--your note will be inserted here--',
                             'site': current_site,}),
             'text_preview': render_to_string('email/email_generic.txt',
                            {'recipient': 'recipient',
-                            'message':'--your messeage above will be inserted here--',
+                            'preform':True,
+                            'message':'--your note will be inserted here--',
                             'site': current_site,})
         }
-        return TemplateResponse(request, 'core/email_users.html',
+        return TemplateResponse(request, 'email/email_users.html',
             context, current_app=self.admin_site.name)
                 
 class UserAdmin(admin.ModelAdmin):

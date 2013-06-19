@@ -243,10 +243,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MESSAGE_TAGS = {
-    messages.WARNING: 'alert click',
-    messages.ERROR: 'alert alert-error fade-out click',
-    messages.SUCCESS: 'alert alert-success fade-out click',
-    messages.INFO: 'alert alert-info click',
+    messages.WARNING: 'alert warning click',
+    messages.ERROR: 'alert error alert-error fade-out click',
+    messages.SUCCESS: 'alert success alert-success fade-out click',
+    messages.INFO: 'alert info alert-info click',
 }
 
 INSTALLED_APPS = (

@@ -59,17 +59,16 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 					<tr>
 						<td class="body" width="auto" style="min-width: 150px; max-width: 400px; padding: 20px 20px 20px 20px;
 						background: White; border-radius: 6px;">
+							{% if sender_note %}{% blocktrans with sender_note as sender_note %}
+							<pre id="sender_note" style="padding: 0;margin: 0;font-family: inherit;background: inherit;color: inherit;font-size: inherit;font-weight: inherit;">{{sender_note}}</pre><br>
+							{% endblocktrans %}
+							{% endif %}
 							{% blocktrans with site.name as sitename and from_user.username|capfirst as from_user %}
 							<div>Congradulations! You have been invited by {{ from_user }} to join
 							{% endblocktrans %}
 								<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
 								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>.
 							</div><br>
-							
-							{% if sender_note %}
-							<div>{{sender_note}}</div><br>
-							{% endif %}
-							
 							<div>
 								{% trans "Membership is by invitation only, so click the link below to join us now!" %}<br><br>
 								<a class="register" style="border: 1px solid #AAA; background-color:#CCC; border-radius:6px;, font-family:Arial, Helvetica, sans-serif" href="{% if invitation_key.key %}http://{{site.domain}}{% url invitation_invited invitation_key=invitation_key.key invitation_email=email%}{% endif %}">
@@ -82,7 +81,11 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 								<a class="brand" style="margin:0 2px; font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
 								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>
 								<span>{% trans "team" %}</span>
-
+							</div><br><br>
+							<div style="font-size:11px; font-style:italic;">
+							{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesturday may suddenly not work today.  Any 500 errors you recive will be reported to us automatically.  Howerver, plase do report any other issues, bugs, or comments" %} 
+							<a style="font-family:Arial, Helvetica, sans-serif" href="{{root_url}}{% url core:contact %}"> HERE</a>.
+							{% trans "  Thank you for your support and participation while we test and improove " %}{{site.name}}.
 							</div>
 						</td>
 					</tr>

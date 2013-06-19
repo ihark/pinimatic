@@ -59,12 +59,17 @@
 </form>
 <script>
 document.getElementById('id_message').addEventListener('change', onChange, false);
+oldText = "--your note will be inserted here--";
 function onChange(e){
-	console.warn(e)
-	console.warn(e.target)
-	text = e.target.innerHTML
-	console.warn(e.target.innerHTML)
-	document.getElementById('message_display').innerHTML = text
+	console.warn(e);
+	console.warn(e.target);
+	text = e.target.value;
+	console.warn(e.target.value);
+	document.getElementById('message_display').innerHTML = text;
+	text = text.replace(/<.*?>/g, '')
+	preview_text = document.getElementById('id_text_preview')
+	preview_text.innerHTML = preview_text.innerHTML.replace(oldText, text);
+	oldText = text;
 }
 </script>
 {% endblock %}

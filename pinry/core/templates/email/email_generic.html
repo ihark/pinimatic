@@ -33,7 +33,13 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 						<td class="body" width="auto" style="min-width: 150px; padding: 20px 20px 20px 20px;
 						background: White; border-radius: 6px; font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 							<div>Hey {{recipient|capfirst}},<br><br></div>
-							{% load i18n %}{% blocktrans with message as message %}<div id="message_display">{{message}}<br>{% endblocktrans %}</div>
+							{% if preform %}{% blocktrans with message as message %}
+							<pre id="message_display" style="padding: 0;margin: 0;font-family: inherit;background: inherit;color: inherit;font-size: inherit;font-weight: inherit;">{{message}}</pre><br>
+							{% endblocktrans %}
+							{% else %}{% blocktrans with message as message %}
+							<div id="message_display">{{message}}</div>
+							{% endblocktrans %}
+							{% endif %}
 							<BR>
 							<div>{% trans "Thank you for using " %}
 							<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{root_url}}/">

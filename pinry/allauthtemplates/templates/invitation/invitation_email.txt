@@ -1,4 +1,5 @@
-{% load i18n %}{% if sender_note %}{{sender_note}}{% endif %}{% blocktrans with site.name as sitename and from_user.username as from_user %}
+{% load i18n %}{% if sender_note %}
+{{sender_note}}{% endif %}{% blocktrans with site.name as sitename and from_user.username as from_user %}
 Congradulations! You have been invited by {{ from_user }} to join {{ sitename }}.
 {% endblocktrans %}
 Click the link below to register for your account within the next {{expiration_days}} days.
@@ -6,10 +7,6 @@ Click the link below to register for your account within the next {{expiration_d
 {% elif not invitation_key.key and full_preview %}http://{{site.domain}}{% url invitation_invited invitation_key=invitation_key invitation_email=email%}
 {% endif %}{% if invitation_key.key or full_preview%}{% blocktrans with site.name as sitename %}
 All the best,
-The {{ sitename }} Team
-{% endblocktrans %}
-{% endif %}
+The {{ sitename }} Team{% endblocktrans %}{% endif %}
 
-
-
-
+{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesturday may suddenly not work today.  Any 500 errors you recive will be reported to us automatically.  Howerver, plase do report any other issues, bugs, or comments" %}. 

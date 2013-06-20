@@ -64,17 +64,16 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 							{% endblocktrans %}
 							{% endif %}
 							{% blocktrans with site.name as sitename and from_user.username|capfirst as from_user %}
-							<div>Congradulations! You have been invited by {{ from_user }} to join
+							<div>Congratulations! You have been invited by {{ from_user }} to join
 							{% endblocktrans %}
 								<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
 								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>.
 							</div><br>
 							<div>
-								{% trans "Membership is by invitation only, so click the link below to join us now!" %}<br><br>
-								<a class="register" style="border: 1px solid #AAA; background-color:#CCC; border-radius:6px;, font-family:Arial, Helvetica, sans-serif" href="{% if invitation_key.key %}http://{{site.domain}}{% url invitation_invited invitation_key=invitation_key.key invitation_email=email%}{% endif %}">
-								{% trans "CLICK HERE TO REGISTER" %}</a><br><br>
-								<span>{% trans "Your invitation will be valid for the next" %} {{expiration_days}} {% trans "days" %}.</span>
+								{% trans "Membership is by invitation only, so click the invitation token below to join us now!" %}<br><br>
+								{{token|safe}}
 							</div><br>
+							
 							<div>			
 								{% trans "All the best" %},<br>
 								<span>{% trans "The" %}</span>
@@ -83,9 +82,9 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 								<span>{% trans "team" %}</span>
 							</div><br><br>
 							<div style="font-size:11px; font-style:italic;">
-							{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesturday may suddenly not work today.  Any 500 errors you recive will be reported to us automatically.  Howerver, plase do report any other issues, bugs, or comments" %} 
+							{% trans "Please note: This is the pre-beta version of pinimatic.  Which means despite our best efforts there will be bugs! Things that worked yesterday may suddenly not work today.  Any 500 errors you receive will be reported to us automatically.  However, please do report any other issues, bugs, or comments" %} 
 							<a style="font-family:Arial, Helvetica, sans-serif" href="{{root_url}}{% url core:contact %}"> HERE</a>.
-							{% trans "  Thank you for your support and participation while we test and improove " %}{{site.name}}.
+							{% trans "  Thank you for your support and participation while we test and improve " %}{{site.name}}.
 							</div>
 						</td>
 					</tr>

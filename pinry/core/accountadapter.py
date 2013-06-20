@@ -27,9 +27,9 @@ class AccountAdapter(DefaultAccountAdapter):
                 invitation_key = request.session.get('invitation_key', False)
                 if invitation_key:
                     if InvitationKey.objects.is_key_valid(invitation_key.key):
-                        invitation_email = request.session.get('invitation_email', False)
-                        print 'account adapter invitation_email: ',invitation_email
-                        self.stash_verified_email(request, invitation_email)
+                        invitation_recipient = request.session.get('invitation_recipient', False)
+                        print 'account adapter invitation_recipient: ',invitation_recipient
+                        self.stash_verified_email(request, invitation_recipient[0])
                         return True
                     else:
                         extra_context = request.session.get('invitation_context', {})
@@ -52,7 +52,7 @@ class AccountAdapter(DefaultAccountAdapter):
             invitation_key = request.session.get('invitation_key', False)
             invitation_key.mark_used(user)
             del request.session['invitation_key']
-            del request.session['invitation_email']
+            del request.session['invitation_recipient']
             del request.session['invitation_context']
         print(user.username, ": has signed up!")
         

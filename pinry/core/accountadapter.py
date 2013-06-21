@@ -28,7 +28,6 @@ class AccountAdapter(DefaultAccountAdapter):
                 if invitation_key:
                     if InvitationKey.objects.is_key_valid(invitation_key.key):
                         invitation_recipient = request.session.get('invitation_recipient', False)
-                        print 'account adapter invitation_recipient: ',invitation_recipient
                         self.stash_verified_email(request, invitation_recipient[0])
                         return True
                     else:
@@ -54,13 +53,11 @@ class AccountAdapter(DefaultAccountAdapter):
             del request.session['invitation_key']
             del request.session['invitation_recipient']
             del request.session['invitation_context']
-        print(user.username, ": has signed up!")
         
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def pre_social_login(self, request, sociallogin):
-        print '----custom---------pre_social_login---------------------'
         """
         Invoked just after a user successfully authenticates via a
         social provider, but before the login is actually processed

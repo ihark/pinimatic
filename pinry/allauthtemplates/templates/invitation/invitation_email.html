@@ -53,21 +53,21 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 	font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 		{% header_generic request %}
 		<tr>
-			<td height="100%" width="100%" style="padding:50px 30px; vertical-align:middle;">
-				<table align="center" cellspacing="0" border="0" style="margin:auto;
+			<td height="100%" width="100%" style="border:none; padding:50px 30px; vertical-align:middle;">
+				<table align="center" cellspacing="0" border="0" style="border:none; margin:auto;
 				font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Arial, sans-serif; color: #666;">
 					<tr>
-						<td class="body" width="auto" style="min-width: 150px; max-width: 400px; padding: 20px 20px 20px 20px;
+						<td border=0 class="body" width="auto" style="border:none; min-width: 150px; max-width: 400px; padding: 20px 20px 20px 20px;
 						background: White; border-radius: 6px;">
 							{% if sender_note %}{% blocktrans with sender_note as sender_note %}
-							<pre id="sender_note" style="padding: 0;margin: 0;font-family: inherit;background: inherit;color: inherit;font-size: inherit;font-weight: inherit;">{{sender_note}}</pre><br>
+							<pre id="sender_note" style="padding:0; margin:0; font-family:inherit; background:inherit; color:inherit; font-size:inherit; font-weight:inherit;">{{sender_note}}</pre><br>
 							{% endblocktrans %}
 							{% endif %}
 							{% blocktrans with site.name as sitename and from_user.username|capfirst as from_user %}
 							<div>Congratulations! You have been invited by {{ from_user }} to join
 							{% endblocktrans %}
 								<a class="brand" style="font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
-								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>.
+								<img style="vertical-align: baseline;" height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>.
 							</div><br>
 							<div>
 								{% trans "Membership is by invitation only, so click the invitation token below to join us now!" %}<br><br>
@@ -78,7 +78,7 @@ font-weight:normal; font-size:16px; line-height:20px; font-family:Helvetica, Ari
 								{% trans "All the best" %},<br>
 								<span>{% trans "The" %}</span>
 								<a class="brand" style="margin:0 2px; font-style:italic; font-family:Arial, Helvetica, sans-serif" href="{{sender_url}}">
-								<img height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>
+								<img style="vertical-align: baseline;" height="14" alt="{{site.name}}" src="{{ DEV_STATIC_PREFIX }}{% static 'core/img/logo-18.png' %}"></a>
 								<span>{% trans "team" %}</span>
 							</div><br><br>
 							<div style="font-size:11px; font-style:italic;">

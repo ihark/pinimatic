@@ -15,7 +15,7 @@
 	{% else %}
 	{% blocktrans with remaining_invitations as qty %}
 	<p>You have <b>{{qty}}</b> invitations remaining!</p>
-	<p>Enter an email address to send an invitation.</p>
+	<p>Enter your friend's information below to send an invitation:</p>
 	{% endblocktrans %}
 	<form action="{% url invitation_invite %}" method="POST">
 		{% csrf_token %}
@@ -26,5 +26,14 @@
 	</form>
 	{% endifequal %}
 </div>
-
+<script>
+document.getElementById('id_sender_note').addEventListener('change', onChange, false);
+function onChange(e){
+	console.warn(e);
+	console.warn(e.target);
+	text = e.target.value;
+	console.warn(e.target.value);
+	document.getElementById('sender_note').innerHTML = text;
+}
+</script>
 {% endblock %}

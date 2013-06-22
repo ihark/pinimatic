@@ -475,7 +475,7 @@ class CmntResource(ModelResource):
         queryset = Comment.objects.all()
         resource_name = 'cmnt'
         include_resource_uri = False
-        allowed_methods = ['get', 'post', 'delete']#TODO: I should be using put for comment edits....
+        allowed_methods = ['get', 'post', 'put', 'delete']#TODO: I should be using put for comment edits....
         #fields, object_pk & content_type_id are REQUIRED for generic foreign key
         fields = ['id', 'comment', 'submit_date']
         #excludes = ["ip_address", "is_public", "is_removed", "user_email", "user_name", "user_url"]

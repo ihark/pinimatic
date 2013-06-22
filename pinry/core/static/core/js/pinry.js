@@ -1029,10 +1029,17 @@ $(document).on( 'submit', '.pin form', function(e){
 	e.preventDefault();
 	var data = $(this).serializeObject()
 	var pin = $(this).closest(".pin")
+	console.warn('cmnt data', data)
+	var method = "POST"
+	var id = ''
+	if (data.id) {
+		method = "PUT"
+		id = data.id
+	}
 	//TODO: validate comment exist here with max length
 	sData = JSON.stringify(data)
 	var target = $(this).closest(".pin").find("#cmnts");//TODO: aply this tecnique throughout!!!!
-	togglePinStat(target[0], 'icon-chat-empty', 'POST', cmntURL, null, sData)
+	togglePinStat(target[0], 'icon-chat-empty', method, cmntURL+id, null, sData)
 	submitProgress(pin)
 });
 //Comment: toggel callback
@@ -1286,7 +1293,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		console.log('result: ',result, 'xhr: ',xhr)
 		
 		//exicute callback with nameSucess
-		var statusA = new Array(201, 204)
+		var statusA = new Array(201, 201, 202, 203, 204)
 		var stat = xhr.status
 		console.log('calling: ', xhr.status, name+'Success()')
 		if (statusA.indexOf(stat)>=0 && typeof(window[name+'Success']) === "function"){

@@ -74,7 +74,7 @@
 		setStyles(lo, los)
 		o.appendChild(lo);// append loader
 		var loi = d.createElement("img");
-		loi.src = staticPrefix+"/static/core/img/loader.gif"
+		loi.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}core/img/loader.gif"
 		lo.appendChild(loi)//append image to loader div
 		var lot = d.createElement("div");
 		lot.innerHTML = "loading"

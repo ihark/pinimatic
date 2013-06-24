@@ -8,12 +8,14 @@
 	{% load static %}
 	////test for EXISTING bookmarklet or siteDom domain
 	siteDom = /^https?:\/\/.*?(({{site_name|lower}})|({{site_name|lower}}-t)|(localhost)).*?\//
+	//prevent base page from scrolling
+	document.body.style.overflow = "hidden"
 	insiteDom = location.href.match(siteDom);
 	console.warn('test for siteDom host : '+insiteDom)
 	if (document.getElementById("overlay") == undefined && insiteDom == null) {
+		////find all images on page and create golbal variables
 		var d = document;
 		var b = d.body;
-		////find all images on page and create golbal variables
 		var images = d.getElementsByTagName("img");
 		var iq = images.length;
 		var ii = 0;
@@ -25,28 +27,64 @@
 			x : document.all ? document.scrollLeft : window.pageXOffset,
 			y : document.all ? document.scrollTop : window.pageYOffset
 		};
+		////add css
+		function appendStyle(styles) {
+			var css = document.createElement('style');
+			css.type = 'text/css';
+
+			if (css.styleSheet) css.styleSheet.cssText = styles;
+			else css.appendChild(document.createTextNode(styles));
+
+			o.appendChild(css);
+			}
+
+		var styles = '#overlay .modal-backdrop.fade {opacity: 0;-webkit-transition: opacity 1s linear;-moz-transition: opacity 1s linear;-o-transition: opacity 1s linear;transition: opacity 1s linear;}';
+		styles += '#overlay .modal-backdrop.fade.in {opacity:.9;filter: alpha(opacity=90);}';
+		
 		////create overlay div
 		var o = d.createElement("div");
 		o.setAttribute("id", "overlay");
 		os = "position:absolute; top:0px; left:0px; right:0px; bottom:0px; z-index:900000000000000000000000000;"
 		setStyles(o, os)
-		o.innerHTML += '{% spaceless %}{% include "pins/bmbase.html" %}{% endspaceless %}';
-		//apped all occurances of /static/ in the bmbase template with staticPrefix
-		o.innerHTML = o.innerHTML.replace(/\/static\//g,staticPrefix+"/static/")
 		b.appendChild(o);// append overlay to document body
 		console.warn('overlay added');
+		////append styles
+		appendStyle(styles);
+		
+
 		////create modal backdrop
-		mbd = d.createElement("div");
+		var mbd = d.createElement("div");
 		mbd.setAttribute("id", "backdrop");
-		//mbd.setAttribute("class", "modal-backdrop");
-		mbds = "z-index: -1; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px;";
-		mbds += "background-color: rgba(0, 0, 0, 0.9);"
+		mbd.setAttribute("class", "modal-backdrop fade");
+		var mbds = "z-index: -1; position: fixed; top: 0;right: 0;bottom: 0;left: 0;";
+		mbds += "background-color: #000000;";
 		setStyles(mbd, mbds)
 		o.appendChild(mbd);// append background to overlay
 		console.warn('modal-backdrop added');
-
+		mbd.className += " in";
+		
+		
 		//load jquery
-		loadScript("vendor/jquery/1.7.2/jquery.js", "jQuery.fn.jquery>='1.7.2'", jqReady);
+		loadScript("vendor/jquery/1.7.2/jquery.js", "jQuery.fn.jquery", jqReady, "1.7.2");
+		
+		////create loader
+		var lo = d.createElement("div");
+		lo.setAttribute("id", "loader");
+		var los = "z-index: 100; position: fixed; top: 50%;right: 50%; text-align:center;";
+		setStyles(lo, los)
+		o.appendChild(lo);// append loader
+		var loi = d.createElement("img");
+		loi.src = staticPrefix+"/static/core/img/loader.gif"
+		lo.appendChild(loi)//append image to loader div
+		var lot = d.createElement("div");
+		lot.innerHTML = "loading"
+		lo.appendChild(lot)//append text to loader div
+		console.warn('loader added');
+
+		////add overlay content
+		innerHTML = '{% spaceless %}{% include "pins/bmbase.html" %}{% endspaceless %}';
+		//apped all occurances of /static/ in the bmbase template with staticPrefix
+		o.innerHTML += innerHTML.replace(/\/static\//g,staticPrefix+"/static/")
 		
 		////create header
 		var hh = "30";
@@ -82,7 +120,7 @@
 		m.innerHTML = "Select an image to pin.";
 		mh.appendChild(m); //append message to mh
 		var nc = d.createElement("ul");
-		ncs = "float:right; border-left: 1px solid #CCC; color: #333; text-shadow: none; padding: 0px 20px; display: block; font-size: 13px; list-style: none; cursor: pointer;";
+		ncs = "margin:0; float:right; border-left: 1px solid #CCC; color: #333; text-shadow: none; padding: 0px 20px; display: block; font-size: 13px; list-style: none; cursor: pointer;";
 		setStyles(nc, ncs);
 		h.appendChild(nc);//append nav to header
 		var n1 = d.createElement("li");
@@ -91,13 +129,8 @@
 		setStyles(n1, ns);
 		n1.onclick = delegate(removeOverlay, this);
 		nc.appendChild(n1);//append nav 1 to header
+
 		
-		// var cb = d.createElement("p");
-		// cbs = "display: inline-block; float:right; width: 38px; height: 38px; background: url('http://www.wookmark.com/assets/bk_close.png') no-repeat center center;";
-		// cbs += "line-height: "+hh+"px; margin: 4px 10px 0 0; cursor: pointer; padding: 0;";
-		// setStyles(cb, cbs);
-		// cb.onclick = delegate(removeOverlay, this);
-		// h.appendChild(cb);//append cancil button to header
 
 		////create image grid container
 		var igs = d.createElement("div");
@@ -121,12 +154,14 @@
 	}
 	//load other scripts
 	function jqReady() {
-		loadScript("vendor/bootstrap/2.2.2/js/bootstrap.js", "jQuery.fn.alert", bootstrapReady);
+		loadScript("vendor/bootstrap/2.2.2/js/bootstrap.js", "jQuery.fn.modal", bootstrapReady);
 	}
 	function bootstrapReady() {
-		loadScript("vendor/jquery-ui/1.10.2.custom/js/jquery-ui-1.10.2.custom.js", "jQuery.ui", jqueryuiReady);
+		$.ui=''
+		loadScript("vendor/jquery-ui/1.10.2.custom/js/jquery-ui-1.10.2.custom.js", "$.ui.version", jqueryuiReady, "1.10.2");
 	}
 	function jqueryuiReady() {
+		jQuery.ui.tagit=''
 		loadScript("vendor/jquery-ui-tag-it/js/tag-it.js", "jQuery.ui.tagit", tagitReady);
 	}
 	function tagitReady() {
@@ -135,6 +170,8 @@
 	function ajaxformReady() {
 		////set form action url to ajaxsubmit view
 		d.getElementById("ajaxform").setAttribute("action", baseurl+"/ajax/submit/");
+		////remove loader
+		o.removeChild(d.getElementById("loader"));
 		////scroll to top of page
 		window.scrollTo(0, 0);//scroll to top of page
 		//use below only if you need to open modal on page load
@@ -162,8 +199,6 @@
 				removeOverlay()
 			}
 			else { //do when no images remain
-				//prevent base page from scrolling
-				$('body').css('overflow', 'hidden')
 				//IOS fix overflow:scroll errors
 				var scrollable = document.getElementById("image-grid-scroller");
 				new ScrollFix(scrollable);
@@ -243,26 +278,53 @@
 		//console.warn('--ani complete added to grid:'+data[gi.id].src);
 	};
 	//Check script load Tool
-	function loadScript(src, test, callback) {
-		s = d.createElement("script");
-		s.type = "text/javascript";
-		s.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}"+src;
-		o.appendChild(s);
-		console.warn('*Added: '+src);
+	function loadScript(src, test, callback, testVersion) {
 		var i = 0
-		checkLoad = function (src, test, callback, msg) {
-			if(eval(test)) {
+		checkVersion = function (test, testVersion) {
+			try{
+				var pass = eval(test)
+			}catch(err){
+				var pass = false
+			}
+			
+			if (pass && testVersion){
+				pass = false
+				if (typeof(testVersion) != 'number') {testVersion = Number(testVersion.replace('.',''))}
+				version = Number(eval(test).replace('.',''))
+				console.warn(version, '>=', testVersion)
+				if (version >= testVersion){
+					pass = true
+				}
+			}
+			return pass
+		}
+		
+		checkLoad = function (src, test, callback, testVersion) {
+			pass = checkVersion (test, testVersion)
+			if(pass) {
 				console.warn("**LOADED:", src);
 				callback();
 			} else if (i<1000){
 				i++
-				console.warn("--test--", eval(test), ' '+i)
-				window.setTimeout(function(){checkLoad(src, test, callback)}, 15 );
+				console.warn("--test result: ", test, pass)
+				window.setTimeout(function(){checkLoad(src, test, callback, testVersion)}, 15 );
 			} else { 
 				alert('{{site_name}}: The bookmarklet did not load properly.  Please refresh the page and try again.')
 			}
 		}
-		checkLoad(src, test, callback)
+
+		pass = checkVersion(test, testVersion)
+		if (!pass){
+			s = d.createElement("script");
+			s.type = "text/javascript";
+			s.src = "{{ STATIC_PREFIX }}{{ STATIC_URL }}"+src;
+			o.appendChild(s);
+			console.warn('*Added: '+src);
+			checkLoad(src, test, callback, testVersion)
+		}else{
+			callback();
+		}
+		
 	}
 
 	//utils
@@ -355,7 +417,7 @@ function removeOverlay() {
 	document.body.removeChild(t);
 	document.body.setAttribute("class", "");
 	window.scrollTo(lsp.x, lsp.y);
-	$('body').css('overflow', 'auto')
+	document.body.style.overflow = "auto"
 }
 /**
  * ScrollFix v0.1

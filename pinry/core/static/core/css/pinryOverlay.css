@@ -13,7 +13,6 @@ body {
 	-webkit-box-sizing: border-box !important;
 	-moz-box-sizing: border-box !important;
 	box-sizing: border-box !important;
-
 }
 
 #overlay  *{
@@ -22,6 +21,8 @@ body {
 	font-weight: normal;
 	font-style: normal;
 	text-rendering: optimizelegibility;
+	margin:0;
+	padding:0;
 }
 #overlay .brand {
 	font-family: 'Fugaz One';
@@ -76,7 +77,76 @@ text-align: left;
 			height: 20px !important;
 			padding: 1px 1px 1px 4px !important;
     }
+/*Buttons*/
+#overlay .btn {
+	display: inline-block;
+	padding: 4px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	line-height: 20px;
+	color: #333333;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #f5f5f5;
+	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+	background-repeat: repeat-x;
+	border: 1px solid #bbbbbb;
+	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	border-bottom-color: #a2a2a2;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+#overlay .btn-primary {
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	background-color: #006dcc;
+	background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+	background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
+	background-image: -o-linear-gradient(top, #0088cc, #0044cc);
+	background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+	background-repeat: repeat-x;
+	border-color: #0044cc #0044cc #002a80;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+#overlay .btn:hover {
+color: #333333;
+text-decoration: none;
+background-position: 0 -15px;
+-webkit-transition: background-position 0.1s linear;
+-moz-transition: background-position 0.1s linear;
+-o-transition: background-position 0.1s linear;
+transition: background-position 0.1s linear;
+}
+#overlay .btn:hover, .btn:active, .btn.active, .btn.disabled, .btn[disabled] {
+	color: #333333;
+	background-color: #e6e6e6;
+}
+#overlay .btn-primary:hover, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+	color: #ffffff;
+	background-color: #0044cc;
+}
+#overlay .modal-footer .btn + .btn {
+margin-bottom: 0;
+margin-left: 5px;
+}
 
+/*Form*/
 #overlay .form-horizontal .control-group {
   margin-bottom: 18px;
 }
@@ -93,21 +163,57 @@ text-align: left;
 #image-grid-scroller{
 	-webkit-overflow-scroll:touch;
 }
-#overlay .modal {
-  width: 450px !important;
-  margin-left: -225px !important;
-  overflow: auto !important;
-  max-height: 400px !important;
-  z-index: 10 !important;
-  background-color: white !important;
-  color: #555 !important;
-  border: 1px solid #CCC !important;
-  -webkit-border-radius: 3px !important;
-  -moz-border-radius: 3px !important;
-  border-radius: 3px !important;
-  padding: 0 !important;
-  bottom: auto !important;
+/*Modal*/
+#overlay .fade {
+opacity: 0;
+#-webkit-transition: opacity 0.15s linear;
+#-moz-transition: opacity 0.15s linear;
+#-o-transition: opacity 0.15s linear;
+#transition: opacity 0.15s linear;
 }
+	#overlay .fade.in {
+	opacity: 1;
+	}
+	
+#overlay .modal {
+	position: fixed;
+	top: 10%;
+	left: 50%;
+	outline: none;
+	width: 450px !important;
+	margin-left: -225px !important;
+	overflow: auto !important;
+	max-height: 400px !important;
+	z-index: 10 !important;
+	background-color: white !important;
+	color: #555 !important;
+	border: 1px solid #CCC !important;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	-webkit-border-radius: 3px !important;
+	-moz-border-radius: 3px !important;
+	border-radius: 3px !important;
+	padding: 0 !important;
+	bottom: auto !important;
+	-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+	
+	#overlay .modal.fade {
+	top: -25%;
+	-webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
+	-moz-transition: opacity 0.3s linear, top 0.3s ease-out;
+	-o-transition: opacity 0.3s linear, top 0.3s ease-out;
+	transition: opacity 0.3s linear, top 0.3s ease-out;
+	}
+	#overlay .modal.fade.in {
+	top: 10%;
+	}
+
 
 #overlay .modal-backdrop {
   position: fixed;
@@ -119,15 +225,10 @@ text-align: left;
   background-color: #000000;
 }
 
-#overlay .modal-backdrop.fade {
-  opacity: 0;
-}
-
-#overlay .modal-backdrop,
-#overlay .modal-backdrop.fade.in {
-  opacity: 0.9;
-  filter: alpha(opacity=90);
-}
+	#overlay .modal-backdrop.fade.in {
+	  opacity: 0.9;
+	  filter: alpha(opacity=90);
+	}
 
 #overlay .messageContainer div {
   float: left;
@@ -275,8 +376,8 @@ text-align: left;
   cursor: default;
 }
 .imageGrid img {
-	width:100%;
-	height:auto;
+	#width:100%;
+	#height:auto;
 }
 /*jquery-ui*/
 .ui-autocomplete {
@@ -304,6 +405,9 @@ text-align: left;
 		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		font-weight: Bold;
 		font-size: 12px;
+	}
+	#overlay .tagit-choice .tagit-close{
+		top:0;
 	}
 	#overlay .ui-widget {
 		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

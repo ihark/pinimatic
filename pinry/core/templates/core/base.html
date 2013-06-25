@@ -42,6 +42,7 @@
 							<li>{{request.session.next}}</li>
 							<li>{{request.session.next_locked}}</li>
 							<li>- prepin click through</li>
+							<a href="#" style="border:none;" id="test" >test del list</a>
 
 						</ul>
 					</ul>
@@ -132,8 +133,8 @@
         {% block yield %}{% endblock %}
 		</div>
 		
-		<div id="loader" class="container">
-			<div class="">
+		<div id="loader">
+			<div class="inner">
 				<img src="{{STATIC_URL}}core/img/loader.gif" alt="Loader">
 			</div>
 		</div>

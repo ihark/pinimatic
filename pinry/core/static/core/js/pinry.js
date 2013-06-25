@@ -2,7 +2,7 @@
 //From base.html template context: STATIC_URL, MEDIA_URL, apiURL
 //From user_profile template tag: aProfileId
 var perams = '?avs=16'
-var pinsURL = apiURL+'pin/'+perams+'&format=json&offset='
+var pinsURL = apiURL+'pin/'+perams+'&format=json'
 var pinURL = apiURL+'pin/'
 var cmntURL = apiURL+'cmnt/'
 //var favsURL = apiURL+'favs/?format=json&'
@@ -10,14 +10,14 @@ var userURL = apiURL+'auth/user/?format=json'
 var page = 0;
 var handler = null;
 var handlerT = null;
-var cTag = null;//used to track current tag
 var cTags = null;//not used yet for list of current tag filters
 var cUser = null;//used to track current user
 var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
 var apiPrefixA = ["user", "profile"];//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
 var aProfile = $('.pin.profile');
-var aProfileO = {username:aProfile.attr('data-profile'), id:parseInt(aProfile.attr('id'))};
+var aProfileO = null
+aProfileO = {username:aProfile.attr('data-profile'), id:parseInt(aProfile.attr('id'))};
 //var aProfileU = aProfile.attr('data-profile');
 var pinA = [];
 var origin = window.location.origin;
@@ -26,7 +26,8 @@ var av=url(3);//active view
 var authUserO = ajax(this, false, userURL, false);//authenticated user object//used to determine current authenticated user
 console.warn('authUserO:',authUserO)
 var aTouchHover //tracks active pin options floater for touch devices
-var vn = { //viewname:"displayname"
+var state = {tag:undefined, user:undefined, filters:undefined, initial:true}//state object passed to pushstate on each state change
+var viewNames = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
 	pins:"Pins",
@@ -35,11 +36,18 @@ var vn = { //viewname:"displayname"
 	cmnts:"Comments",
 	pop:"Popular"
 }
+
+//test button on base template for superusers only
+$(document).on( 'click', '#test', function(e){
+	e.preventDefault();
+	ajax(this, false, cmntURL, true, "DELETE")
+}); 
+
 //determines weather or ot to loadData() on page load http://domain/apiPrefix/
 function is_apiDomain(){
 	return inArray(url(1), apiPrefixA);
 }
-var state = {tag:undefined, user:undefined, initial:true}//state object passed to pushstate on each state change
+
 //redirect to http when in api domain
 if (is_apiDomain()){
 	if (url('protocol') == 'https'){
@@ -166,7 +174,7 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 		//if (authUserO && authUserO.id == aProfileO.id || !aProfileO.id){
 		if (reload){
 			console.log('--TODO:eliminate need for this--reloading data after ajax')
-			loadData(undefined, undefined, true)//reloads page & data
+			loadData(undefined, undefined, undefined, true)//reloads page & data
 		}
 		//}
 	}
@@ -211,10 +219,22 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 //TODO TEST: fix error with manual scroll jitter, better with below (possibly need to stop ajax calls when no data left via pages??
 
 //When scrolled all the way to the bottom, add more tiles.
+var docHeight = $(document).height()
+var more
+var prevSb = 0
 function onScroll(event) { 
   if(!isLoading && is_apiDomain()) {
-      var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
-      if(closeToBottom) loadData();
+	more = docHeight < $(document).height()
+	var sb = $(window).scrollTop()+$(window).height()
+	var lp = $(document).height() - 1000
+	var lpb = $(document).height() - 100
+	var ok = (prevSb < lp) && more
+	var okb = (prevSb < lpb) && more
+	//console.warn('---',sb,'>', lp, '=', sb > lp, '&&', ok,  'or', sb, '>', lpb, '=', sb > lpb, 'okb', okb)
+	more = more > $(document).height()
+    var closeToBottom = ((sb > lp && ok) || (sb > lpb && okb));
+    if(closeToBottom) loadData();
+	prevSb = sb
   }
 };
 
@@ -280,15 +300,13 @@ function layoutThumbs(target) {
  * set tag / user to null to clear
  * set tag / user to undefined to keep current filters.
  */
-function loadData(tag, user, reload, popstate) {
+function loadData(tag, user, filters, reload, popstate) {
 	//make tag urlsafe
 	if(typeof tag == "string"){tag = urlSafe(tag)}
 	//default values
 	if (reload === undefined){reload = false};
 	if (popstate === undefined){popstate = false};
 	if (user === null){user = 'all'};
-	var cTag
-	var cUser
 	//loader
     isLoading = true;
     $('#loader').show();
@@ -305,10 +323,10 @@ function loadData(tag, user, reload, popstate) {
 		var nAddress = '/'+apiPrefix+'/';
 	}
 	if (url(3) && apiPrefix) {
-		console.log('url(3) sets cTag to : '+url(3));
-		cTag = url(3);
+		console.log('url(3) sets cTags to : '+url(3));
+		cTags = url(3).split("&");
     }else{
-		cTag = null;
+		cTags = [];
 	}
 	
 	//catch undefined when not in api domain
@@ -317,115 +335,122 @@ function loadData(tag, user, reload, popstate) {
 		if (user === undefined & cUser == undefined){
 			user = 'all'
 		}
-		if (tag === undefined & cTag == undefined){
+		if (tag === undefined & cTags.length==0){
 			tag = ''
 		}
 		nAddress = '/user/'
 	}
-
-	//if new user or tag specifiled overide url and current user & tag acordingly.
+	
+	//add new tag to cTags
+	if (tag){
+		console.log('add tag to cTags: ', tag, cTags, 'type=', typeof(tag));
+		if (typeof(tag) == 'object'){
+			console.warn('tag is array')
+			for (key in tag){
+				exists = cTags.indexOf(tag[key])>-1
+				del = cTags[key].search(/^d!/) == 0
+				if (!del && !exists) cTags.push(tag[key])
+				else if (del) cTags.splice(key,1)
+			}
+		}else{
+			
+			del = tag.match(/^d!(.*)/)
+			console.warn('tag NOT array', cTags, del)
+			if (!del) cTags.push(tag)
+			else cTags.splice(cTags.indexOf(del[1]),1)
+			console.warn('tag NOT array', cTags)
+			
+		}
+		console.log('cTags: ', cTags);
+	// clear all tags on null
+	} else if (tag === null){
+		cTags = []
+		console.log('null = remove all tags from cTags: ', cTags);
+	}
+	
+	//determine if there is an active view
+	av = false
+	for (key in cTags){
+		result = getKey(cTags[key], viewNames)
+		console.warn('searching for view name for:', cTags, key, cTags[key], '=', result)
+		if (result) av = result
+	}
+	
+	//Create nAddress for user & cTags
+	var nAddressUser = ''
 	if (user) {
-		nAddress += user+'/';
+		nAddressUser = user+'/';
+		nAddress += nAddressUser;
 		console.log('if user update url to: '+nAddress);
 	}else if (cUser) {
 		user = cUser;
-		nAddress += user+'/';
+		nAddressUser = user+'/';
+		nAddress += nAddressUser;
 		console.log('else if cUser update url to: '+nAddress);
 	}
-	if (tag){//*add support for multi tags with cTags, maybe peramiter url is better??
-		nAddress += tag+'/';
-		console.log('if tag update url to: '+nAddress);
-	}else if (cTag && tag !== null){
-		tag = cTag;
-		nAddress += cTag+'/';
-		console.log('else if cTag update url to: '+nAddress);
+	var nAddressTags = ''
+	if (cTags.length > 0){
+		for (key in cTags){
+			if (key > 0) nAddressTags += '&'
+			nAddressTags += cTags[key];
+		}
+		nAddress += nAddressTags+'/';
+		console.log('update nAddress for tags: ', nAddress);
 	}
-	
-	//add active tag to tag display div
-	if (tag){
+
+	console.log('tag:', tag, 'cTags:', cTags, 'user:', user);
+
+	//add active tags to tag display div
+	if (cTags.length>0 || (user && user != 'all')){
 		$('#tags').show();
-		$('#tags .tags').html('<span class="label tag" onclick="loadData(null)">' + displaySafe(tag) + ' x</span>');
+		$('#tags .tags').html('');
+		if (user != 'all' && !av){
+			username = (aProfileO.username || authUserO.username)
+			$('#tags .tags').append('<a href="/user/all/'+nAddressTags+'"><span class="label tag user" onclick="loadData(undefined,null)">' + capFirst(username) + '\'s Pins x</span></a>');
+		}
+		if (cTags.length>0){
+			for (key in cTags){
+				$('#tags .tags').append('<span class="label tag group" onclick="loadData(\'d!'+cTags[key]+'\')">' + displaySafe(cTags[key]) + ' x</span>');
+			}
+		}
 	}else{
 		$('#tags').hide();
 	}
 
-	//if current tag has a view convert tag name to defined view
-	av = getKey(tag, vn)
-	/*debug
+	/* DEBUG
 	console.log('tag = '+tag)
-	console.log('cTag = '+cTag)
-	console.log(tag !== undefined && tag !== cTag )
+	console.log('cTags = '+cTags)
+	console.log(tag !== undefined && tag !== cTags )
 	console.log('user = '+user)
 	console.log('cUser = '+cUser)
 	console.log(user !== undefined && user !== cUser)
 	console.log('av = '+av)
-	console.log('av name = '+vn[av])
-	console.log(vn[av] !== cTag)
+	console.log('av name = '+viewNames[av])
+	console.log(viewNames[av] !== cTags)
 	 */
-	
-	
-	/* //redirect and stop script when not in apiDomain 
-	if (!apiPrefix){
-		//TODO:working but needs tags & checks
-		
-	}  */
+
+	//redirect and stop script when not in apiDomain 
 	if (!popstate  && !apiPrefix){
 		console.log('!popstate')
 		window.location = nAddress;
 		$('#pins').html('');
 		throw new Error('Redirected by loadData()');
 	}
-	console.warn('-relaod: ', reload)
+	
 	//reset page and refresh pins display
-	if (reload || tag !== undefined && tag !== cTag || user !== undefined && user !== cUser || vn[av] !== undefined && vn[av] !== cTag){
+	console.warn('-relaod: ', reload)
+	if (reload || tag !== undefined && !cTags.indexOf(tag)>-1 || user !== undefined && user !== cUser || viewNames[av] !== undefined && !(cTags.indexOf(viewNames[av])>-1)){
 		console.warn('----page reset')
 		page = 0;
 		$('#pins').html('');
 	}
-	//make api url
 	console.log('page: '+page);
-    var loadURL = pinsURL;
 	
-	//if current tag has a view setup ajax for view
-	console.log('active view set to:'+av);
-	
-	if (av == 'pop') {
-		loadURL += (page*30)+"&pop&sort=popularity"
-		//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
-		tag = null
-	}else if (av == 'favs') {
-		loadURL += (page*30)+"&favs=" + user;
-		user = null
-		tag = null
-	}else if (av == 'tags') {
-		//TODO: Rework group display so that the server returns groups with pins alredy assigned.
-		//temp increased pins to 1000 to insure all groups are made.
-		loadURL += (page*1000)
-		tag = null
-	}else if (av == 'fing') {
-		loadURL += (page*30)+"&fing=" + user;
-		user = null
-		tag = null
-	}else if (av == 'fers') {
-		loadURL += (page*30)+"&fers=" + user;
-		user = null
-		tag = null
-	}else if (av == 'cmnts') {
-		loadURL += (page*30)+"&cmnts=" + user;
-		user = null
-		tag = null
-	}else{
-		loadURL += (page*30)
-	}
-	
-	//set api perameters
-	if (user && user != 'all') loadURL += "&user=" + user;
-    if (tag && tag !== null) loadURL += "&tag=" + tag;
-	
-	//set state object
-	state.tag = tag;
+	//set state object prior to av mods for api peramiters
+	state.tag = cTags;
 	state.user = user;
-	console.log('state: ');console.log(state);
+	state.filters = filters;
+	console.log('state: ', state);
 	//updated push state for forward/back navigation
 	console.log('final url = '+nAddress);
 	console.log('curren url(path) = '+url('path'));
@@ -436,9 +461,60 @@ function loadData(tag, user, reload, popstate) {
 		console.log('new url(path) = '+url('path'));
 	}
 
+	//start loadUrl
+    var loadURL = pinsURL;
+	var qty = 30
+	
+	//if current tag has a view setup ajax perameters for view
+	console.log('active view set to:'+av);
+	if (av == 'pop') {
+		qty = 30
+		loadURL += "&pop&sort=popularity"
+		//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
+		//cTags = null
+	}else if (av == 'favs') {
+		qty = 30
+		loadURL += "&favs=" + user;
+		user = null
+		//cTags = null
+	}else if (av == 'tags') {//TODO: change to groups
+		//TODO: Rework group display so that the server returns groups with enough pins for each group alredy assigned.
+		//temp increased pins to 1000 to insure all groups are made.
+		qty = 1000
+		//cTags = null
+	}else if (av == 'fing') {
+		qty = 30
+		loadURL += "&fing=" + user;
+		user = null
+		//cTags = null
+	}else if (av == 'fers') {
+		qty = 30
+		loadURL += "&fers=" + user;
+		user = null
+		//cTags = null
+	}else if (av == 'cmnts') {
+		qty = 30
+		loadURL += "&cmnts=" + user;
+		user = null
+		//cTags = null
+	}else{
+		qty = 30
+	}
+	
+	//set quantity of pins to retrieve per page
+	loadURL += "&offset="+(page*qty)
+	
+	//set loadUrl api perameters for user and tags
+	if (user && user != 'all') loadURL += "&user=" + user;
+	if (cTags.length>0) loadURL += "&tagsF="
+	for (key in cTags){
+		if (!(cTags[key] == viewNames[av])) loadURL += cTags[key]+",";
+	}
+	console.warn('loadUrl: ', loadURL)
+	
 	//prevent api request when not in apiPrefix domain
 	if (url(1) == apiPrefix) {
-		console.log('-ajax - 2 loaddata()');
+		console.log('-ajax - 2 loaddata() complete');
 		$.ajax({//2 load data
 			url: loadURL,
 			contentType: 'application/json',
@@ -471,12 +547,12 @@ window.onpopstate = function(e) {
 	if (is_apiDomain()){
 		if (e.state && !state.initial) {
 			console.log('popstate redireccting to e.state: ', e.state);
-			loadData(e.state.tag, e.state.user, true, true);
+			loadData(e.state.tag, e.state.user, e.state.filters, true, true);
 		}
 		if (!e.state && !state.initial) {
 			console.log('popstate !e.state redireccting to undefined: ');
 			//when there is not e.state reset to user & tag to undefined (home)
-			loadData(undefined, undefined, true, true);
+			loadData(undefined, undefined, undefined, true, true);
 			//window.location.href = url('path')
 		} else {
 			console.log('--popstate setting initial: false');
@@ -490,7 +566,9 @@ window.onpopstate = function(e) {
  * insert: set to "prepend" to prepend existing HTML, "exclude" appends data to existing HTML.
  */
 function onLoadData(data, insert) {
+	console.log('---onLoadData() called----')
     applyLayout();//for static pins
+	meta = data.meta;
 	data = data.objects;
 	page++;
 	var maxImages = 10 //max images to include on tag/group pin flow cover
@@ -761,6 +839,7 @@ function onLoadData(data, insert) {
 			applyLayout();
 		}
 	}
+	docHeight = $(document).height()//set doc height for next laod
 	isLoading = false;
 	$('#loader').hide();console.log('hiding loader')
 	//Apply layout to show any static pins in template
@@ -972,8 +1051,10 @@ $('#repins').live('click', function(e){
 	//open repin form
 	$('#re-pin.modal').modal('toggle')
 });
-//Options > repin: on form submit 
-$('#re-pin-form').submit(function () { //// catch the form's submit event
+//Options > repin: on form submit
+$(document).on( 'submit', '#re-pin-form', function(e){
+	e.preventDefault();
+	console.warn('repin-submit called', e.target)
 	//ALT: this uses api to submit repin, alternitively use the ajax submit on python/js
 	data = $(this).serializeObject()
 	delete data.id
@@ -981,15 +1062,24 @@ $('#re-pin-form').submit(function () { //// catch the form's submit event
 	//replaced by toggle//ajax(this, false, pinURL, true, 'POST', onRepinSuccess, onRepinError, sData);
 	var target = $("#"+data.repin+"-pin").find("#repins")
 	togglePinStat(target[0], 'icon-plus-sign', 'POST', pinURL, null, sData, this)
+	submitProgress($(e.target))
 	return false
 });
 function repinsSuccess(result, pin){
-	console.log('---onRepinSuccess');
+	console.log('---onRepinSuccess', url(2), url(3), result);
 	//onLoadData requires data.objects
-	data = []
-	data['objects'] = [result];
-	onLoadData(data, 'prepend');
-	$('#re-pin').modal('toggle')
+	isActiveTag = false
+	console.log('---onRepinSuccess', url(2), url(3), result);
+	for (key in result.tags){
+		console.log('---for', key, result.tags, cTags);
+		if (cTags.length==0 || result.tags[key] in cTags) isActiveTag = true;
+	}
+	if (url(2) == 'all' && isActiveTag){
+		data = []
+		data['objects'] = [result];
+		onLoadData(data, 'prepend');
+	}
+	$('#re-pin').modal('toggle');
 }
 
 //Options > Comment: on click open form
@@ -1215,7 +1305,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	var state = button.attr('data-state');
 	var pin = $($(targetBtn).closest(".pin"));
 	var p = pin.data('perams')
-	console.log('P =',p)
+	console.log('load data P =',p)
 	//if url is an array break up [url,perams]
 	console.warn(url)
 	if (url && typeof(url)=='object'){
@@ -1301,20 +1391,12 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		}
 	}
 	if (typeof url == "string" && url != ""){
-		//console.log('-ajax - 3 togglepin()');
+		//make sure there is a / on the end of the url because ie will not redirect!
+		console.warn('url', url)
+		if (!url.search(/\/$/)>0) url+='/';
 		//ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data)
 		ajax(messageTarget, false, url+p, true, type, $.proxy(this.onSuccess, this), null, data)
 		
-		/* $.ajax({//3
-			url: pinsPrefix+url,
-			type: type,
-			data: data,
-			contentType: 'application/json',
-			success: $.proxy(this.onSuccess, this),
-			error: function(jqXHR, settings) {
-				console.warn('togglePinStat() - ajax error');
-			},
-		}); */
 	}else{console.warn('togglePinStat failed due to bad url')}
 }
 
@@ -1330,11 +1412,11 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 	});
 	$('#user-tags').live('click', function(event){
 		event.preventDefault();
-		loadData(vn.tags, aProfileO.id);
+		loadData(viewNames.tags, aProfileO.id);
 	});
 	$('#user-favs').live('click', function(event){
 		event.preventDefault();
-		loadData(vn.favs, aProfileO.id);
+		loadData(viewNames.favs, aProfileO.id);
 	});
 	$('#user-fing').live('click', function(event){
 		event.preventDefault();
@@ -1343,7 +1425,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		}else{
 			user = authUserO.id
 		}
-		loadData(vn.fing, user);
+		loadData(viewNames.fing, user);
 	});
 	$('#user-cmnts').live('click', function(event){
 		event.preventDefault();
@@ -1352,7 +1434,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		}else{
 			user = authUserO.id
 		}
-		loadData(vn.cmnts, user);
+		loadData(viewNames.cmnts, user);
 	});
 	$('#user-fers').live('click', function(event){
 		event.preventDefault();
@@ -1361,7 +1443,7 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
 		}else{
 			user = authUserO.id
 		}
-		loadData(vn.fers, user);
+		loadData(viewNames.fers, user);
 	});
 	$('#follow').live('click', function(event){
 		follow(this, 'followers');
@@ -1373,11 +1455,11 @@ $('#Recent-all').live('click', function(event){
 	return false
 });
 $('#Popular-all').live('click', function(event){
-	loadData(vn.pop, 'all');
+	loadData(viewNames.pop, 'all');
 	return false
 });
 $('#Category-all').live('click', function(event){
-	loadData(vn.tags, 'all');
+	loadData(viewNames.tags, 'all');
 	return false
 });
 
@@ -1694,7 +1776,7 @@ function inArray(value, array){
 };
 //check for if key exists for given value in array, return false or key
 function getKey(value, array){
-	for (key in array) {
+	for (var key in array) {
 		if (array[key] === value) {
 			return key;
 		}
@@ -1703,7 +1785,7 @@ function getKey(value, array){
 };
 //check for if value exists for given key in array, return false or value
 function getValue(key, array){
-	for (i in array) {
+	for (var i in array) {
 		if (array[key]) {
 			return array[key];
 		}

@@ -34,12 +34,62 @@ from tastypie.validation import CleanedDataFormValidation
 from django.core.files.storage import default_storage
 from tastypie.serializers import Serializer
 from django.core.urlresolvers import reverse
-
+from tastypie.exceptions import Unauthorized
 from pinry.core.templatetags.email import smartdate
 
 
 #resource path = pinry.api.api.SomeResource
 
+class DjangoAuthorizationLimits(DjangoAuthorization):
+
+    def create_list(self, object_list, bundle):
+        # Assuming their auto-assigned to ``user``.
+        return object_list
+
+    def create_detail(self, object_list, bundle):
+        # Is the requested object owned by the user?
+        user = getattr(bundle.obj, 'user', None)
+        if not user: user = getattr(bundle.obj, 'submitter', None)
+        if user and user != bundle.request.user:
+            raise Unauthorized("Sorry, not your's.")
+        else:
+            return True
+
+    def update_list(self, object_list, bundle):
+        allowed = []
+        # Since they may not all be saved, iterate over them.
+        for obj in object_list:
+            # Is the requested object owned by the user?
+            user = getattr(obj, 'user', None)
+            if not user: user = getattr(obj, 'submitter', None)
+            if user and user == bundle.request.user:
+                allowed.append(obj)
+
+        return allowed
+
+    def update_detail(self, object_list, bundle):
+        # Is the requested object owned by the user?
+        user = getattr(bundle.obj, 'user', None)
+        if not user: user = getattr(bundle.obj, 'submitter', None)
+        print user, bundle.request.user
+        if user and user != bundle.request.user:
+            raise Unauthorized("Sorry, not your's.")
+        else:
+            return True
+
+    def delete_list(self, object_list, bundle):
+        # Sorry user, no list deletes!
+        raise Unauthorized("Sorry, no list deletes.")
+    
+    def delete_detail(self, object_list, bundle):
+        # Is the requested object owned by the user?
+        user = getattr(bundle.obj, 'user', None)
+        if not user: user = getattr(bundle.obj, 'submitter', None)
+        if user and user != bundle.request.user:
+            raise Unauthorized("Sorry, not your's.")
+        else:
+            return True
+        
 class UserResource(ModelResource):
     #follows = fields.ToManyField('pinry.api.api.FavsResource', 'following', full=True)
     avatar = fields.ToManyField('pinry.api.api.AvatarResource', attribute=lambda bundle: Avatar.objects.filter(user=bundle.obj, primary=True), null=True, full=True)
@@ -53,7 +103,7 @@ class UserResource(ModelResource):
         serializer = Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
 
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
 
     def determine_format(self, request): 
         return "application/json" 
@@ -62,6 +112,7 @@ class UserResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         result =  object_list.filter(id=bundle.request.user.id)
         return result
+    
     #handle anonomus users
     def alter_list_data_to_serialize(self, request, bundle):
         try:
@@ -98,7 +149,7 @@ class AvatarResource(ModelResource):
         serializer = Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
 
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
 
     def determine_format(self, request): 
         return "application/json" 
@@ -152,7 +203,7 @@ class RepinsResource(ModelResource):
         }
         
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
         
     def build_filters(self, filters=None):
         if filters is None:
@@ -195,7 +246,7 @@ class FavsResource(ModelResource):
         }
         
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
         
     def build_filters(self, filters=None):
         if filters is None:
@@ -237,7 +288,7 @@ class FollowsResource(ModelResource):
         }
         
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
         
     def build_filters(self, filters=None):
         if filters is None:
@@ -303,7 +354,8 @@ class PinResource(ModelResource):
         }
         validation = CleanedDataFormValidation(form_class=PinForm)
         #ordering = ['popularity']
-        authorization = DjangoAuthorization()
+        #authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
     '''No longer needed since comments foreign relation started working (keeping for reference)
     def obj_get_list(self, bundle, **kwargs):
         #P '--obj_get_list--'
@@ -332,15 +384,23 @@ class PinResource(ModelResource):
         """
         distinct = request.GET.get('distinct', False) == ''
         pop = request.GET.get('pop', False) == ''
+        tagsF = request.GET.get('tagsF', False)
         
+        if tagsF:
+            print '-tags filter'
+            qs = self.get_object_list(request).filter(**applicable_filters)
+            tagsF = tagsF.rstrip(',').split(',')
+            for t in tagsF:
+                qs = qs.filter(tags__name__exact=t)
+            return qs
         if pop:
             qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
             return qs
         if distinct:
             return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
         else:
-            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True))
-    
+            return self.get_object_list(request).filter(**applicable_filters)
+
     
     def apply_sorting(self, objects, options=None):
         #P'---apply_sorting----'
@@ -380,10 +440,10 @@ class PinResource(ModelResource):
 
         if 'pop' in filters:
                 orm_filters['f_pin__folowing__isnull'] = 'true'
-
+        '''
         if 'tag' in filters:
-            orm_filters['tags__name__in'] = filters['tag'].split(',')
-        
+            orm_filters['tags__name__in'] = filters['tag'].rstrip(',')
+        '''
         if 'cmnts' in filters:
             comments = Comment.objects.filter(user__id=filters['cmnts'], content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('object_pk', flat=True)
             comments = [int(c) for c in comments]
@@ -475,7 +535,7 @@ class CmntResource(ModelResource):
         queryset = Comment.objects.all()
         resource_name = 'cmnt'
         include_resource_uri = False
-        allowed_methods = ['get', 'post', 'put', 'delete']#TODO: I should be using put for comment edits....
+        allowed_methods = ['get', 'post', 'put', 'delete']
         #fields, object_pk & content_type_id are REQUIRED for generic foreign key
         fields = ['id', 'comment', 'submit_date']
         #excludes = ["ip_address", "is_public", "is_removed", "user_email", "user_name", "user_url"]
@@ -486,7 +546,7 @@ class CmntResource(ModelResource):
             'content_type': ALL_WITH_RELATIONS,
         }
         #authentication = BasicAuthentication()
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
     '''
     def dehydrate(self, bundle):
         #dehydrate follows for only favorites
@@ -550,14 +610,14 @@ class PinTagResource(ModelResource):
         queryset = Pin.tags.all()
         resource_name = 'pintags'
         include_resource_uri = False
-        allowed_methods = ['get']#TODO: I should be using put for comment edits....
+        allowed_methods = ['get']
         fields = ['id', 'name']
 
         filtering = {
             'user': ALL_WITH_RELATIONS,
             'tags': ALL_WITH_RELATIONS,
         }
-        authorization = DjangoAuthorization()
+        authorization = DjangoAuthorizationLimits()
     
     def build_filters(self, filters=None):
         #P '---build filters---'

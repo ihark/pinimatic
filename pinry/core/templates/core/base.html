@@ -101,6 +101,10 @@
 				{% endif %}
 				{% block account-nav %}{% endblock %}
             </div>
+			<div id="tags">
+				<div class="tags-cont"><div class="tags"></div></div>
+				<div class="button touch-off"><i class="icon-filter"></i></div>
+			</div>
         </div>
 		
 		<ul id="messageList" class="messages">
@@ -134,9 +138,7 @@
 		</div>
 		
 		<div id="loader">
-			<div class="inner">
 				<img src="{{STATIC_URL}}core/img/loader.gif" alt="Loader">
-			</div>
 		</div>
         {% new_pin request %}
 		{% re_pin request %}

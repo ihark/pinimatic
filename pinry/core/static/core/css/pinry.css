@@ -307,7 +307,7 @@ margin: 0px 0px;
 		margin: 8px 10px 8px 10px !important;
 	}
 .navbar{
-	margin-bottom: 35px;
+	#margin-bottom: 35px;
 }
 .navbar-inner {
     background-image: none;
@@ -332,7 +332,7 @@ margin: 0px 0px;
 		padding-left:0px;
 		margin-left:10px;
 		/*controll height & center*/
-		padding-top: 5px;
+		padding: 5px 0 0 0;
     }
 	.brand:hover{
 		color: #398F00;
@@ -354,7 +354,7 @@ margin: 0px 0px;
 
 .messages {
     list-style-type: none;
-    top: 50px;
+    top: 60px;
     right: 10px;
     position: fixed;
     z-index: 200;
@@ -381,7 +381,15 @@ margin: 0px 0px;
 	.messages button{
         cursor: pointer;
     }
-
+#loader {
+	position: relative;
+	bottom: 200px;
+	text-align: center;
+	z-index: 1000;
+	width: 100%;
+	display:none;
+}
+/*
 #loader {
 	position: relative;
 	bottom: 50px;
@@ -389,9 +397,9 @@ margin: 0px 0px;
 	text-align: center;
 	z-index: 1000;
 	width: 100%;
-	height: 100%;
+	height: inherit;
 	display:none;
-}
+}*/
 #loader .inner{
 	text-align: center;
 	width: 100%;
@@ -411,9 +419,67 @@ margin: 0px 0px;
 	}
 	
 #tags {
-    padding-bottom: 5px;
+    position: fixed;
+	top: 30px;
+	z-index: 500;
+	width: 100%;
+	height:26px;
 	display: none;
+	overflow-x: auto;
+	
 }
+	#tags .tags .tag {
+		margin-top:5px;
+	}
+	#tags .tags:after{
+		content: "";
+		color:White;
+		position:absolute;
+		height:100%;
+		top:0;
+		left:0;
+		right:0;
+		#background: url(/static/core/img/backgrounds/pw_maze_black.png);
+		background-color: Grey;
+		opacity: 0.5;
+		filter:alpha(opacity=.5);
+		z-index: -1;
+		display:inline-block;
+	}
+	#tags .tags{
+		padding: 0px 10px 2px 36px;
+		text-align:right;
+		height: auto;
+	}
+	
+	#tags .tags-cont{
+		position: relative;
+		display: inline-block;
+		width: 100%;
+		margin-left: -100%;
+		height:auto;
+	}
+	
+	#tags .tags-cont.open{
+		margin-left: -26px;		
+	}
+
+	#tags .button{
+		vertical-align: top;
+		font-weight: bold;
+		padding: 0 6px;
+		margin-left: -5px;
+		background-color: #CCC;
+		opacity: 0.5;
+		display: inline-block;
+		line-height:26px;
+		height:26px;
+		cursor:pointer;
+	}
+	
+	#tags .button i{
+		
+	}
 
 	.tag:hover {
 		color: #398F00;
@@ -424,11 +490,11 @@ margin: 0px 0px;
 	.tag{
 		cursor: pointer;
 		display: inline-block;
-		margin: 1px 0px;
+		margin: 1px 2px;
 		padding: 2px 4px;
 		font-size: 11px;
 		font-weight: Bold;
-		line-height: 13px;
+		line-height: 12px;
 		color: #777;
 		text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.97);
 		white-space: nowrap;
@@ -479,9 +545,10 @@ margin: 0px 0px;
 }
 #content-container{
 	top: 70px;
-    position: absolute;
+    position: relative;
 	width: 100%;
-	height: 100%;
+	min-height: 300px;
+	height: inherit;
 }
 
 #pins .pin {
@@ -668,6 +735,7 @@ margin: 0px 0px;
 			/*REQUIRED FOR IE to stop click through */
 			background:#000;
 			background:rgba(0,0,0,0);
+			opacity:0;
 			filter:alpha(opacity=0);
 		}
 		
@@ -813,6 +881,7 @@ margin: 0px 0px;
 			.pin-detail .pin .pin-cmnt-form  .fields{
 				margin-left:120px;
 			}
+			
 		.pin-cmnt-form  .avatar-pill {
 			width:40px;
 		}
@@ -896,11 +965,16 @@ margin: 0px 0px;
 			line-height: 16px;
 		}
 		.pin-cmnt {
-			clear: both;
+			#clear: both;
 		}
 		.pin-detail .pin .pin-cmnt .text{
 			line-height: 17px;
 			min-height: 32px;
+		}
+		.pin-detail .pin-cmnt{
+			min-height: 35px;
+			padding: 4px 0;
+			#border-bottom: 1px solid #CCC;
 		}
 		.user-detail{
 			width:auto;
@@ -1559,6 +1633,7 @@ form h1 {
 .background-50{
 	background-color: #eee;
 	opacity:0.8;
+	filter:alpha(opacity=.8);
 	text-align: center;
 	padding: 2px 0px 4px 0px;
 	margin: 5px auto;

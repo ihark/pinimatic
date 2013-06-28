@@ -10,8 +10,10 @@ var userURL = apiURL+'auth/user/?format=json'
 var page = 0;
 var handler = null;
 var handlerT = null;
-var cTags = null;//not used yet for list of current tag filters
+var cFilters = [];//not used yet for list of current filters
+var cTags = [];//used to track current tags & filters as tags
 var cUser = null;//used to track current user
+var isFiltered = function (){return (cTags.length>0 || cUser || cFilters.length>0);}
 var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
 var apiPrefixA = ["user", "profile"];//prefix for recent-pins (defined in pins.urls recent-pins) determines when to use pins api in below funcions
@@ -36,7 +38,6 @@ var viewNames = { //viewname:"displayname"
 	cmnts:"Comments",
 	pop:"Popular"
 }
-
 //test button on base template for superusers only
 $(document).on( 'click', '#test', function(e){
 	e.preventDefault();
@@ -75,15 +76,27 @@ function submitProgress(target){
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
-//set up screen size
 var ios
+//prevent webapp mode from opening links in new window.
+if( /iPhone|iPod|iPad/i.test(navigator.userAgent) ) {
+	ios = true
+	var a=document.getElementsByTagName("a");
+	for(var i=0;i<a.length;i++)
+	{
+		a[i].onclick=function()
+		{
+			window.location=this.getAttribute("href");
+			return false
+		}
+	}
+}
+//set up screen size
 if( /iPhone|iPod/i.test(navigator.userAgent) ) {
 	$('head').append('<meta name = "viewport" content = "initial-scale = .6">');
-	ios = true
 }
+//set up screen size
 if( /iPad/i.test(navigator.userAgent) ) {
 	$('head').append('<meta name = "viewport" content = "initial-scale = 1.0">');
-	ios = true
 }
 var ie10
 if (navigator.msMaxTouchPoints>0){ie10 = true}
@@ -103,7 +116,7 @@ function setUpTouch(s) {
 	}
 	console.warn('touchOn: ',touchOn)
 };
-//handle touch/mouse devices
+//handle touch/mouse devices detect mouse so that touch is toggled off
 var lastTouch = 0
 var lastMouse = 0
 function realMouseDown(){
@@ -118,7 +131,7 @@ function realMouseDown(){
 }
 if (!ios){
 	$("body").bind("MSPointerDown touchstart mousedown", function (event) {
-		console.log(event.type)
+		//console.log(event.type)
 		if (event.type=="touchstart"){
 			lastTouch = event.timeStamp
 			if (!touchOn) setUpTouch(true);
@@ -228,8 +241,8 @@ function onScroll(event) {
 	var sb = $(window).scrollTop()+$(window).height()
 	var lp = $(document).height() - 1000
 	var lpb = $(document).height() - 100
-	var ok = (prevSb < lp) && more
-	var okb = (prevSb < lpb) && more
+	var ok = (prevSb <= lp) && more
+	var okb = (prevSb <= lpb) && more
 	//console.warn('---',sb,'>', lp, '=', sb > lp, '&&', ok,  'or', sb, '>', lpb, '=', sb > lpb, 'okb', okb)
 	more = more > $(document).height()
     var closeToBottom = ((sb > lp && ok) || (sb > lpb && okb));
@@ -256,6 +269,7 @@ function applyLayout() {
 	  //show hidden static pins in tempate
 	  $('.load.hide').show();
   });
+  $('#content-container').height('inherit');
 };
 //use to apply layout to each pin as loaded
 function applyLayout1(pinId) {
@@ -277,6 +291,7 @@ function applyLayout1(pinId) {
 	  //show last pin to load
 	  $("#"+pinId+'-pin').show()
   });
+  $('#content-container').height('inherit');
 };
 //apply layout to pin grid for tag/group covers
 function layoutThumbs(target) {
@@ -353,12 +368,14 @@ function loadData(tag, user, filters, reload, popstate) {
 				else if (del) cTags.splice(key,1)
 			}
 		}else{
-			
-			del = tag.match(/^d!(.*)/)
-			console.warn('tag NOT array', cTags, del)
-			if (!del) cTags.push(tag)
-			else cTags.splice(cTags.indexOf(del[1]),1)
-			console.warn('tag NOT array', cTags)
+			exists = cTags.indexOf(tag)>-1
+			if (!exists) {
+				del = tag.match(/^d!(.*)/)
+				console.warn('tag NOT array', cTags, del)
+				if (!del) cTags.push(tag)
+				else if (del) cTags.splice(cTags.indexOf(del[1]),1)
+				console.warn('tag NOT array', cTags)
+			}else{ tag = undefined }
 			
 		}
 		console.log('cTags: ', cTags);
@@ -401,6 +418,7 @@ function loadData(tag, user, filters, reload, popstate) {
 	console.log('tag:', tag, 'cTags:', cTags, 'user:', user);
 
 	//add active tags to tag display div
+	
 	if (cTags.length>0 || (user && user != 'all')){
 		$('#tags').show();
 		$('#tags .tags').html('');
@@ -413,10 +431,10 @@ function loadData(tag, user, filters, reload, popstate) {
 				$('#tags .tags').append('<span class="label tag group" onclick="loadData(\'d!'+cTags[key]+'\')">' + displaySafe(cTags[key]) + ' x</span>');
 			}
 		}
+		openTags(eok=false)
 	}else{
-		$('#tags').hide();
+		closeTags()
 	}
-
 	/* DEBUG
 	console.log('tag = '+tag)
 	console.log('cTags = '+cTags)
@@ -443,6 +461,7 @@ function loadData(tag, user, filters, reload, popstate) {
 		console.warn('----page reset')
 		page = 0;
 		$('#pins').html('');
+		$('#content-container').height('0');//for loader position
 	}
 	console.log('page: '+page);
 	
@@ -726,12 +745,10 @@ function onLoadData(data, insert) {
 			//TAGS
 				html += '<div class="pin-tags section">';
 				if (image.tags) {
-					html += '<l>';
 					/* html += '<span>Groups: </span>' */
 					for (tag in image.tags) {
 						html += '<span class="tag" onclick="loadData(\'' + image.tags[tag] + '\')">' + image.tags[tag] + '</span> ';
 					}
-					html += '</l>';
 				}
 				html += '</div>';
 			//COMMENTS
@@ -880,70 +897,6 @@ $(document).on( 'MSPointerUp tosuchend', 'label[title]', function(e){
 	alert(e.target.title)
 });
 
-//DOCUMENT READY SETUP
-$(document).ready(new function() {
-	//TODO TEST: chanded $(document) to $(window) for ios compat
-    //TODO TRY: does this need to be in doc ready? 
-	$(window).bind('scroll', onScroll);
-	//TODO: TOUCH: is this necessary?
-	//$(window).bind('touchstart', onScroll);
-	//$(window).bind('touchend', onScroll);
-	//$(window).bind('touchcancel', onScroll);
-	
-	var _super = $.ajaxSettings.xhr;
-	$.ajaxSetup({
-		// Required for reading Location header of ajax POST responses in firefox.
-		xhr: function () {
-			console.log('-------------xhr setup xhr--');
-			var xhr = _super();
-			var getAllResponseHeaders = xhr.getAllResponseHeaders;
-			xhr.getAllResponseHeaders = function () {
-				var allHeaders = getAllResponseHeaders.call(xhr);
-				if (allHeaders) {
-					return allHeaders;
-				}
-				allHeaders = "";
-				$(["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma", "Location"]).each(function (i, header_name) {
-					if (xhr.getResponseHeader(header_name)) {
-						allHeaders += header_name + ": " + xhr.getResponseHeader(header_name) + "\n";
-					}
-				});
-				return allHeaders;
-			};
-			return xhr;
-		},
-		headers: { "cache-control": "no-cache" },//to prevent ios safari from caching.
-		//TODO: temp added for X-CSRFToken header
-		beforeSend: function(xhr, settings) {
-			console.log('-------------before send--');
-			function getCookie(name) {
-				var cookieValue = null;
-				if (document.cookie && document.cookie != '') {
-					var cookies = document.cookie.split(';');
-					for (var i = 0; i < cookies.length; i++) {
-						var cookie = jQuery.trim(cookies[i]);
-						// Does this cookie string begin with the name we want?
-					if (cookie.substring(0, name.length + 1) == (name + '=')) {
-						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-						break;
-					}
-				}
-			}
-			return cookieValue;
-			}
-			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-				// Only send the token to relative URLs i.e. locally.
-				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-			}
-		} 
-	});
-
-	//load initial pin data if in api prfix domain
-	if (is_apiDomain()){
-		loadData();
-	}
-});
-
 /**On clicking an image show fancybox original.
  * 
  */
@@ -966,7 +919,7 @@ $('.pin #large-image').live('click', function(e){
  * 
  */
  
-/* no longer needed //TOUCH: pin options button for touch devices
+/* no longer needed, using overlay button//TOUCH: pin options button for touch devices
 $(document).on('touchstart', '.pin-options-btn', function(e){
 	 e.preventDefault();
 	target = $(e.target).closest('.pin').find('.pin-options');
@@ -976,11 +929,73 @@ $(document).on('touchstart', '.pin-options-btn', function(e){
 //TOUCH: pin image overlay button for touch devices
 $(document).on('click', '.pin.item .image.touch-on', function(e){
 	//do not preventDefault() or inner option hrefs will not work.
-	//e.preventDefault();
-	//e.stopPropagation()
 	target = $(e.target).closest('.pin').find('.pin-options');
 	toggleTouchHover(target, true)
 });
+
+//TAGS BAR:
+console.warn('+++++++++handler')
+var tagsTarg = $('#tags')
+var tagsBtn = $('#tags .button')
+var tagsBtnIcon = $('#tags .button i');
+var tagsCont = $('#tags .tags-cont')
+$(document).on('click', '#tags .button', function(e){
+	console.warn('+++++++++tags click handler')
+	e.preventDefault();
+	e.stopPropagation();
+	toggleTags(e.timeStamp);
+});
+//drag open: incomplete
+$(document).on('touchmove', '#tags .button.touch-on', function(e) {
+	e.preventDefault();
+	e.stopPropagation();
+    //console.log('touchmove tags', e)
+	cont = $(e.target).find('tag-cont')
+	//console.log(e.originalEvent.touches[0].pageX, e.originalEvent.changedTouches)
+	//var touch = event.touches[0];
+    //console.log("Touch x:" + touch.pageX + ", y:" + touch.pageY);
+	
+});
+function toggleTags(ts){
+	tagsBtnIcon.removeClass()
+	console.warn('+++++++++toggletags', isFiltered)
+	if (!tagsCont.hasClass('open') && isFiltered){
+		tagsTarg.show();
+		console.warn('+++++++++tags click handler !open')
+		tagsBtnIcon.addClass('icon-lock')
+		tagsCont.addClass('open');
+
+		tagsTarg.data('autoclose',ts)
+		window.setTimeout(function(){
+			if (tagsTarg.data('autoclose')==ts){
+				tagsCont.toggleClass('open');
+				tagsTarg.data('autoclose',false);
+				tagsBtnIcon.addClass('icon-filter');
+			}
+		}, 10000 );
+	}else if (tagsTarg.data('autoclose')){
+		tagsTarg.data('autoclose',false)
+		tagsBtnIcon.addClass('icon-arrow-left')
+	}else if (!tagsTarg.data('autoclose')){
+		tagsCont.toggleClass('open');
+		tagsBtnIcon.addClass('icon-filter')
+	}
+	if (!isFiltered)tagsTarg.hide();
+}
+function closeTags(){
+		tagsCont.removeClass('open')
+		tagsBtnIcon.addClass('icon-filter')
+		tagsTarg.data('autoclose',false)
+		if (cTags.length==0)tagsTarg.hide();
+	}
+function openTags(eok){
+	console.warn('+++++++++opentags', eok)
+	if (eok) tagsTarg.show();
+	closeTags()
+	tagsBtn.click()
+}
+
+
 /*Pinstats > dropdown-toggle: for all pin stats that are set up
 * dropdown-toggle needs the following data attributes to funtion
 * -data-toggle="open/closed"
@@ -1729,6 +1744,8 @@ function toggleTouchHover(target, self){
 		aTouchHover = target;
 	}
 }
+
+/* replced with above
 function toggleHover(target, self){
 	if(self===undefined){self = true}
 	if(!aTouchHover){
@@ -1741,7 +1758,7 @@ function toggleHover(target, self){
 		aTouchHover.removeClass('touch-hover')
 		aTouchHover = target;
 	}
-}
+} */
 //returns avatar pill as html string
 function avatar(user, size, line2){
 	var html = ""
@@ -1898,3 +1915,67 @@ $.fn.serializeObject = function () {
 };
 })(jQuery);
 
+//DOCUMENT READY SETUP
+$(document).ready(new function() {
+	//TODO TEST: chanded $(document) to $(window) for ios compat
+    //TODO TRY: does this need to be in doc ready? 
+	$(window).bind('scroll', onScroll);
+	//TODO: TOUCH: is this necessary?
+	//$(window).bind('touchstart', onScroll);
+	//$(window).bind('touchend', onScroll);
+	//$(window).bind('touchcancel', onScroll);
+	$(window).bind('touchmove', onScroll);
+	
+	var _super = $.ajaxSettings.xhr;
+	$.ajaxSetup({
+		// Required for reading Location header of ajax POST responses in firefox.
+		xhr: function () {
+			console.log('-------------xhr setup xhr--');
+			var xhr = _super();
+			var getAllResponseHeaders = xhr.getAllResponseHeaders;
+			xhr.getAllResponseHeaders = function () {
+				var allHeaders = getAllResponseHeaders.call(xhr);
+				if (allHeaders) {
+					return allHeaders;
+				}
+				allHeaders = "";
+				$(["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma", "Location"]).each(function (i, header_name) {
+					if (xhr.getResponseHeader(header_name)) {
+						allHeaders += header_name + ": " + xhr.getResponseHeader(header_name) + "\n";
+					}
+				});
+				return allHeaders;
+			};
+			return xhr;
+		},
+		headers: { "cache-control": "no-cache" },//to prevent ios safari from caching.
+		//TODO: temp added for X-CSRFToken header
+		beforeSend: function(xhr, settings) {
+			console.log('-------------before send--');
+			function getCookie(name) {
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) == (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+			}
+			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+				// Only send the token to relative URLs i.e. locally.
+				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+			}
+		} 
+	});
+
+	//load initial pin data if in api prfix domain
+	if (is_apiDomain()){
+		loadData();
+	}
+});

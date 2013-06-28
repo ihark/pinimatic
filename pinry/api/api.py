@@ -387,17 +387,16 @@ class PinResource(ModelResource):
         tagsF = request.GET.get('tagsF', False)
         
         if tagsF:
-            print '-tags filter'
             qs = self.get_object_list(request).filter(**applicable_filters)
             tagsF = tagsF.rstrip(',').split(',')
             for t in tagsF:
                 qs = qs.filter(tags__name__exact=t)
             return qs
         if pop:
-            qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
+            qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
             return qs
         if distinct:
-            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True), repin_count=Count('repin__id', distinct=True)).distinct()
+            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
         else:
             return self.get_object_list(request).filter(**applicable_filters)
 
@@ -406,9 +405,10 @@ class PinResource(ModelResource):
         #P'---apply_sorting----'
         if options and "sort" in options:
             if options['sort'] == "popularity":
-                #TODO: this is wrong, need to get how many times a pin is repinned. This is counting the fact that it was repinned from another pin.
                 for p in objects:
-                    p.popularity = p.fav_count+(p.repin_count*1.25)
+                    cmnts = p.comments.count()
+                    repins = Pin.objects.filter(repin=p.id).count()
+                    p.popularity = p.fav_count+(repins*1.25)+(cmnts*.25)
 
             return sorted(objects, key=attrgetter(options['sort']), reverse=True)
  

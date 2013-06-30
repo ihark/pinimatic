@@ -19,7 +19,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 
 from django.db.models import Count, Sum, F
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
 from django.contrib import messages
 from tastypie.exceptions import ImmediateHttpResponse
@@ -36,6 +36,11 @@ from tastypie.serializers import Serializer
 from django.core.urlresolvers import reverse
 from tastypie.exceptions import Unauthorized
 from pinry.core.templatetags.email import smartdate
+
+from django.db.models import Q
+import operator
+from collections import Counter
+
 
 
 #resource path = pinry.api.api.SomeResource
@@ -324,6 +329,8 @@ class ContentTypeResource(ModelResource):
     def determine_format(self, request): 
         return "application/json" 
 
+import itertools
+import collections
 
 class PinResource(ModelResource):
 
@@ -356,20 +363,7 @@ class PinResource(ModelResource):
         #ordering = ['popularity']
         #authorization = DjangoAuthorization()
         authorization = DjangoAuthorizationLimits()
-    '''No longer needed since comments foreign relation started working (keeping for reference)
-    def obj_get_list(self, bundle, **kwargs):
-        #P '--obj_get_list--'
-        objects = super(PinResource, self).obj_get_list(bundle, **kwargs)
-        for p in objects:
-            #add comments to pin
-            cqs = Comment.objects.filter(object_pk__exact=p.id).order_by('id').values('id', 'user_id', 'comment', 'submit_date', 'is_public')
-            p.comments = cqs
-            #add user to comments
-            for c in cqs:
-                uqs = User.objects.filter(id__exact=c['user_id']).values()
-                c['user'] = uqs[0]
-        return objects
-    '''
+
     
     def apply_filters(self, request, applicable_filters):
         #P '---apply_filters----'
@@ -382,36 +376,177 @@ class PinResource(ModelResource):
         Here we override to check for a 'distinct' query string variable,
         if it's equal to True we apply distinct() to the queryset after filtering.
         """
-        distinct = request.GET.get('distinct', False) == ''
-        pop = request.GET.get('pop', False) == ''
-        tagsF = request.GET.get('tagsF', False)
+        distinct = request.GET.get('distinct', False) == ''#for general use
+        pop = request.GET.get('pop', False) == ''#for popular view
+        tagsFilter = request.GET.get('tagsF', False)#for normal tag filtering
         
-        if tagsF:
-            qs = self.get_object_list(request).filter(**applicable_filters)
-            tagsF = tagsF.rstrip(',').split(',')
-            for t in tagsF:
-                qs = qs.filter(tags__name__exact=t)
-            return qs
+        #text search
+        desc_search = request.GET.get('descSearch', False)
+        tag_search = request.GET.get('tagSearch', False)
+        cmnt_search = request.GET.get('cmntSearch', False)
+        user_search = request.GET.get('userSearch', False)
+        
+        search_and = request.GET.get('and', False) == ''
+        tag_opr = request.GET.get('tagAnd', 'or_')
+        desc_opr = request.GET.get('descAnd', 'or_')
+        cmnt_opr = request.GET.get('cmntAnd', 'or_')
+
+        if tag_opr not in ['or_','and_']: tag_opr = 'or_'
+        if desc_opr not in ['or_','and_']: desc_opr = 'or_'
+        if cmnt_opr not in ['or_','and_']: cmnt_opr = 'or_'
+        
+        #tests:
+
+        print 'tag_opr', tag_opr
+        print 'desc_opr', desc_opr
+        print 'cmnt_opr', cmnt_opr
+        print 'search_and', search_and
+        '''
+        test_search = 'light cool'
+        tag_search = test_search
+        desc_search = test_search
+        cmnt_search = test_search
+        #user_search = test_search
+        '''
+        is_search = tag_search or desc_search or cmnt_search or user_search
+        search_qsl = []
+        
+        #Base query set (must be disctnct so that i can be combined with other distict qs)
+        qs = self.get_object_list(request).filter(**applicable_filters).distinct()
+        
+        if tagsFilter:
+            tagsFilter = tagsFilter.rstrip(',').split(',')
+            for t in tagsFilter:
+                qs = base_qs.filter(tags__name__exact=t)
+        
         if pop:
-            qs = self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
-            return qs
+            qs = qs.annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
+        
         if distinct:
-            return self.get_object_list(request).filter(**applicable_filters).annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
-        else:
-            return self.get_object_list(request).filter(**applicable_filters)
+            qs =  qs.distinct()
+            
+        if tag_search:# TEXT SEARCH: for partial words sorted by number of occurances in each field
+            tag_search = tag_search.split(' ')
+            tag_qs = qs.filter(reduce(getattr(operator,tag_opr), (Q(tags__name__icontains=x) for x in tag_search))).distinct()
+            #tag_qs = tag_qs.annotate(tag_rank=Count('tags__name', distinct=True))
+            #tag_qs = tag_qs.order_by('tag_rank').reverse()
+            print 'tag_qs', tag_qs.count()
+            search_qsl.append(tag_qs)
+        if desc_search:
+            desc_search = desc_search.split(' ')
+            desc_qs = qs.filter(reduce(getattr(operator,desc_opr), (Q(description__icontains=x) for x in desc_search))).distinct()
+            search_qsl.append(desc_qs)
+        if cmnt_search:
+            cmnt_search = cmnt_search.split(' ')
+            cmntqs = Comment.objects.filter(content_type__name = 'pin', site_id=settings.SITE_ID )
+            cmntqs = cmntqs.filter(reduce(getattr(operator,cmnt_opr), (Q(comment__icontains=x) for x in cmnt_search))).distinct()
+            cmnts = list(cmntqs.values('object_pk'))
+            if len(cmnts)>0:
+                cmnt_qs = qs.filter(reduce(operator.or_, (Q(pk__exact=int(x['object_pk'])) for x in cmnts))).distinct()
+                #create dictionary of object_pk:rank
+                cmnts = {str(i['object_pk']):0 for i in cmnts}
+                search_qsl.append(cmnt_qs)
+                #populate cmnts with rank
+                for ci in cmntqs:
+                    rank = 0
+                    print '--cmnt=', ci.comment
+                    for w in cmnt_search:
+                        rank +=  ci.comment.lower().count(w.lower())
+                        print 'w rank:', rank, w.lower()
+                    cmnts[str(ci.object_pk)] += rank
+                    print 'TC rank:', rank, cmnts
+            else: 
+                cmnt_qs = []
+                cmnts = {}
+        
+        #merge all query sets
+        merged_qs = []
+        for sqs in search_qsl:
+            if len(merged_qs)>0 and search_and:
+                print 'and merge'
+                merged_qs &= sqs
+            elif len(merged_qs)>0:
+                merged_qs |= sqs
+            else:
+                merged_qs = sqs
+        
+        #filter for user
+        if user_search:
+            user_search = user_search.split(' ')
+            merged_qs = merged_qs.filter(reduce(operator.or_, (Q(submitter__username__icontains=x) for x in user_search))).distinct()
+        
+        #add ranks to merged_qs
+        for i in merged_qs:
+            rank = 0
+            print 'i--------------', i.id
+            if tag_search and i in tag_qs:
+                rank = 0
+                for w in desc_search:
+                    for t in i.tags.all():
+                        #print 't', t, t.name.lower().count(w.lower())
+                        rank +=  t.name.lower().count(w.lower())
+                i.tag_rank = rank
+            rank = 0
+            if desc_search and i in desc_qs:
+                rank = 0
+                for w in desc_search:
+                    rank +=  i.description.lower().count(w.lower())
+                i.desc_rank = rank
+            if cmnt_search and i in cmnt_qs:
+                i.cmnt_rank = cmnts[str(i.id)]
+
+        if not merged_qs and is_search:
+            messages.success(request, 'No reuts for your search.')
+
+        return merged_qs or qs
+        
 
     
     def apply_sorting(self, objects, options=None):
-        #P'---apply_sorting----'
+        #API---apply_sorting----'
+        
         if options and "sort" in options:
             if options['sort'] == "popularity":
                 for p in objects:
                     cmnts = p.comments.count()
                     repins = Pin.objects.filter(repin=p.id).count()
                     p.popularity = p.fav_count+(repins*1.25)+(cmnts*.25)
+            ordered_pop = sorted(objects, key=attrgetter(options['sort']), reverse=True)
+            return ordered_pop
+        
+        for o in objects:
+            print '----------------------------------'
+            print 'getting rang for pin#: ', o.id
+            o.search_rank = 0
+            if getattr(o, 'tag_rank', False):
+                print 'is_tag_search:', o.tag_rank
+                #tags are already sorted
+                #return objects
+                o.search_rank += o.tag_rank * 1
+                
+            if getattr(o, 'user_rank', False):
+                print 'is_user_search:', o.user_rank
+                #return objects
+                o.search_rank += o.user_rank * 1
+                
+            if getattr(o, 'desc_rank', False):
+                print 'is_desc_search:', o.desc_rank
+                #ordered_desc = sorted(objects, key=attrgetter('desc_rank'), reverse=True)
+                #return ordered_desc
+                o.search_rank += o.desc_rank * .5
+            
+            if getattr(o, 'cmnt_rank', False):
+                print 'is_cmnt_search:', o.cmnt_rank
+                #ordered_cmnt = sorted(objects, key=attrgetter('cmnt_rank'), reverse=True)
+                #return ordered_cmnt
+                o.search_rank += o.cmnt_rank * .25
 
-            return sorted(objects, key=attrgetter(options['sort']), reverse=True)
- 
+            print '=====total o.search_rank = ',o.search_rank
+
+            
+        ordered_objects = sorted(objects, key=attrgetter('search_rank'), reverse=True)
+        return ordered_objects
+
         return super(PinResource, self).apply_sorting(objects, options)
 
     def build_filters(self, filters=None):
@@ -446,12 +581,12 @@ class PinResource(ModelResource):
         '''
         if 'cmnts' in filters:
             comments = Comment.objects.filter(user__id=filters['cmnts'], content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('object_pk', flat=True)
-            comments = [int(c) for c in comments]
+            comments = [int(c) for c in comments].values_list('object_pk', flat=True)
             orm_filters['pk__in'] = comments
 
-        
-
         return orm_filters
+    
+   
     
     def dehydrate_tags(self, bundle):
         return map(str, bundle.obj.tags.all())
@@ -496,30 +631,30 @@ class PinResource(ModelResource):
         
 
     def obj_delete(self, bundle, **kwargs):
-            if not hasattr(bundle.obj, 'delete'):
-                try:
-                    bundle.obj = self.obj_get(bundle=bundle, **kwargs)
-                except ObjectDoesNotExist:
-                    raise NotFound("A model instance matching the provided arguments could not be found.")
-            if bundle.request.user == bundle.obj.submitter or bundle.request.user.is_superuser:
-                self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
-                bundle.obj.delete()
-                #delete the images
-                default_storage.delete(bundle.obj.image.name)
-                default_storage.delete(bundle.obj.thumbnail.name)
-                
-                #TODO:try += so i dont accendnetly over write the bundle data.
-                #TODO: how to add message to normal tasypie responce instead of forcing it here.  
-                #Also, why is it not getting picked up by middleware, so i can gust use django messages.
-                messages.success(bundle.request, 'Delete was successfull.')
-                mstore = messages.get_messages(bundle.request)
-                for m in mstore:                  
-                    bundle.data['django_messages'] = [{"extra_tags": m.tags, "message": m, "level": m.level}]
-                #using HttpGone in stead of HttpNoContent so success message can be displaied.
-                raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))
-            else:
-                bundle.data = {"django_messages": [{"extra_tags": "alert alert-error fade-out", "message": 'You can not delete other users pins.', "level": 25}]}
-                raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
+        if not hasattr(bundle.obj, 'delete'):
+            try:
+                bundle.obj = self.obj_get(bundle=bundle, **kwargs)
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+        if bundle.request.user == bundle.obj.submitter or bundle.request.user.is_superuser:
+            self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
+            bundle.obj.delete()
+            #delete the images
+            default_storage.delete(bundle.obj.image.name)
+            default_storage.delete(bundle.obj.thumbnail.name)
+            
+            #TODO:try += so i dont accendnetly over write the bundle data.
+            #TODO: how to add message to normal tasypie responce instead of forcing it here.  
+            #Also, why is it not getting picked up by middleware, so i can gust use django messages.
+            messages.success(bundle.request, 'Delete was successfull.')
+            mstore = messages.get_messages(bundle.request)
+            for m in mstore:                  
+                bundle.data['django_messages'] = [{"extra_tags": m.tags, "message": m, "level": m.level}]
+            #using HttpGone in stead of HttpNoContent so success message can be displaied.
+            raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpGone))
+        else:
+            bundle.data = {"django_messages": [{"extra_tags": "alert alert-error fade-out", "message": 'You can not delete other users pins.', "level": 25}]}
+            raise ImmediateHttpResponse(self.create_response(bundle.request, bundle, response_class = HttpForbidden))
         
         
 class CmntResource(ModelResource):

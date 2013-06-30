@@ -203,3 +203,5 @@ def url_exists(url):
     response = conn.getresponse()
     conn.close()
     return response.status in (200, 301, 302)
+    
+    

@@ -49,7 +49,7 @@
 				{% endif %}
 				{% if user.is_authenticated %}
 				<!-- <li><a class="button-bm" title="Drag this link to your bookmarks or favorites bar, then click it to post things to pinry." href="javascript:void((function(){ var e=document.createElement('script'); e.type='text/javascript'; e.src='{{ BASE_URL }}/bookmarklet/?srcUrl='+location.href; document.body.appendChild(e);})())">PiniFy It</a></li> -->
-				<ul class="nav pull-right">
+				<ul class="nav pull-right border">
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<div class="avatar nav">{% avatar user 20 "img" %}</div>{{ user|capfirst }}<span class="icon-notice led {{notice_unseen}}"></span>
@@ -77,20 +77,35 @@
 						</ul>
 					</li>
 				</ul>
-				<ul class="nav pull-right">
+				<ul class="nav pull-right border">
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							Get Started
 						</a>
 						<ul class="dropdown-menu">
-						<li><a href="#new-pin" data-toggle="modal">Add A New Pin</a></li>
-						<li class="divider"></li>
-						<li><a href="{% url core:help %}#install">Install Bookmarklet</a></li>
-						<li><a href="{% url core:help %}#use">Use Bookmarklet</a></li>
-						<li><a href="{% url core:help %}#group ">What are Groups?</a></li>
-						<li class="divider"></li>
-						<li><a href="{% url core:contact %}">Contact Us</a></li>
+							<li><a href="#new-pin" data-toggle="modal">Add A New Pin</a></li>
+							<li class="divider"></li>
+							<li><a href="{% url core:help %}#install">Install Bookmarklet</a></li>
+							<li><a href="{% url core:help %}#use">Use Bookmarklet</a></li>
+							<li><a href="{% url core:help %}#group ">What are Groups?</a></li>
+							<li class="divider"></li>
+							<li><a href="{% url core:contact %}">Contact Us</a></li>
 						</ul>
+					</li>
+				</ul>
+				<ul class="nav pull-right">
+					<li class="dropdown">
+						<form enctype="multipart/form-data" id="search" action="" class="navbar-search">
+							<input type="text" name="textSearch" class="search-query" placeholder="Search">
+							<a href="#" class="dropdown-toggle search-opt" data-toggle="dropdown">
+								<i class="icon-cog"></i>
+							</a>
+							<ul class="dropdown-menu dm-caret">
+								<li><input id="id_tag_opt" name="in" type="checkbox" value="tag"/>Groups</li>
+								<li><input id="id_desc_opt" name="in" type="checkbox" value="desc"/>Description</li>
+								<li><input id="id_cmnt_opt" name="in" type="checkbox" value="cmnt"/>Comments</li>
+							</ul>
+						</form>
 					</li>
 				</ul>
 				{% else %}

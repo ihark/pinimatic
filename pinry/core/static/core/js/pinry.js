@@ -13,6 +13,9 @@ var handlerT = null;
 var cFilters = [];//not used yet for list of current filters
 var cTags = [];//used to track current tags & filters as tags
 var cUser = null;//used to track current user
+var cTextSearch = [];//used to track current textSearch
+var cTextSearchOpt = [];//used to track current textSearch options
+var allTextSearch = [];;//used to track all current textSearchs terms+options
 var isFiltered = function (){return (cTags.length>0 || cUser || cFilters.length>0);}
 var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
@@ -28,7 +31,7 @@ var av=url(3);//active view
 var authUserO = ajax(this, false, userURL, false);//authenticated user object//used to determine current authenticated user
 console.warn('authUserO:',authUserO)
 var aTouchHover //tracks active pin options floater for touch devices
-var state = {tag:undefined, user:undefined, filters:undefined, initial:true}//state object passed to pushstate on each state change
+var state = {tag:undefined, user:undefined, filters:undefined, textSearch:undefined, initial:true}//state object passed to pushstate on each state change
 var viewNames = { //viewname:"displayname"
 	favs:"Favorites",
 	tags:"Groups",
@@ -315,12 +318,51 @@ function layoutThumbs(target) {
  * set tag / user to null to clear
  * set tag / user to undefined to keep current filters.
  */
-function loadData(tag, user, filters, reload, popstate) {
+function parseTextSearchString(string){
+	console.warn('--------string---',string)
+	var tsPeramA = string.split('&')
+	console.warn('--------tsPeramA---',tsPeramA)
+	var tsString = tsPeramA[0].replace('textSearch=','')
+	console.warn('--------tsString---',tsString)
+	
+	var tsTermsA = tsString.split(' ')
+	console.warn ('tsTermsA 1', tsTermsA)
+	tsTermsA = cleanArray(tsTermsA)
+	console.warn ('tsTermsA 2', tsTermsA)
+	
+	tsTermsA = tsString.split('%20')
+	
+	tsTermsA = cleanArray(tsTermsA)
+	addRemoveFilter(tsTermsA, cTextSearch)
+	/* for (st in tsTermsA){
+		cTextSearch.push(tsTermsA[st])
+	} */
+	//remove ts from array
+	tsPeramA.splice(0,1)
+	//find options & add to cTextSearchOpt
+	if (tsPeramA.length>0){
+		for (opt in tsPeramA){
+			cTextSearchOpt.push(tsPeramA[opt])
+		}
+	}
+}
+function addRemoveFilter(newArray, cArray){
+		for (key in newArray){
+			exists = cArray.indexOf(newArray[key])>-1
+			del = newArray[key].search(/^d!/) == 0
+			console.warn('del',del)
+			if (!del && !exists) cArray.push(newArray[key])
+			else if (del) cArray.splice(key,1)
+		}
+	}
+function loadData(tag, user, filters, reload, popstate, textSearch) {
 	//make tag urlsafe
-	if(typeof tag == "string"){tag = urlSafe(tag)}
+	if(typeof tag == "string"){tag = [urlSafe(tag)]}
+	console.log('tag is: ',typeof tag)
+	
 	//default values
-	if (reload === undefined){reload = false};
-	if (popstate === undefined){popstate = false};
+	reload = reload || false;
+	popstate = popstate || false;
 	if (user === null){user = 'all'};
 	//loader
     isLoading = true;
@@ -328,10 +370,9 @@ function loadData(tag, user, filters, reload, popstate) {
 	console.log('+++state: ',state)
 	//check if the window is in apiDomain
 	var apiPrefix = is_apiDomain();
-
 	console.log('----loadData(): tag:'+tag+' user: '+user+' apiPrefix: '+apiPrefix+' reload: '+reload)
 	
-	//check url for current user / tag
+	//check url for current user / tag / testSearch
 	if (url(2) && apiPrefix) {
 		console.log('url(2)sets cUser to: '+url(2));
 		cUser = url(2);
@@ -343,7 +384,23 @@ function loadData(tag, user, filters, reload, popstate) {
     }else{
 		cTags = [];
 	}
-	
+	//get any perams from url
+	urlPeramsA = url('?').split('&')
+	//textSearch : construct textSearch string from params
+	var eTextSearch = ''
+	for (i in urlPeramsA){
+		if (urlPeramsA[i].search('textSearch=')+1) eTextSearch += urlPeramsA[i]
+		if (urlPeramsA[i].search('in=')+1) eTextSearch += '&'+urlPeramsA[i]
+	} 
+	//textSearch : check for existing
+	console.warn('eTextSearch', eTextSearch)
+	if (eTextSearch && apiPrefix){
+		parseTextSearchString(eTextSearch)
+	}else{
+		cTextSearch = [];
+		cTextSearchOpt = [];
+	}
+
 	//catch undefined when not in api domain
 	if (!is_apiDomain()){
 		
@@ -351,38 +408,32 @@ function loadData(tag, user, filters, reload, popstate) {
 			user = 'all'
 		}
 		if (tag === undefined & cTags.length==0){
-			tag = ''
+			tag = []
+		}
+		if (textSearch === undefined & cTextSearch.length==0){
+			cTextSearch = []
 		}
 		nAddress = '/user/'
 	}
-	
 	//add new tag to cTags
 	if (tag){
-		console.log('add tag to cTags: ', tag, cTags, 'type=', typeof(tag));
-		if (typeof(tag) == 'object'){
-			console.warn('tag is array')
-			for (key in tag){
-				exists = cTags.indexOf(tag[key])>-1
-				del = cTags[key].search(/^d!/) == 0
-				if (!del && !exists) cTags.push(tag[key])
-				else if (del) cTags.splice(key,1)
-			}
-		}else{
-			exists = cTags.indexOf(tag)>-1
-			if (!exists) {
-				del = tag.match(/^d!(.*)/)
-				console.warn('tag NOT array', cTags, del)
-				if (!del) cTags.push(tag)
-				else if (del) cTags.splice(cTags.indexOf(del[1]),1)
-				console.warn('tag NOT array', cTags)
-			}else{ tag = undefined }
-			
-		}
-		console.log('cTags: ', cTags);
+		console.log('add tag to cTags: ', tag, cTags);
+		addRemoveFilter(tag, cTags)
 	// clear all tags on null
 	} else if (tag === null){
 		cTags = []
 		console.log('null = remove all tags from cTags: ', cTags);
+	}
+
+	//textSearch : add to cTextSearch 
+	console.log('textSearch', textSearch);
+	if (textSearch){
+		console.log('add textSearch to cTextSearch: ', textSearch, cTextSearch);
+		parseTextSearchString(textSearch)
+	}else if (textSearch === null){
+		cTextSearch = []
+		cTextSearchOpt = []
+		console.log('null = remove all testSearc terms and options: ', cTags);
 	}
 	
 	//determine if there is an active view
@@ -393,7 +444,7 @@ function loadData(tag, user, filters, reload, popstate) {
 		if (result) av = result
 	}
 	
-	//Create nAddress for user & cTags
+	//Create nAddress for user & cTags & textSearch
 	var nAddressUser = ''
 	if (user) {
 		nAddressUser = user+'/';
@@ -405,6 +456,7 @@ function loadData(tag, user, filters, reload, popstate) {
 		nAddress += nAddressUser;
 		console.log('else if cUser update url to: '+nAddress);
 	}
+	console.log('cTags: ', cTags, nAddress);
 	var nAddressTags = ''
 	if (cTags.length > 0){
 		for (key in cTags){
@@ -414,27 +466,54 @@ function loadData(tag, user, filters, reload, popstate) {
 		nAddress += nAddressTags+'/';
 		console.log('update nAddress for tags: ', nAddress);
 	}
+	console.log('cTags: ', cTags, nAddress);
+	console.log('cTextSearch: ', cTextSearch, nAddress);
+	var nAddressSearch = ''
+	if(cTextSearch.length>0){
+		nAddressSearch +='?textSearch='
+		console.warn('--------cTextSearch--4-',cTextSearch)
+		for (st in cTextSearch){
+			console.warn('---adding to cTextSearch-',cTextSearch[st])
+			nAddressSearch += cTextSearch[st]+'%20'
+		}
+		for (so in cTextSearchOpt){
+			console.warn('---adding to cTextSearchOpt-',cTextSearchOpt[so])
+			nAddressSearch += '&'+cTextSearchOpt[so]
+		}
+		nAddress += nAddressSearch
+	}
+	console.log('cTextSearch: ', cTextSearch, nAddress);
 
-	console.log('tag:', tag, 'cTags:', cTags, 'user:', user);
+	console.log('tag:', tag, 'cTags:', cTags, 'user:', user, 'textSearch:', textSearch, 'cTextSearch:',cTextSearch);
 
-	//add active tags to tag display div
-	
-	if (cTags.length>0 || (user && user != 'all')){
+	//add active tags & textSearch to tags display
+	addUser = (user && user != 'all') || false
+	addTags = cTags.length>0 || false
+	addTextSearch = cTextSearch.length>0 || false
+	if (addUser || addTags || addTextSearch){
 		$('#tags').show();
 		$('#tags .tags').html('');
-		if (user != 'all' && !av){
+		if (addUser && !av){
 			username = (aProfileO.username || authUserO.username)
-			$('#tags .tags').append('<a href="/user/all/'+nAddressTags+'"><span class="label tag user" onclick="loadData(undefined,null)">' + capFirst(username) + '\'s Pins x</span></a>');
+			$('#tags .tags').append('<a href="/user/all/'+nAddressTags+nAddressSearch+'"><span class="label tag user" onclick="loadData(undefined,null)">' + capFirst(username) + '\'s Pins x</span></a>');
 		}
-		if (cTags.length>0){
+		if (addTags){
 			for (key in cTags){
 				$('#tags .tags').append('<span class="label tag group" onclick="loadData(\'d!'+cTags[key]+'\')">' + displaySafe(cTags[key]) + ' x</span>');
+			}
+		}
+		if (addTextSearch){
+			for (key in cTextSearch){
+				$('#tags .tags').append('<span class="label tag group" onclick="loadData(undefined, undefined, undefined, undefined, undefined,\'d!'+cTextSearch[key]+'\')">' + displaySafe(cTextSearch[key]) + ' x</span>');
 			}
 		}
 		openTags(eok=false)
 	}else{
 		closeTags()
 	}
+	
+	console.log('textSearc 2: ', textSearch);
+	
 	/* DEBUG
 	console.log('tag = '+tag)
 	console.log('cTags = '+cTags)
@@ -449,35 +528,36 @@ function loadData(tag, user, filters, reload, popstate) {
 
 	//redirect and stop script when not in apiDomain 
 	if (!popstate  && !apiPrefix){
-		console.log('!popstate')
+		console.log('*****!popstate redirecting*******')
 		window.location = nAddress;
 		$('#pins').html('');
 		throw new Error('Redirected by loadData()');
 	}
-	
+	console.log('textSearc 2: ', textSearch);
 	//reset page and refresh pins display
 	console.warn('-relaod: ', reload)
-	if (reload || tag !== undefined && !cTags.indexOf(tag)>-1 || user !== undefined && user !== cUser || viewNames[av] !== undefined && !(cTags.indexOf(viewNames[av])>-1)){
+	if (textSearch!==undefined || reload || tag !== undefined && !cTags.indexOf(tag)>-1 || user !== undefined && user !== cUser || viewNames[av] !== undefined && !(cTags.indexOf(viewNames[av])>-1)){
 		console.warn('----page reset')
 		page = 0;
 		$('#pins').html('');
 		$('#content-container').height('0');//for loader position
 	}
 	console.log('page: '+page);
-	
+	console.log('textSearc 1: ', textSearch);
 	//set state object prior to av mods for api peramiters
 	state.tag = cTags;
 	state.user = user;
 	state.filters = filters;
+	state.textSearch = textSearch
 	console.log('state: ', state);
 	//updated push state for forward/back navigation
 	console.log('final url = '+nAddress);
-	console.log('curren url(path) = '+url('path'));
-	console.log('ok for push state:', nAddress != url('path'));
-	if (nAddress && nAddress != url('path')){
+	console.log('curren url(path) = '+url('path')+location.search);
+	console.log('ok for push state:', nAddress != url('path')+location.search);
+	if (nAddress && nAddress != url('path')+location.search){
 		window.history.pushState(state, 'Pinry: '+nAddress, nAddress);
-		console.log('PUSH STATE ADDED:'+nAddress);
-		console.log('new url(path) = '+url('path'));
+		console.log('PUSH STATE ADDED:', nAddress, state);
+		console.log('new url(path) = ', url('path')+location.search);
 	}
 
 	//start loadUrl
@@ -519,16 +599,20 @@ function loadData(tag, user, filters, reload, popstate) {
 	}else{
 		qty = 30
 	}
-	
 	//set quantity of pins to retrieve per page
 	loadURL += "&offset="+(page*qty)
-	
 	//set loadUrl api perameters for user and tags
 	if (user && user != 'all') loadURL += "&user=" + user;
 	if (cTags.length>0) loadURL += "&tagsF="
 	for (key in cTags){
 		if (!(cTags[key] == viewNames[av])) loadURL += cTags[key]+",";
 	}
+	if (addTextSearch){
+		loadURL += "&textSearch="
+		for (st in cTextSearch){
+			loadURL += cTextSearch[st]+' '
+		}
+	}	
 	console.warn('loadUrl: ', loadURL)
 	
 	//prevent api request when not in apiPrefix domain
@@ -566,12 +650,12 @@ window.onpopstate = function(e) {
 	if (is_apiDomain()){
 		if (e.state && !state.initial) {
 			console.log('popstate redireccting to e.state: ', e.state);
-			loadData(e.state.tag, e.state.user, e.state.filters, true, true);
+			loadData(e.state.tag, e.state.user, e.state.filters, true, true, e.state.textSearch);
 		}
 		if (!e.state && !state.initial) {
 			console.log('popstate !e.state redireccting to undefined: ');
 			//when there is not e.state reset to user & tag to undefined (home)
-			loadData(undefined, undefined, undefined, true, true);
+			loadData(undefined, undefined, undefined, true, true, undefined);
 			//window.location.href = url('path')
 		} else {
 			console.log('--popstate setting initial: false');
@@ -1004,13 +1088,13 @@ function openTags(eok){
 $(document).on( 'click', '.dropdown-toggle', function(e){
 	e.preventDefault();
 	e.stopPropagation();
-	clicked = $(e.target)
-	toggle = clicked.closest('.dropdown-toggle')
+	var clicked = $(e.target)
+	var toggle = clicked.closest('.dropdown-toggle')
 	console.log('toggle',toggle)
-	state = toggle.data('toggle')
-	pin = toggle.closest('.pin')
+	var state = toggle.data('toggle')
+	var pin = toggle.closest('.pin')
 	console.warn(pin)
-	toggle_t = toggle.data('target')
+	var toggle_t = toggle.data('target')
 	if (toggle_t !='#'){
 		target = pin.find('.'+toggle_t)
 	}
@@ -1719,6 +1803,16 @@ function cancelNewPin(){
 	$(thumbTarget).attr("src", STATIC_URL+'core/img/thumb-default.png');
 }
 
+//Search form submit
+$(document).on( 'submit', '#search', function(e){
+	e.preventDefault();
+	console.warn('search submit called', e.target, this)
+	data = $(this).serializeObject()
+	textSearch = $(this).serialize()
+	loadData(undefined, undefined, undefined, undefined, undefined, textSearch)
+	return false
+});
+
 
 /** 
  * UTILITIES
@@ -1809,6 +1903,18 @@ function getValue(key, array){
 	}
 	return false;
 };
+//clean specified value from array or all falsy values
+function cleanArray(array, value){
+	var newArray = new Array();
+	for(var i = 0; i<array.length; i++){
+		if (array[i] && !value){
+			newArray.push(array[i]);
+		}else if (array[i] === value){
+			newArray.push(array[i]);
+		}
+  }
+  return newArray;
+}
 //get host name from url and determine if it is a userupload
 function getHost(url){
 	var a = document.createElement('a');

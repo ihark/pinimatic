@@ -380,123 +380,135 @@ class PinResource(ModelResource):
         pop = request.GET.get('pop', False) == ''#for popular view
         tagsFilter = request.GET.get('tagsF', False)#for normal tag filtering
         
-        #text search
-        desc_search = request.GET.get('descSearch', False)
-        tag_search = request.GET.get('tagSearch', False)
-        cmnt_search = request.GET.get('cmntSearch', False)
-        user_search = request.GET.get('userSearch', False)
-        
-        search_and = request.GET.get('and', False) == ''
-        tag_opr = request.GET.get('tagAnd', 'or_')
-        desc_opr = request.GET.get('descAnd', 'or_')
-        cmnt_opr = request.GET.get('cmntAnd', 'or_')
-
-        if tag_opr not in ['or_','and_']: tag_opr = 'or_'
-        if desc_opr not in ['or_','and_']: desc_opr = 'or_'
-        if cmnt_opr not in ['or_','and_']: cmnt_opr = 'or_'
-        
-        #tests:
-
-        print 'tag_opr', tag_opr
-        print 'desc_opr', desc_opr
-        print 'cmnt_opr', cmnt_opr
-        print 'search_and', search_and
-        '''
-        test_search = 'light cool'
-        tag_search = test_search
-        desc_search = test_search
-        cmnt_search = test_search
-        #user_search = test_search
-        '''
-        is_search = tag_search or desc_search or cmnt_search or user_search
-        search_qsl = []
-        
         #Base query set (must be disctnct so that i can be combined with other distict qs)
         qs = self.get_object_list(request).filter(**applicable_filters).distinct()
         
         if tagsFilter:
             tagsFilter = tagsFilter.rstrip(',').split(',')
             for t in tagsFilter:
-                qs = base_qs.filter(tags__name__exact=t)
+                qs = qs.filter(tags__name__exact=t)
         
         if pop:
             qs = qs.annotate(fav_count=Count('f_pin__id', distinct=True)).distinct()
         
         if distinct:
             qs =  qs.distinct()
-            
-        if tag_search:# TEXT SEARCH: for partial words sorted by number of occurances in each field
-            tag_search = tag_search.split(' ')
-            tag_qs = qs.filter(reduce(getattr(operator,tag_opr), (Q(tags__name__icontains=x) for x in tag_search))).distinct()
-            #tag_qs = tag_qs.annotate(tag_rank=Count('tags__name', distinct=True))
-            #tag_qs = tag_qs.order_by('tag_rank').reverse()
-            print 'tag_qs', tag_qs.count()
-            search_qsl.append(tag_qs)
-        if desc_search:
-            desc_search = desc_search.split(' ')
-            desc_qs = qs.filter(reduce(getattr(operator,desc_opr), (Q(description__icontains=x) for x in desc_search))).distinct()
-            search_qsl.append(desc_qs)
-        if cmnt_search:
-            cmnt_search = cmnt_search.split(' ')
-            cmntqs = Comment.objects.filter(content_type__name = 'pin', site_id=settings.SITE_ID )
-            cmntqs = cmntqs.filter(reduce(getattr(operator,cmnt_opr), (Q(comment__icontains=x) for x in cmnt_search))).distinct()
-            cmnts = list(cmntqs.values('object_pk'))
-            if len(cmnts)>0:
-                cmnt_qs = qs.filter(reduce(operator.or_, (Q(pk__exact=int(x['object_pk'])) for x in cmnts))).distinct()
-                #create dictionary of object_pk:rank
-                cmnts = {str(i['object_pk']):0 for i in cmnts}
-                search_qsl.append(cmnt_qs)
-                #populate cmnts with rank
-                for ci in cmntqs:
-                    rank = 0
-                    print '--cmnt=', ci.comment
-                    for w in cmnt_search:
-                        rank +=  ci.comment.lower().count(w.lower())
-                        print 'w rank:', rank, w.lower()
-                    cmnts[str(ci.object_pk)] += rank
-                    print 'TC rank:', rank, cmnts
-            else: 
-                cmnt_qs = []
-                cmnts = {}
         
-        #merge all query sets
+        #text search
+        text_search = request.GET.get('textSearch', False)
         merged_qs = []
-        for sqs in search_qsl:
-            if len(merged_qs)>0 and search_and:
-                print 'and merge'
-                merged_qs &= sqs
-            elif len(merged_qs)>0:
-                merged_qs |= sqs
+        if text_search:
+            #field options
+            desc_search = request.GET.get('in', False) == 'desc'
+            tag_search = request.GET.get('in', False) == 'tag'
+            cmnt_search = request.GET.get('in', False) == 'cmnt'
+            user_search = request.GET.get('in', False) == 'user'
+            #operator options
+            search_and = request.GET.get('and', False) == ''
+            tag_opr = request.GET.get('tagAnd', 'or_')
+            desc_opr = request.GET.get('descAnd', 'or_')
+            cmnt_opr = request.GET.get('cmntAnd', 'or_')
+            #operator validation
+            if tag_opr not in ['or_','and_']: tag_opr = 'or_'
+            if desc_opr not in ['or_','and_']: desc_opr = 'or_'
+            if cmnt_opr not in ['or_','and_']: cmnt_opr = 'or_'
+            
+            #apply search string to slected search fields
+            if not (tag_search or desc_search or cmnt_search):
+                tag_search = text_search
+                desc_search = text_search
+                cmnt_search = text_search
             else:
-                merged_qs = sqs
-        
-        #filter for user
-        if user_search:
-            user_search = user_search.split(' ')
-            merged_qs = merged_qs.filter(reduce(operator.or_, (Q(submitter__username__icontains=x) for x in user_search))).distinct()
-        
-        #add ranks to merged_qs
-        for i in merged_qs:
-            rank = 0
-            print 'i--------------', i.id
-            if tag_search and i in tag_qs:
-                rank = 0
-                for w in desc_search:
-                    for t in i.tags.all():
-                        #print 't', t, t.name.lower().count(w.lower())
-                        rank +=  t.name.lower().count(w.lower())
-                i.tag_rank = rank
-            rank = 0
-            if desc_search and i in desc_qs:
-                rank = 0
-                for w in desc_search:
-                    rank +=  i.description.lower().count(w.lower())
-                i.desc_rank = rank
-            if cmnt_search and i in cmnt_qs:
-                i.cmnt_rank = cmnts[str(i.id)]
+                if tag_search: tag_search = text_search
+                if desc_search: desc_search = text_search
+                if cmnt_search: cmnt_search = text_search
+            
+            #user search is special, must be expicity chosen
+            if user_search: user_search = text_search
+                
+            #tests
+            #text_search = 'light cool'
+            print 'text_search', text_search
+            print 'tag_search', tag_search
+            print 'desc_search', desc_search
+            print 'cmnt_search', cmnt_search
+            print 'user_search', user_search
 
-        if not merged_qs and is_search:
-            messages.success(request, 'No reuts for your search.')
+            print 'tag_opr', tag_opr
+            print 'desc_opr', desc_opr
+            print 'cmnt_opr', cmnt_opr
+            print 'search_and', search_and
+
+            is_search = text_search
+            search_qsl = []
+            text_search = text_search.split(' ')
+            if tag_search:# TEXT SEARCH: for partial words sorted by number of occurances in each field
+                tag_qs = qs.filter(reduce(getattr(operator,tag_opr), (Q(tags__name__icontains=x) for x in text_search))).distinct()
+                #tag_qs = tag_qs.annotate(tag_rank=Count('tags__name', distinct=True))
+                #tag_qs = tag_qs.order_by('tag_rank').reverse()
+                print 'tag_qs', tag_qs.count()
+                search_qsl.append(tag_qs)
+            if desc_search:
+                desc_qs = qs.filter(reduce(getattr(operator,desc_opr), (Q(description__icontains=x) for x in text_search))).distinct()
+                search_qsl.append(desc_qs)
+            if cmnt_search:
+                cmntqs = Comment.objects.filter(content_type__name = 'pin', site_id=settings.SITE_ID )
+                cmntqs = cmntqs.filter(reduce(getattr(operator,cmnt_opr), (Q(comment__icontains=x) for x in text_search))).distinct()
+                cmnts = list(cmntqs.values('object_pk'))
+                if len(cmnts)>0:
+                    cmnt_qs = qs.filter(reduce(operator.or_, (Q(pk__exact=int(x['object_pk'])) for x in cmnts))).distinct()
+                    #create dictionary of object_pk:rank
+                    cmnts = {str(i['object_pk']):0 for i in cmnts}
+                    search_qsl.append(cmnt_qs)
+                    #populate cmnts with rank
+                    for ci in cmntqs:
+                        rank = 0
+                        print '--cmnt=', ci.comment
+                        for w in text_search:
+                            rank +=  ci.comment.lower().count(w.lower())
+                            print 'w rank:', rank, w.lower()
+                        cmnts[str(ci.object_pk)] += rank
+                        print 'TC rank:', rank, cmnts
+                else: 
+                    cmnt_qs = []
+                    cmnts = {}
+            
+            #merge all query sets
+            for sqs in search_qsl:
+                if len(merged_qs)>0 and search_and:
+                    print 'and merge'
+                    merged_qs &= sqs
+                elif len(merged_qs)>0:
+                    merged_qs |= sqs
+                else:
+                    merged_qs = sqs
+            
+            #filter for user
+            if user_search:
+                merged_qs = merged_qs.filter(reduce(operator.or_, (Q(submitter__username__icontains=x) for x in text_search))).distinct()
+            
+            #add ranks to merged_qs
+            for i in merged_qs:
+                rank = 0
+                print 'i--------------', i.id
+                if tag_search and i in tag_qs:
+                    rank = 0
+                    for w in text_search:
+                        for t in i.tags.all():
+                            #print 't', t, t.name.lower().count(w.lower())
+                            rank +=  t.name.lower().count(w.lower())
+                    i.tag_rank = rank
+                rank = 0
+                if desc_search and i in desc_qs:
+                    rank = 0
+                    for w in text_search:
+                        rank +=  i.description.lower().count(w.lower())
+                    i.desc_rank = rank
+                if cmnt_search and i in cmnt_qs:
+                    i.cmnt_rank = cmnts[str(i.id)]
+
+            if not merged_qs and is_search:
+                messages.success(request, 'No reuts for your search.')
 
         return merged_qs or qs
         

@@ -347,14 +347,17 @@ function parseTextSearchString(string){
 	}
 }
 function addRemoveFilter(newArray, cArray){
-		for (key in newArray){
-			exists = cArray.indexOf(newArray[key])>-1
-			del = newArray[key].search(/^d!/) == 0
-			console.warn('del',del)
-			if (!del && !exists) cArray.push(newArray[key])
-			else if (del) cArray.splice(key,1)
+	for (key in newArray){
+		exists = cArray.indexOf(newArray[key])>-1
+		if (!exists) {
+			del = newArray[key].match(/^d!(.*)/)
+			console.warn('tag NOT array', newArray, cArray, del)
+			if (!del) cArray.push(newArray[key])
+			else if (del) cArray.splice(cArray.indexOf(del[1]),1)
+			console.warn('tag NOT array', newArray, cArray)
 		}
 	}
+}
 function loadData(tag, user, filters, reload, popstate, textSearch) {
 	//make tag urlsafe
 	if(typeof tag == "string"){tag = [urlSafe(tag)]}

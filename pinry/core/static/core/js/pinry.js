@@ -474,7 +474,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	//add new tag to cTags
 	if (tag){
 		console.log('add tag to cTags: ', tag, cTags);
-		addRemoveFilter(tag, cTags)
+		cTags = addRemoveFilter(tag, cTags)
 	// clear all tags on null
 	} else if (tag === null){
 		cTags = []
@@ -583,7 +583,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 			}
 		}
 		
-	//addRemoveFilter(newTOA[0], searchHistoryA[searchHistoryA.length-1][0])
+	//check for null text search to clear
 	}else if (textSearch === null){
 		cSearchTerms = []
 		cSearchOpt = []
@@ -599,12 +599,18 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	}
 	
 	
-	//determine if there is an active view
+	//determine if there is an active view and only one
 	av = false
 	for (key in cTags){
 		result = getKey(cTags[key], viewNames)
 		console.warn('searching for view name for:', cTags, key, cTags[key], '=', result)
-		if (result) av = result
+		if (result && av){
+			cTags = addRemoveFilter(['d!'+viewNames[av], viewNames[result]], cTags); 
+			av = result;
+		}else if(result && !av){ 
+			 av = result;
+		}
+		
 	}
 	
 	//Create nAddress for user & cTags & textSearch
@@ -735,7 +741,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	console.log('cUser = '+cUser)
 	console.log(user !== undefined && user !== cUser)
 	console.log('av = '+av)
-	console.log('av name = '+viewNames[av])
+	console.log('avName = 'viewNames[av])
 	console.log(viewNames[av] !== cTags)
 	 */
 
@@ -779,6 +785,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	
 	//if current tag has a view setup ajax perameters for view
 	console.log('active view set to:'+av);
+
 	if (av == 'pop') {
 		qty = 30
 		loadURL += "&pop&sort=popularity"
@@ -786,7 +793,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		//cTags = null
 	}else if (av == 'favs') {
 		qty = 30
-		loadURL += "&favs=" + user;
+		loadURL += "&favs=" + authUserO.id;
 		user = null
 		//cTags = null
 	}else if (av == 'tags') {//TODO: change to groups
@@ -796,29 +803,32 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		//cTags = null
 	}else if (av == 'fing') {
 		qty = 30
-		loadURL += "&fing=" + user;
+		loadURL += "&fing=" + authUserO.id;
+		//var fUrl = '/user/'+authUserO.id+'/'+viewNames[av]+'/';
+		//if (url('path') != fUrl) window.location = fUrl
 		user = null
 		//cTags = null
 	}else if (av == 'fers') {
 		qty = 30
-		loadURL += "&fers=" + user;
+		loadURL += "&fers=" + authUserO.id;
 		user = null
 		//cTags = null
 	}else if (av == 'cmnts') {
 		qty = 30
-		loadURL += "&cmnts=" + user;
+		loadURL += "&cmnts=" + authUserO.id;
 		user = null
 		//cTags = null
 	}else{
 		qty = 30
 	}
+	
 	//set quantity of pins to retrieve per page
 	loadURL += "&offset="+(page*qty)
 	//set loadUrl api perameters for user and tags
 	if (user && user != 'all') loadURL += "&user=" + user;
 	if (cTags.length>0) loadURL += "&tagsF="
 	for (key in cTags){
-		if (!(cTags[key] == viewNames[av])) loadURL += cTags[key]+",";
+		if (cTags[key] != viewNames[av]) loadURL += cTags[key]+",";
 	}
 	
 	//TODO: need to make switch for progressiveSearch
@@ -2029,7 +2039,6 @@ $(document).on( 'submit', '#search', function(e){
 	data = $(this).serializeObject()
 	textSearch = $(this).serialize()
 	loadData(undefined, undefined, undefined, undefined, undefined, textSearch)
-	console.error($('#search .search-query'))
 	$('#search .search-query').val("");
 	return false
 });

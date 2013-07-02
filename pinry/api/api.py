@@ -345,7 +345,7 @@ class PinResource(ModelResource):
     popularity = fields.DecimalField(attribute='popularity', null=True)
     comments = fields.ToManyField('pinry.api.api.CmntResource', 'comments', full=True, null=True)
 
-
+    current_search = None
     class Meta:
         always_return_data = True
         queryset = Pin.objects.all()
@@ -438,10 +438,12 @@ class PinResource(ModelResource):
             print 'desc_opr', desc_opr
             print 'cmnt_opr', cmnt_opr
             print 'search_and', search_and
-
+            
+            self.current_search=text_search
+            
             is_search = text_search
             search_qsl = []
-            text_search = text_search.split(' ')
+            text_search = filter(None, text_search.split(' '))
             if tag_search:# TEXT SEARCH: for partial words sorted by number of occurances in each field
                 tag_qs = qs.filter(reduce(getattr(operator,tag_opr), (Q(tags__name__icontains=x) for x in text_search))).distinct()
                 #tag_qs = tag_qs.annotate(tag_rank=Count('tags__name', distinct=True))
@@ -508,7 +510,7 @@ class PinResource(ModelResource):
                     i.cmnt_rank = cmnts[str(i.id)]
 
             if not merged_qs and is_search:
-                messages.success(request, 'No reuts for your search.')
+                messages.error(request, 'No reuts for your search.')
 
         return merged_qs or qs
         
@@ -598,7 +600,22 @@ class PinResource(ModelResource):
 
         return orm_filters
     
-   
+    def alter_list_data_to_serialize(self, request, bundle):
+        #TODO: make an object for search data and filter
+        bundle['search'] = self.current_search
+        bundle['filter'] = 'not implimented'
+        mstore = messages.get_messages(request)
+        for m in mstore: 
+            bundle['django_messages'] = [{"extra_tags": m.tags, "message": m, "level": m.level}]
+            
+        
+        for obj in bundle['objects']:
+            #obj.data['meta']
+            pass
+
+            
+            
+        return bundle
     
     def dehydrate_tags(self, bundle):
         return map(str, bundle.obj.tags.all())

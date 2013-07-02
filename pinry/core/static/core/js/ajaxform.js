@@ -98,9 +98,13 @@ if (authUserO){tu = authUserO.id}else{tu = null};
 // }
 
 //get and process messages targetForm should be sent as $(targetForm)
-function getMessages(xhr, targetForm){
+function getMessages(xhr, targetForm, contentType){
 	console.warn('*****get messages')
-	var contentType = xhr.getResponseHeader("Content-Type");
+	if (contentType == undefined){
+		contentType = xhr.getResponseHeader("Content-Type")
+	}else{
+		xhr = {responseText:xhr}
+	}
 	console.warn(contentType)
 	if (contentType == undefined){contentType = "text"}
 	if (contentType.indexOf("application/javascript") != -1 || contentType.indexOf("application/json") != -1) {

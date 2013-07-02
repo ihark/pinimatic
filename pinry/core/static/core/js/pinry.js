@@ -13,9 +13,9 @@ var handlerT = null;
 var cFilters = [];//not used yet for list of current filters
 var cTags = [];//used to track current tags & filters as tags
 var cUser = null;//used to track current user
-var cTextSearch = [];//used to track current textSearch
-var cTextSearchOpt = [];//used to track current textSearch options
-var allTextSearch = [];;//used to track all current textSearchs terms+options
+var cSearchTerms = [];//used to track current textSearch
+var cSearchOpt = [];//used to track current textSearch options
+var searchHistoryA = [];;//used to track all current textSearchs terms+options
 var isFiltered = function (){return (cTags.length>0 || cUser || cFilters.length>0);}
 var isLoading = false;
 var pinsPrefix = ""; //url required for access to pins url's (defined in pinry.urls for include: pinry.pins.urls)
@@ -318,51 +318,79 @@ function layoutThumbs(target) {
  * set tag / user to null to clear
  * set tag / user to undefined to keep current filters.
  */
-function parseTextSearchString(string){
-	console.warn('--------string---',string)
+ 
+function parseTextSearchString(string, options){
 	var tsPeramA = string.split('&')
-	console.warn('--------tsPeramA---',tsPeramA)
+	var tsOptA = tsPeramA.slice(0)
+	tsOptA.splice(0,1)
 	var tsString = tsPeramA[0].replace('textSearch=','')
-	console.warn('--------tsString---',tsString)
-	
-	var tsTermsA = tsString.split(' ')
-	console.warn ('tsTermsA 1', tsTermsA)
+	var tsTermsA = tsString.split('+')
 	tsTermsA = cleanArray(tsTermsA)
-	console.warn ('tsTermsA 2', tsTermsA)
-	
-	tsTermsA = tsString.split('%20')
-	
+	tsTermsA = tsString.split('+')
 	tsTermsA = cleanArray(tsTermsA)
-	addRemoveFilter(tsTermsA, cTextSearch)
-	/* for (st in tsTermsA){
-		cTextSearch.push(tsTermsA[st])
-	} */
-	//remove ts from array
-	tsPeramA.splice(0,1)
-	//find options & add to cTextSearchOpt
-	if (tsPeramA.length>0){
-		for (opt in tsPeramA){
-			cTextSearchOpt.push(tsPeramA[opt])
+	//add terms to cSearchTerms
+	cSearchTerms = addRemoveFilter(tsTermsA, cSearchTerms, options)
+	//find options & add to cSearchOpt
+	if (tsOptA.length>0){
+		for (opt in tsOptA){
+			var exsit = cSearchOpt.indexOf(tsOptA[opt])+1
+			if (!exsit) cSearchOpt.push(tsOptA[opt])
+			console.warn('parseTextSearchString() cSearchOpt:', cSearchOpt)
 		}
 	}
+	console.warn('parseTextSearchString() return: tsTermsA:',tsTermsA, 'tsOptA: ', tsOptA)
+	return [tsTermsA, tsOptA]
 }
-function addRemoveFilter(newArray, cArray){
-	for (key in newArray){
-		exists = cArray.indexOf(newArray[key])>-1
-		if (!exists) {
-			del = newArray[key].match(/^d!(.*)/)
-			console.warn('tag NOT array', newArray, cArray, del)
-			if (!del) cArray.push(newArray[key])
-			else if (del) cArray.splice(cArray.indexOf(del[1]),1)
-			console.warn('tag NOT array', newArray, cArray)
-		}
+function addRemoveFilter(newFiltersA, allFiltersA, options){
+	if (options){
+		var dok = options.d==undefined ? true:false  // ok to delete
+		var aok = options.a==undefined ? true:false  // ok to add
+	}else{
+		var dok = true; var aok = true
 	}
+	//make sure we are using a copy!
+	var allFiltersA = allFiltersA.slice(0)
+	var newFiltersA = newFiltersA.slice(0)
+	console.warn('addRemoveFilter() del:', dok, 'add:', aok)
+    var results = []
+	for (key in newFiltersA){
+		exists = allFiltersA.indexOf(newFiltersA[key])>-1
+		console.warn('addRemoveFilter() newFiltersA[key]:',newFiltersA[key], 'exists:', exists, 'in allFiltersA:', allFiltersA)
+		//debug
+		for (x in searchHistoryA){
+			console.log('arf1----------------------------searchHistoryA search #: ', x);
+			for (y in searchHistoryA[x]){
+				console.log('results from add to searchHistoryA: ', searchHistoryA[x][y]);
+			}
+		}
+		console.warn('3--------------cSearchOpt: ',cSearchOpt);
+		if (!exists) {
+			del = newFiltersA[key].match(/^d!(\d*?!{0,1})(.+)/)
+			console.warn('=======================del',del)
+			if (!del && aok) allFiltersA.push(newFiltersA[key])
+			else if (del && dok) allFiltersA.splice(allFiltersA.indexOf(del[2]),1)
+			if (!del && aok) console.warn('***added:'+newFiltersA[key])
+			if (del && dok) console.warn('***emoved:'+newFiltersA[key])
+			//if (del && dok) console.warn('-removed:'+del[0])
+			console.warn('addRemoveFilter() newFiltersA:', newFiltersA, 'allFiltersA:',  allFiltersA)
+		}
+		console.warn('4--------------cSearchOpt: ',cSearchOpt);
+		//debug
+		for (x in searchHistoryA){
+			console.log('arf2----------------------------searchHistoryA search #: ', x);
+			for (y in searchHistoryA[x]){
+				console.log('searchHistoryA: ', searchHistoryA[x][y]);
+			}
+		}
+		
+	}
+	
+	return allFiltersA
 }
 function loadData(tag, user, filters, reload, popstate, textSearch) {
+
 	//make tag urlsafe
 	if(typeof tag == "string"){tag = [urlSafe(tag)]}
-	console.log('tag is: ',typeof tag)
-	
 	//default values
 	reload = reload || false;
 	popstate = popstate || false;
@@ -373,8 +401,9 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	console.log('+++state: ',state)
 	//check if the window is in apiDomain
 	var apiPrefix = is_apiDomain();
-	console.log('----loadData(): tag:'+tag+' user: '+user+' apiPrefix: '+apiPrefix+' reload: '+reload)
-	
+	console.log('---------------------------------------loadData():')
+	console.log('loadData(): tag:',tag,' user: ',user,' filters: ',filters,' reload: ',reload,' popstate: ',popstate,' textSearch: ',textSearch)
+	console.log('loadData(): in apiPrefix:',apiPrefix)
 	//check url for current user / tag / testSearch
 	if (url(2) && apiPrefix) {
 		console.log('url(2)sets cUser to: '+url(2));
@@ -387,23 +416,47 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
     }else{
 		cTags = [];
 	}
-	//get any perams from url
+	
+	//populate searchHistoryA from url
+	searcA = url('?').match(/textSearch=([^&]+?)(&|$)(in=\w+&?)*/g)
+	console.warn('+++++reset search history+++++++++match: ',searcA);
+	searchHistoryA = []
+	for (search in searcA){
+		searchHistoryA.push(parseTextSearchString(searcA[search]))
+	}
+	console.warn('searchHistoryA[0]', searchHistoryA[0])
+	if (searchHistoryA[0]){
+		cSearchTerms = searchHistoryA[searchHistoryA.length-1][0];
+		cSearchOpt = searchHistoryA[searchHistoryA.length-1][1];
+		
+	}else{
+		cSearchTerms = [];
+		cSearchOpt = [];
+	}
+	console.warn('cSearchTerms', cSearchTerms)
+	console.warn('cSearchOpt', cSearchOpt)
+	
+	//get any perams from url (not used but may be in future)
 	urlPeramsA = url('?').split('&')
+	
+	/* OLD METHOD of search history (do not delte yet)
+	eTextSearch = ''
 	//textSearch : construct textSearch string from params
-	var eTextSearch = ''
+	//var searchHistoryA = []
 	for (i in urlPeramsA){
 		if (urlPeramsA[i].search('textSearch=')+1) eTextSearch += urlPeramsA[i]
 		if (urlPeramsA[i].search('in=')+1) eTextSearch += '&'+urlPeramsA[i]
 	} 
-	//textSearch : check for existing
+	//textSearch : check for existing & add to current
 	console.warn('eTextSearch', eTextSearch)
 	if (eTextSearch && apiPrefix){
+		
 		parseTextSearchString(eTextSearch)
 	}else{
-		cTextSearch = [];
-		cTextSearchOpt = [];
-	}
-
+		cSearchTerms = [];
+		cSearchOpt = [];
+	} */
+	
 	//catch undefined when not in api domain
 	if (!is_apiDomain()){
 		
@@ -413,8 +466,8 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		if (tag === undefined & cTags.length==0){
 			tag = []
 		}
-		if (textSearch === undefined & cTextSearch.length==0){
-			cTextSearch = []
+		if (textSearch === undefined & cSearchTerms.length==0){
+			cSearchTerms = []
 		}
 		nAddress = '/user/'
 	}
@@ -427,17 +480,124 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		cTags = []
 		console.log('null = remove all tags from cTags: ', cTags);
 	}
-
-	//textSearch : add to cTextSearch 
-	console.log('textSearch', textSearch);
+	console.warn('1--------------cSearchOpt: ',cSearchOpt);
+	//debug
+	for (x in searchHistoryA){
+		console.log('0----------------------------searchHistoryA search #: ', x);
+		for (y in searchHistoryA[x]){
+			console.log('searchHistoryA: ', searchHistoryA[x][y]);
+		}
+	}
+	
+	/** PROGRESSIVE SEARCH SWITHC **
+	*
+	* a) cumulative search: all terms share one set of options
+	* b) progressive: terms are added with thier own options
+	* a = searchHistoryA.push([cSearchTerms,newOpt]);
+	* b = searchHistoryA.push([newTerms,newOpt])
+	* 
+	*/
+	progressiveSearch = false
+	/**TODO:
+	-  delete on progressive search need work. probably related to array clones
+	-  possibly get current search string back from server.
+	-  need to impliment in api: loop through many textSearch=
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	
+	
+	//textSearch : if specified add to cSearchTerms
+	console.log('textSearch:', textSearch);
+	console.log('searchHistoryA.length: ', searchHistoryA.length);
 	if (textSearch){
-		console.log('add textSearch to cTextSearch: ', textSearch, cTextSearch);
-		parseTextSearchString(textSearch)
+		//textSearch : get NEW search arrays and add/remove to current cSearchTerms & cSearchOpt
+		var newTOA = parseTextSearchString(textSearch)
+		var newTerms = newTOA[0]
+		var newOpt = newTOA[1]
+		//TESTING
+		//ScSearchOpt = newOpt
+		console.warn('1--------------cSearchOpt: ',cSearchOpt);
+
+
+		//textSearch : add only NEW search terms and options to searchHistoryA for record of each search
+		console.log('searchHistoryA.length: ', searchHistoryA.length);
+		
+		//debug
+		for (x in searchHistoryA){
+			console.log('1----------------------------searchHistoryA search #: ', x);
+			for (y in searchHistoryA[x]){
+				console.log('searchHistoryA: ', searchHistoryA[x][y]);
+			}
+		}
+		
+		//textSearch : remove any newTOA deletes from preveous searchHistoryA records
+		for (search in searchHistoryA){
+			searchHistoryA[search][0] = addRemoveFilter(newTerms, searchHistoryA[search][0], {a:false})
+			//remove search from history if no terms remain
+			console.warn('remove search from history if no terms remain searchHistoryA[search][0]:',searchHistoryA[search][0]) 
+			console.log('searchHistoryA.length: ', searchHistoryA.length);
+			if (!searchHistoryA[search][0]) searchHistoryA.splice(search,1)
+			console.log('searchHistoryA.length: ', searchHistoryA.length);
+		}
+		
+		//debug
+		for (x in searchHistoryA){
+			console.log('2----------------------------searchHistoryA search #: ', x);
+			for (y in searchHistoryA[x]){
+				console.log('searchHistoryA: ', searchHistoryA[x][y]);
+			}
+		}
+		
+		
+		//add cSearchTerms and opt to search record if terms remain
+		console.warn('cSearchTerms', cSearchTerms)
+		if (cSearchTerms[0]){
+			console.log('searchHistoryA.length: ', searchHistoryA.length);
+			//choose progressive or cumulative search
+			if (progressiveSearch)searchHistoryA.push([newTerms,newOpt]);
+			else searchHistoryA.push([cSearchTerms,newOpt]);
+
+			console.warn('adding to searchHistoryA:', cSearchTerms)
+			console.log('searchHistoryA.length: ', searchHistoryA.length);
+			for (x in searchHistoryA){
+				console.log('3----------------------------searchHistoryA search #: ', x);
+				for (y in searchHistoryA[x]){
+					console.log('results from add to searchHistoryA: ', searchHistoryA[x][y]);
+				}
+			}
+		}else{
+			console.warn('removing current from searchHistoryA[searchHistoryA.length-1]', searchHistoryA[searchHistoryA.length-1], 'cSearchTerms:', cSearchTerms, 'cSearchOpt:', cSearchOpt)
+			cSearchTerms=[];
+			cSearchOpt=[];
+			console.warn('searchHistoryA.length:',searchHistoryA.length) 
+			searchHistoryA.splice(searchHistoryA.length-1,1);
+			console.warn('searchHistoryA.length:',searchHistoryA.length) 
+			console.warn('removed current from searchHistoryA:', searchHistoryA, 'cSearchTerms:', cSearchTerms, 'cSearchOpt:', cSearchOpt)
+		}
+		
+		//debug
+		for (x in searchHistoryA){
+			console.log('4----------------------------searchHistoryA search #: ', x);
+			for (y in searchHistoryA[x]){
+				console.log('searchHistoryA: ', searchHistoryA[x][y]);
+			}
+		}
+		
+	//addRemoveFilter(newTOA[0], searchHistoryA[searchHistoryA.length-1][0])
 	}else if (textSearch === null){
-		cTextSearch = []
-		cTextSearchOpt = []
+		cSearchTerms = []
+		cSearchOpt = []
 		console.log('null = remove all testSearc terms and options: ', cTags);
 	}
+	
+	//debug
+	for (x in searchHistoryA){
+		console.log('5----------------------------searchHistoryA search #: ', x);
+		for (y in searchHistoryA[x]){
+			console.log('searchHistoryA: ', searchHistoryA[x][y]);
+		}
+	}
+	
 	
 	//determine if there is an active view
 	av = false
@@ -469,30 +629,79 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		nAddress += nAddressTags+'/';
 		console.log('update nAddress for tags: ', nAddress);
 	}
-	console.log('cTags: ', cTags, nAddress);
-	console.log('cTextSearch: ', cTextSearch, nAddress);
-	var nAddressSearch = ''
-	if(cTextSearch.length>0){
-		nAddressSearch +='?textSearch='
-		console.warn('--------cTextSearch--4-',cTextSearch)
-		for (st in cTextSearch){
-			console.warn('---adding to cTextSearch-',cTextSearch[st])
-			nAddressSearch += cTextSearch[st]+'%20'
+	console.log('cTags: ', cTags, 'nAddress: ', nAddress);
+	
+	//debug
+	for (x in searchHistoryA){
+		console.log('6----------------------------searchHistoryA search #: ', x);
+		for (y in searchHistoryA[x]){
+			console.log('results from add to searchHistoryA: ', searchHistoryA[x][y]);
 		}
-		for (so in cTextSearchOpt){
-			console.warn('---adding to cTextSearchOpt-',cTextSearchOpt[so])
-			nAddressSearch += '&'+cTextSearchOpt[so]
-		}
-		nAddress += nAddressSearch
 	}
-	console.log('cTextSearch: ', cTextSearch, nAddress);
+	
+	//update nAddress for search
+	console.warn('---adding nAddressSearch:',nAddressSearch)
+	console.warn('progressiveSearch:',progressiveSearch)
+	var nAddressSearch = ''
+	if(progressiveSearch && searchHistoryA[0] && searchHistoryA[0][0]){
+		if (searchHistoryA[0]) nAddressSearch +='?'
+		for (s in searchHistoryA){
+			//add terms
+			if(searchHistoryA[s][0][0]){
+				if (s != 0)nAddressSearch +='&'
+				nAddressSearch +='textSearch='
+				for (st in searchHistoryA[s][0]){
+					if (st != 0)nAddressSearch += '+'
+					nAddressSearch += searchHistoryA[s][0][st]
+					console.log('adding term nAddressSearch: ',s,st, nAddressSearch);
+					
+				}
+			}
+			//add if terms add options
+			if(searchHistoryA[s][1][0]){
+				for (so in searchHistoryA[s][1]){
+					nAddressSearch += '&'+searchHistoryA[s][1][so]
+					console.warn('---adding opt nAddressSearch:',s,so,nAddressSearch)
+				}
+			}
 
-	console.log('tag:', tag, 'cTags:', cTags, 'user:', user, 'textSearch:', textSearch, 'cTextSearch:',cTextSearch);
+			console.log('search#', s, '= nAddress: ', nAddress, ' nAddressSearch: ',nAddressSearch);
+		}
+	}
+	if (!progressiveSearch && cSearchTerms[0]){
+		nAddressSearch +='?textSearch='
+		for (s in cSearchTerms){
+			if(cSearchTerms[s]){
+				if (s != 0)nAddressSearch += '+'
+				nAddressSearch += cSearchTerms[s]
+				console.log('adding term nAddressSearch: ',s, nAddressSearch);
+			}
+			//add if terms add options
+		}
+		for (o in cSearchOpt){
+			nAddressSearch += '&'+cSearchOpt[o]
+			console.warn('---adding opt nAddressSearch:',o,nAddressSearch)
+		}
+	}
+	nAddress += nAddressSearch
+	
+	
+	
+	console.log('nAddressSearch: ', nAddressSearch, 'from searchHistoryA:', searchHistoryA.join());
 
+	console.log('tag:', tag, 'cTags:', cTags, 'user:', user, 'textSearch:', textSearch, 'cSearchTerms:',cSearchTerms);
+	//debug
+	for (x in searchHistoryA){
+		console.log('7----------------------------searchHistoryA search #: ', x);
+		for (y in searchHistoryA[x]){
+			console.log('searchHistoryA: ', searchHistoryA[x][y]);
+		}
+	}
 	//add active tags & textSearch to tags display
 	addUser = (user && user != 'all') || false
 	addTags = cTags.length>0 || false
-	addTextSearch = cTextSearch.length>0 || false
+	addTextSearch = cSearchTerms.length>0 || false
+	console.warn('cSearchTerms.length>0',cSearchTerms.length>0, cSearchTerms[0])
 	if (addUser || addTags || addTextSearch){
 		$('#tags').show();
 		$('#tags .tags').html('');
@@ -506,8 +715,9 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 			}
 		}
 		if (addTextSearch){
-			for (key in cTextSearch){
-				$('#tags .tags').append('<span class="label tag group" onclick="loadData(undefined, undefined, undefined, undefined, undefined,\'d!'+cTextSearch[key]+'\')">' + displaySafe(cTextSearch[key]) + ' x</span>');
+			for (key in cSearchTerms){
+				console.warn('cSearchTerms[key]',cSearchTerms[key])
+				$('#tags .tags').append('<span class="label tag group" onclick="loadData(undefined, undefined, undefined, undefined, undefined,\'d!'+cSearchTerms[key]+'\')">' + displaySafe(cSearchTerms[key]) + ' x</span>');
 			}
 		}
 		openTags(eok=false)
@@ -610,10 +820,12 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	for (key in cTags){
 		if (!(cTags[key] == viewNames[av])) loadURL += cTags[key]+",";
 	}
+	
+	//TODO: need to make switch for progressiveSearch
 	if (addTextSearch){
 		loadURL += "&textSearch="
-		for (st in cTextSearch){
-			loadURL += cTextSearch[st]+' '
+		for (st in cSearchTerms){
+			loadURL += cSearchTerms[st]+'+'
 		}
 	}	
 	console.warn('loadUrl: ', loadURL)
@@ -674,15 +886,19 @@ window.onpopstate = function(e) {
 function onLoadData(data, insert) {
 	console.log('---onLoadData() called----')
     applyLayout();//for static pins
+	messages = data.django_messages
 	meta = data.meta;
-	data = data.objects;
+	objects = data.objects;
 	page++;
+	
+	//for (m in messages
+	getMessages(JSON.stringify({django_messages:messages}), $('#messageList'), "application/javascript")
 	var maxImages = 10 //max images to include on tag/group pin flow cover
 	var minImages = 7 //min images to include on tag/group pin flow cover
 	var tags = {}
-	var i=0, length=data.length, image;
+	var i=0, length=objects.length, image;
 	for(; i<length; i++) {
-		image = data[i];
+		image = objects[i];
 		var html = '';
 		var userFav = 'False'
 		var userPin = 'False'
@@ -1813,6 +2029,8 @@ $(document).on( 'submit', '#search', function(e){
 	data = $(this).serializeObject()
 	textSearch = $(this).serialize()
 	loadData(undefined, undefined, undefined, undefined, undefined, textSearch)
+	console.error($('#search .search-query'))
+	$('#search .search-query').val("");
 	return false
 });
 

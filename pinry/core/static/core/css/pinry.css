@@ -340,7 +340,7 @@ margin: 0px 0px;
 	}
 	.navbar .nav {
 
-		padding: 0 5px;
+		#padding: 0 5px;
 
     }
 	.navbar-search,
@@ -353,9 +353,14 @@ margin: 0px 0px;
 		vertical-align: middle;
 		margin: 0;
     }
-	.navbar .nav.border{
+	.navbar .nav.border > ul,
+	.navbar .nav.border > li{
 		border-left: 1px solid #ccc;
 	}
+	.navbar .nav > li{
+		padding:0 5px;
+	}
+
 	.navbar-search li{
         color: Black;
 	}

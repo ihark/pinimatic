@@ -1,6 +1,7 @@
-//Global Variables
-//From base.html template context: STATIC_URL, MEDIA_URL, apiURL
-//From user_profile template tag: aProfileId
+/** PROGRESSIVE SEARCH SWITCH **
+*	From base.html template context: STATIC_URL, MEDIA_URL, apiURL
+*	From user_profile template tag: aProfileId
+*/
 var perams = '?avs=16'
 var pinsURL = apiURL+'pin/'+perams+'&format=json'
 var pinURL = apiURL+'pin/'
@@ -24,10 +25,11 @@ var aProfile = $('.pin.profile');
 var aProfileO = null
 aProfileO = {username:aProfile.attr('data-profile'), id:parseInt(aProfile.attr('id'))};
 //var aProfileU = aProfile.attr('data-profile');
-var pinA = [];
+var pinA = ['pins'];
 var origin = window.location.origin;
 console.log(origin);
-var av=url(3);//active view
+var ava=[];//active views array
+var multiView = true //allow more than one view/filter to be used at once ie: follwing + popular
 var authUserO = ajax(this, false, userURL, false);//authenticated user object//used to determine current authenticated user
 console.warn('authUserO:',authUserO)
 var aTouchHover //tracks active pin options floater for touch devices
@@ -41,6 +43,21 @@ var viewNames = { //viewname:"displayname"
 	cmnts:"Comments",
 	pop:"Popular"
 }
+/** PROGRESSIVE SEARCH SWITCH **
+*
+* a) cumulative search: all terms share one set of options
+* b) progressive: terms are added with thier own options
+* a = searchHistoryA.push([cSearchTerms,newOpt]);
+* b = searchHistoryA.push([newTerms,newOpt])
+* 
+*/
+var progressiveSearch = false
+/**TODO:
+-  delete on progressive search need work. probably related to array clones
+-  possibly get current search string back from server.
+-  need to impliment in api: loop through many textSearch=
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 //test button on base template for superusers only
 $(document).on( 'click', '#test', function(e){
 	e.preventDefault();
@@ -66,16 +83,7 @@ if (is_apiDomain()){
 		throw new Error('Redirecting');
 	}
 }
-//add loading img to target's submit button or target innerHTML
-function submitProgress(target){
-	var btn = target.find("button[type='submit']")
-	if (!btn.length) btn = target;
-	var img = $('<img class="load-img">');
-	img.attr('src', STATIC_URL+'core/img/loader.gif');
-	img.css('max-height', '10px');
-	img.css('width', 'auto');
-	btn.html(img)
-}
+
 //TOUCH: USER AGENT DETECTION 
 //alert('user agent: '+navigator.userAgent)
 //"/Android|webOS|iPhone|iPad|iPod|BlackBerry/i"
@@ -171,7 +179,7 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 		var statusText = xhr.statusText;
 		//precess & display ajax messages
 		var jsonMessage = getMessages(xhr, $(messageTarget))
-		alertFade()//display and fade messages
+		//alertFade()//display and fade messages
 		//if callback exicute call back
 		if (cbS){
 			cbS(data, ajaxStatus, xhr)
@@ -197,7 +205,7 @@ function ajax(messageTarget, reload, url, async, reqType, cbS, cbE, data){
 	function onApiError(xhr, settings, what) {
 		//TODO: may wnat to change tastypie form field error responce if possible to success.....
 		var jsonMessage = getMessages(xhr, $(messageTarget))
-		alertFade()//set messages to fade out
+		//alertFade()//set messages to fade out
 		if (cbE){cbE(xhr, settings, what)}else{console.warn('ajax()error: ',xhr, settings, what)};
 	}
 	console.log('-ajax - 1 custom ajax()');
@@ -356,14 +364,7 @@ function addRemoveFilter(newFiltersA, allFiltersA, options){
 	for (key in newFiltersA){
 		exists = allFiltersA.indexOf(newFiltersA[key])>-1
 		console.warn('addRemoveFilter() newFiltersA[key]:',newFiltersA[key], 'exists:', exists, 'in allFiltersA:', allFiltersA)
-		//debug
-		for (x in searchHistoryA){
-			console.log('arf1----------------------------searchHistoryA search #: ', x);
-			for (y in searchHistoryA[x]){
-				console.log('results from add to searchHistoryA: ', searchHistoryA[x][y]);
-			}
-		}
-		console.warn('3--------------cSearchOpt: ',cSearchOpt);
+		
 		if (!exists) {
 			del = newFiltersA[key].match(/^d!(\d*?!{0,1})(.+)/)
 			console.warn('=======================del',del)
@@ -374,15 +375,6 @@ function addRemoveFilter(newFiltersA, allFiltersA, options){
 			//if (del && dok) console.warn('-removed:'+del[0])
 			console.warn('addRemoveFilter() newFiltersA:', newFiltersA, 'allFiltersA:',  allFiltersA)
 		}
-		console.warn('4--------------cSearchOpt: ',cSearchOpt);
-		//debug
-		for (x in searchHistoryA){
-			console.log('arf2----------------------------searchHistoryA search #: ', x);
-			for (y in searchHistoryA[x]){
-				console.log('searchHistoryA: ', searchHistoryA[x][y]);
-			}
-		}
-		
 	}
 	
 	return allFiltersA
@@ -399,9 +391,10 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
     isLoading = true;
     $('#loader').show();
 	console.log('+++state: ',state)
+	console.log('+++state: ',state.tag)
 	//check if the window is in apiDomain
 	var apiPrefix = is_apiDomain();
-	console.log('---------------------------------------loadData():')
+	console.log('--------------------loadData()-------------------:')
 	console.log('loadData(): tag:',tag,' user: ',user,' filters: ',filters,' reload: ',reload,' popstate: ',popstate,' textSearch: ',textSearch)
 	console.log('loadData(): in apiPrefix:',apiPrefix)
 	//check url for current user / tag / testSearch
@@ -412,7 +405,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	}
 	if (url(3) && apiPrefix) {
 		console.log('url(3) sets cTags to : '+url(3));
-		cTags = url(3).split("&");
+		cTags = url(3).split('+');
     }else{
 		cTags = [];
 	}
@@ -481,29 +474,6 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		console.log('null = remove all tags from cTags: ', cTags);
 	}
 	console.warn('1--------------cSearchOpt: ',cSearchOpt);
-	//debug
-	for (x in searchHistoryA){
-		console.log('0----------------------------searchHistoryA search #: ', x);
-		for (y in searchHistoryA[x]){
-			console.log('searchHistoryA: ', searchHistoryA[x][y]);
-		}
-	}
-	
-	/** PROGRESSIVE SEARCH SWITHC **
-	*
-	* a) cumulative search: all terms share one set of options
-	* b) progressive: terms are added with thier own options
-	* a = searchHistoryA.push([cSearchTerms,newOpt]);
-	* b = searchHistoryA.push([newTerms,newOpt])
-	* 
-	*/
-	progressiveSearch = false
-	/**TODO:
-	-  delete on progressive search need work. probably related to array clones
-	-  possibly get current search string back from server.
-	-  need to impliment in api: loop through many textSearch=
-	* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	
 	
 	
 	//textSearch : if specified add to cSearchTerms
@@ -539,16 +509,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 			if (!searchHistoryA[search][0]) searchHistoryA.splice(search,1)
 			console.log('searchHistoryA.length: ', searchHistoryA.length);
 		}
-		
-		//debug
-		for (x in searchHistoryA){
-			console.log('2----------------------------searchHistoryA search #: ', x);
-			for (y in searchHistoryA[x]){
-				console.log('searchHistoryA: ', searchHistoryA[x][y]);
-			}
-		}
-		
-		
+
 		//add cSearchTerms and opt to search record if terms remain
 		console.warn('cSearchTerms', cSearchTerms)
 		if (cSearchTerms[0]){
@@ -575,43 +536,28 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 			console.warn('removed current from searchHistoryA:', searchHistoryA, 'cSearchTerms:', cSearchTerms, 'cSearchOpt:', cSearchOpt)
 		}
 		
-		//debug
-		for (x in searchHistoryA){
-			console.log('4----------------------------searchHistoryA search #: ', x);
-			for (y in searchHistoryA[x]){
-				console.log('searchHistoryA: ', searchHistoryA[x][y]);
-			}
-		}
-		
 	//check for null text search to clear
 	}else if (textSearch === null){
 		cSearchTerms = []
 		cSearchOpt = []
 		console.log('null = remove all testSearc terms and options: ', cTags);
 	}
-	
-	//debug
-	for (x in searchHistoryA){
-		console.log('5----------------------------searchHistoryA search #: ', x);
-		for (y in searchHistoryA[x]){
-			console.log('searchHistoryA: ', searchHistoryA[x][y]);
-		}
-	}
-	
-	
-	//determine if there is an active view and only one
-	av = false
+
+	//determine if there is an active view
+	ava = []
 	for (key in cTags){
 		result = getKey(cTags[key], viewNames)
 		console.warn('searching for view name for:', cTags, key, cTags[key], '=', result)
-		if (result && av){
-			cTags = addRemoveFilter(['d!'+viewNames[av], viewNames[result]], cTags); 
-			av = result;
-		}else if(result && !av){ 
-			 av = result;
+		if (result && ava[0] && !multiView){
+			cTags = addRemoveFilter(['d!'+viewNames[ava[0]], viewNames[result]], cTags); 
+			ava = [result];
+		}else if(result && !ava[0]){ 
+			ava = [result];
+		}else{
+			ava.push(result)
 		}
-		
 	}
+
 	
 	//Create nAddress for user & cTags & textSearch
 	var nAddressUser = ''
@@ -629,21 +575,12 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	var nAddressTags = ''
 	if (cTags.length > 0){
 		for (key in cTags){
-			if (key > 0) nAddressTags += '&'
+			if (key > 0) nAddressTags += '+'
 			nAddressTags += cTags[key];
 		}
 		nAddress += nAddressTags+'/';
-		console.log('update nAddress for tags: ', nAddress);
 	}
 	console.log('cTags: ', cTags, 'nAddress: ', nAddress);
-	
-	//debug
-	for (x in searchHistoryA){
-		console.log('6----------------------------searchHistoryA search #: ', x);
-		for (y in searchHistoryA[x]){
-			console.log('results from add to searchHistoryA: ', searchHistoryA[x][y]);
-		}
-	}
 	
 	//update nAddress for search
 	console.warn('---adding nAddressSearch:',nAddressSearch)
@@ -670,7 +607,6 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 					console.warn('---adding opt nAddressSearch:',s,so,nAddressSearch)
 				}
 			}
-
 			console.log('search#', s, '= nAddress: ', nAddress, ' nAddressSearch: ',nAddressSearch);
 		}
 	}
@@ -693,9 +629,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	
 	
 	
-	console.log('nAddressSearch: ', nAddressSearch, 'from searchHistoryA:', searchHistoryA.join());
-
-	console.log('tag:', tag, 'cTags:', cTags, 'user:', user, 'textSearch:', textSearch, 'cSearchTerms:',cSearchTerms);
+	console.log('nAddressSearch: ', nAddressSearch, 'from searchHistoryA:');
 	//debug
 	for (x in searchHistoryA){
 		console.log('7----------------------------searchHistoryA search #: ', x);
@@ -703,7 +637,11 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 			console.log('searchHistoryA: ', searchHistoryA[x][y]);
 		}
 	}
-	//add active tags & textSearch to tags display
+
+	console.log('tag:', tag, 'cTags:', cTags, 'user:', user, 'textSearch:', textSearch, 'cSearchTerms:',cSearchTerms);
+	
+	
+	//add active tags & textSearch to filter display
 	addUser = (user && user != 'all') || false
 	addTags = cTags.length>0 || false
 	addTextSearch = cSearchTerms.length>0 || false
@@ -711,9 +649,9 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	if (addUser || addTags || addTextSearch){
 		$('#tags').show();
 		$('#tags .tags').html('');
-		if (addUser && !av){
+		if (addUser){
 			username = (aProfileO.username || authUserO.username)
-			$('#tags .tags').append('<a href="/user/all/'+nAddressTags+nAddressSearch+'"><span class="label tag user" onclick="loadData(undefined,null)">' + capFirst(username) + '\'s Pins x</span></a>');
+			$('#tags .tags').append('<a href="/user/all/'+nAddressTags+nAddressSearch+'"><span class="label tag user" onclick="loadData(undefined,null)">' + displaySafe(capFirst(username)) + '\'s Pins x</span></a>');
 		}
 		if (addTags){
 			for (key in cTags){
@@ -723,7 +661,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		if (addTextSearch){
 			for (key in cSearchTerms){
 				console.warn('cSearchTerms[key]',cSearchTerms[key])
-				$('#tags .tags').append('<span class="label tag group" onclick="loadData(undefined, undefined, undefined, undefined, undefined,\'d!'+cSearchTerms[key]+'\')">' + displaySafe(cSearchTerms[key]) + ' x</span>');
+				$('#tags .tags').append('<span class="label tag group" onclick="loadData(undefined, undefined, undefined, undefined, undefined,\'d!'+cSearchTerms[key]+'\')">s: ' + displaySafe(cSearchTerms[key]) + ' x</span>');
 			}
 		}
 		openTags(eok=false)
@@ -752,10 +690,14 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 		$('#pins').html('');
 		throw new Error('Redirected by loadData()');
 	}
-	console.log('textSearc 2: ', textSearch);
+	
 	//reset page and refresh pins display
 	console.warn('-relaod: ', reload)
-	if (textSearch!==undefined || reload || tag !== undefined && !cTags.indexOf(tag)>-1 || user !== undefined && user !== cUser || viewNames[av] !== undefined && !(cTags.indexOf(viewNames[av])>-1)){
+	var rTS = textSearch!==undefined
+	var rTags = tag !== undefined && !cTags.indexOf(tag)>-1
+	var rUser = user !== undefined && user !== cUser
+	//var rAv = viewNames[av] !== undefined && !(cTags.indexOf(viewNames[av])>-1)
+	if ( reload || rTS || rTags || rUser){
 		console.warn('----page reset')
 		page = 0;
 		$('#pins').html('');
@@ -769,6 +711,7 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	state.filters = filters;
 	state.textSearch = textSearch
 	console.log('state: ', state);
+	console.log('state.tag: ', state.tag);
 	//updated push state for forward/back navigation
 	console.log('final url = '+nAddress);
 	console.log('curren url(path) = '+url('path')+location.search);
@@ -784,51 +727,51 @@ function loadData(tag, user, filters, reload, popstate, textSearch) {
 	var qty = 30
 	
 	//if current tag has a view setup ajax perameters for view
-	console.log('active view set to:'+av);
-
-	if (av == 'pop') {
-		qty = 30
-		loadURL += "&pop&sort=popularity"
-		//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
-		//cTags = null
-	}else if (av == 'favs') {
-		qty = 30
-		loadURL += "&favs=" + authUserO.id;
-		user = null
-		//cTags = null
-	}else if (av == 'tags') {//TODO: change to groups
-		//TODO: Rework group display so that the server returns groups with enough pins for each group alredy assigned.
-		//temp increased pins to 1000 to insure all groups are made.
-		qty = 1000
-		//cTags = null
-	}else if (av == 'fing') {
-		qty = 30
-		loadURL += "&fing=" + authUserO.id;
-		//var fUrl = '/user/'+authUserO.id+'/'+viewNames[av]+'/';
-		//if (url('path') != fUrl) window.location = fUrl
-		user = null
-		//cTags = null
-	}else if (av == 'fers') {
-		qty = 30
-		loadURL += "&fers=" + authUserO.id;
-		user = null
-		//cTags = null
-	}else if (av == 'cmnts') {
-		qty = 30
-		loadURL += "&cmnts=" + authUserO.id;
-		user = null
-		//cTags = null
-	}else{
-		qty = 30
+	console.log('active view set to:', ava);
+	for (av in ava){
+		if (ava[av] == 'pop') {
+			qty = 30
+			loadURL += "&pop&sort=popularity"
+			//loadURL =pinURL+'?favorites__isnull=false&format=json&offset='+page*30
+			//cTags = null
+		}else if (ava[av] == 'favs') {
+			qty = 30
+			loadURL += "&favs=" + authUserO.id;
+			user = null
+			//cTags = null
+		}else if (ava[av] == 'tags') {//TODO: change to groups
+			//TODO: Rework group display so that the server returns groups with enough pins for each group alredy assigned.
+			//temp increased pins to 1000 to insure all groups are made.
+			qty = 1000
+			//cTags = null
+		}else if (ava[av] == 'fing') {
+			qty = 30
+			loadURL += "&fing=" + authUserO.id;
+			//var fUrl = '/user/'+authUserO.id+'/'+viewNames[av]+'/';
+			//if (url('path') != fUrl) window.location = fUrl
+			user = null
+			//cTags = null
+		}else if (ava[av] == 'fers') {
+			qty = 30
+			loadURL += "&fers=" + authUserO.id;
+			user = null
+			//cTags = null
+		}else if (ava[av] == 'cmnts') {
+			qty = 30
+			loadURL += "&cmnts=" + authUserO.id;
+			user = null
+			//cTags = null
+		}else{
+			qty = 30
+		}
 	}
-	
 	//set quantity of pins to retrieve per page
 	loadURL += "&offset="+(page*qty)
 	//set loadUrl api perameters for user and tags
 	if (user && user != 'all') loadURL += "&user=" + user;
 	if (cTags.length>0) loadURL += "&tagsF="
 	for (key in cTags){
-		if (cTags[key] != viewNames[av]) loadURL += cTags[key]+",";
+		if (!(ava.indexOf(getKey(cTags[key], viewNames))+1)) loadURL += cTags[key]+",";
 	}
 	
 	//TODO: need to make switch for progressiveSearch
@@ -915,7 +858,7 @@ function onLoadData(data, insert) {
 		var userCmnt = 'False'
 		var repined = 'False' //TODO: used to determine if pin has been repined by authUser
 		//layout for all views except for those listed below
-		if (av != 'tags'){
+		if (!(ava.indexOf('tags')+1>0)){
 			console.log('onLoadData() av != tags')
 			
 			//package pin data for js access(req for repin)
@@ -1077,7 +1020,6 @@ function onLoadData(data, insert) {
 					}
 				html += '</div>'//end pin-cmnts;
 			html += '</div>'//end pin;
-
 			//inserts pin into docuement
 			if (insert=="prepend"){
 				$('#pins').prepend(html);
@@ -1087,12 +1029,11 @@ function onLoadData(data, insert) {
 			//
 			//hide elements as required
 			hidePinComponents(image.id)
-			
 			applyLayout1(image.id);//for each pin individual pin
 		}//end typical view
 		
 		//lay out tags/group view
-		if (av == 'tags'){
+		if (ava.indexOf('tags')+1>0){
 			console.log('-loadData-av == tags')
 			//console.log('----setting up group: '+image.tags)
 			
@@ -1143,7 +1084,7 @@ function onLoadData(data, insert) {
 		}//end tag/group view
 	}//end image for loop
 	// for each tag add place holder images as required by min/max
-	if (av == 'tags'){
+	if (ava.indexOf('tags')+1>0){
 		for (key in tags){
 			tagId = idSafe(key)
 			console.log('--key: '+key)
@@ -1247,13 +1188,11 @@ $(document).on('click', '.pin.item .image.touch-on', function(e){
 });
 
 //TAGS BAR:
-console.warn('+++++++++handler')
 var tagsTarg = $('#tags')
 var tagsBtn = $('#tags .button')
 var tagsBtnIcon = $('#tags .button i');
 var tagsCont = $('#tags .tags-cont')
 $(document).on('click', '#tags .button', function(e){
-	console.warn('+++++++++tags click handler')
 	e.preventDefault();
 	e.stopPropagation();
 	toggleTags(e.timeStamp);
@@ -1271,10 +1210,8 @@ $(document).on('touchmove', '#tags .button.touch-on', function(e) {
 });
 function toggleTags(ts){
 	tagsBtnIcon.removeClass()
-	console.warn('+++++++++toggletags', isFiltered)
 	if (!tagsCont.hasClass('open') && isFiltered){
 		tagsTarg.show();
-		console.warn('+++++++++tags click handler !open')
 		tagsBtnIcon.addClass('icon-lock')
 		tagsCont.addClass('open');
 
@@ -1302,7 +1239,6 @@ function closeTags(){
 		if (cTags.length==0)tagsTarg.hide();
 	}
 function openTags(eok){
-	console.warn('+++++++++opentags', eok)
 	if (eok) tagsTarg.show();
 	closeTags()
 	tagsBtn.click()
@@ -1553,8 +1489,8 @@ function getPinData(pin){
 //Comment: insert comment
 function insertComment(comment,pin){
 	if (pin){
-		pinData = getPinData(pin)
-		avs = pinData.avs
+		var pinData = getPinData(pin)
+		var avs = pinData.avs
 	}else{avs = undefined;}
 	if (avs > 20){ line2=comment.submit_date.l }else{line2=undefined;}
 	var username = comment.user.username
@@ -1732,46 +1668,31 @@ function togglePinStat(targetBtn, fIcon, type, url, id, data, messageTarget){
  * Profile Functions.
  */
  //only use handlers in this view
- if (av != 'pins'){
+ if (!(ava.indexOf('pins')+1>0)){
 	// add event listeners for profile buttons
 	$('#user-pins').live('click', function(event){
 		event.preventDefault();
-		loadData(null, aProfileO.id);
+		loadData(null, undefined);
 	});
 	$('#user-tags').live('click', function(event){
 		event.preventDefault();
-		loadData(viewNames.tags, aProfileO.id);
+		loadData(viewNames.tags, undefined);
 	});
 	$('#user-favs').live('click', function(event){
 		event.preventDefault();
-		loadData(viewNames.favs, aProfileO.id);
+		loadData(viewNames.favs, undefined);
 	});
 	$('#user-fing').live('click', function(event){
 		event.preventDefault();
-		if (aProfileO.id) {
-			user = aProfileO.id
-		}else{
-			user = authUserO.id
-		}
-		loadData(viewNames.fing, user);
+		loadData(viewNames.fing, undefined);
 	});
 	$('#user-cmnts').live('click', function(event){
 		event.preventDefault();
-		if (aProfileO.id) {
-			user = aProfileO.id
-		}else{
-			user = authUserO.id
-		}
-		loadData(viewNames.cmnts, user);
+		loadData(viewNames.cmnts, undefined);
 	});
 	$('#user-fers').live('click', function(event){
 		event.preventDefault();
-		if (aProfileO.id) {
-			user = aProfileO.id
-		}else{
-			user = authUserO.id
-		}
-		loadData(viewNames.fers, user);
+		loadData(viewNames.fers, undefined);
 	});
 	$('#follow').live('click', function(event){
 		follow(this, 'followers');
@@ -2044,10 +1965,18 @@ $(document).on( 'submit', '#search', function(e){
 });
 
 
-/** 
- * UTILITIES
- */
- 
+/*** UTILITIES ***/
+
+//add loading img to target's submit button or target innerHTML
+function submitProgress(target){
+	var btn = target.find("button[type='submit']")
+	if (!btn.length) btn = target;
+	var img = $('<img class="load-img">');
+	img.attr('src', STATIC_URL+'core/img/loader.gif');
+	img.css('max-height', '10px');
+	img.css('width', 'auto');
+	btn.html(img)
+}
 /* TOGGLE TOUCH HOVER ELEMENT by touching another element for touch devices
 *- target is the element you want to show on touch & hover
 *- use $(document).on('MSPointerUp touchend', '.class', function(e){get target here} 

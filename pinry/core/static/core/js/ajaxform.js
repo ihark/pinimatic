@@ -169,15 +169,11 @@ function addMessage(html_id, text, extra_tags) {
 	}else{
 		var message = $('<li class="'+extra_tags+'">'+text+'</li>').hide();
 	}
-	//<button type="button" class="close" data-dismiss="alert">×</button>
 	$( '#'+html_id ).prepend(message);
-	//message.insertAfter(id);
+	//set message to fade in
     message.fadeIn(500);
-    // setTimeout(function() {
-        // message.fadeOut(2000, function() {
-            // message.remove();
-        // });
-    // }, 10000);
+	//run alertFade to determine if message should fade out automatically
+	alertFade()
 }
 function apply_form_field_error(targetForm, fieldname, error, tags) {
 	if ($("#div_id_"+fieldname).length == 0){

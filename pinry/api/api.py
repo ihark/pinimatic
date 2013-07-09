@@ -595,7 +595,7 @@ class PinResource(ModelResource):
         '''
         if 'cmnts' in filters:
             comments = Comment.objects.filter(user__id=filters['cmnts'], content_type__name = 'pin', site_id=settings.SITE_ID ).values_list('object_pk', flat=True)
-            comments = [int(c) for c in comments].values_list('object_pk', flat=True)
+            comments = [int(c) for c in comments]
             orm_filters['pk__in'] = comments
 
         return orm_filters
@@ -613,8 +613,6 @@ class PinResource(ModelResource):
             #obj.data['meta']
             pass
 
-            
-            
         return bundle
     
     def dehydrate_tags(self, bundle):
